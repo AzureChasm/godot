@@ -14,7 +14,7 @@ Decorators can change this starting state. An underground decorator could carve 
 
 Containers structure, size, shape, and position nested regions. The original World Generator, Ocean, and Continent authoring concepts belong to this role. Containers can contain smaller containers recursively, without a fixed conceptual nesting depth.
 
-A container's boundary and enclosure describe where its content may generate. Terrain modifications belong to decorators. How the parent allocates space while respecting a child's chosen region shape remains open. Runtime termination, minimum-size handling, and allocation validation also need design.
+A container's boundary and enclosure structure generation scope. They are not automatically hard clipping boundaries: flora and structures may extend beyond their originating region, subject to placement restrictions. Terrain modifications belong to decorators. How the parent allocates space while respecting a child's chosen region shape remains open. Runtime termination, minimum-size handling, and allocation validation also need design.
 
 ## Decorators
 
@@ -47,13 +47,27 @@ Rule identity, categories, partial settings, precedence, and whether a deeper de
 
 A structure decorator can group several operations at its logical position: inspect a site, prepare terrain, remove or alter vegetation in the footprint, and place the structure. Its terrain edits need not be moved back into the initial terrain phase. This updates the earlier assistant suggestion that every foundation edit should be scheduled there.
 
-**Assistant proposal:** each operation group identifies the world data it reads, what it changes, and its affected area. Group preparation and validation should avoid leaving a cleared site with no building if placement fails; rollback or another failure mechanism is not yet selected.
+**Confirmed:** the world must be consistent after each completed decorator operation. An operation must be checked for validity before execution. Invalid placement may lead to trying another building; the fallback sequence and other alternatives are not yet specified.
 
-Later terrain edits may affect vegetation already placed, including nearby trees the structure did not explicitly target. We need a policy for revalidation, removal, adaptation, or rejection, plus updates to affected geometry and collision. Re-running whole earlier generation passes could undo intentional later changes, so any repair/revalidation mechanism needs a defined scope.
+**Assistant interpretation:** a combined placement is one logical operation whose proposed terrain, vegetation, and building changes are checked together. Any required reconciliation of affected earlier content belongs to that operation's successful result, not to a later global repair pass. Failure should leave the previously consistent world intact. Whether this uses staged changes, rollback, or another mechanism remains undecided.
+
+**Assistant proposal:** identify each operation's read data, proposed writes, and complete affected area. Later terrain edits may affect nearby vegetation beyond the building footprint; this must be included in validation and any adaptation/removal policy. Re-running whole earlier generation passes could undo intentional later changes, so repair/revalidation needs a defined scope. Exact consistency invariants, presentation/cache synchronization, failure handling, and configurable physics exceptions remain to design.
 
 Scope resolution and execution order are different concerns: an inherited forest rule can be authored on an ancestor but evaluated after descendant terrain modifiers. Local suppression can determine which inherited decorators participate before placement.
 
 The phase list, numeric priority direction, allowed reordering, dependency validation, and stable tie-breaking remain undecided. The same inputs must produce the same results regardless of actual task scheduling or exploration order. Priority changes intentionally change generation inputs.
+
+## Placement restrictions and protected features
+
+**Confirmed:** flora and structures may overreach their originating regions. Permission to overreach does not permit violating world restrictions. A house foundation must not destroy or completely block a river simply because the house was selected for that site.
+
+A watermill is a special interaction case, but must still preserve the river rather than accidentally block it. The exact flow requirement and how we validate it have not been specified; this does not commit us to a full fluid simulation.
+
+Validation must consider the proposed result, including terrain preparation and vegetation edits, rather than only whether a building's object bounds fit. It must cover affected neighboring space as well as the originating region. Relevant constraints must be available for that space; how this works across unloaded areas remains open.
+
+**User option under consideration:** restricting containers can constrain building placement to an assigned space. We have not decided whether they impose a hard outer limit, require a structure to fill an exact footprint/volume, or support both. River protection is a semantic restriction that a simple bounding box alone does not express.
+
+The selection/retry policy remains configurable design work. Trying another building is the user's example; another site, adaptation, or skipping placement are assistant-suggested alternatives, not yet selected defaults. Any retry process must retain the deterministic generation contract.
 
 ## Example authoring structure
 

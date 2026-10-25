@@ -22,6 +22,8 @@ Decorations apply throughout a container's descendants. A forest rule can span h
 
 Generation order is adjustable with sensible defaults. The current proposed sequence is terrain, vegetation, then structures, with fauna potentially later. Later decorators can modify earlier results: vegetation may edit terrain, and structures may edit both terrain and vegetation. One decorator can group several operations. Exact priorities, ordering contracts, and affected-content reconciliation remain under discussion in [the architecture draft](ARCHITECTURE.md).
 
+Each completed decorator operation must leave a consistent world, and its proposed changes must be validated before execution. Flora and structures may cross region boundaries, but must obey restrictions throughout the affected area. A building's foundation must not destroy or completely block a river; a watermill requires a deliberate compatible placement. Invalid placement may try another building. Restricting containers are an option under consideration; hard limits versus exact-fill requirements remain open.
+
 Adding ocean and continent children lets the author configure selection chances and size ranges independently. A 70% ocean chance means selecting Ocean 70% of the time, not targeting 70% ocean coverage. An ocean definition with a 10% selection chance can still dominate the visible world if its generated instances are much larger than continents. How eligibility and space constraints affect the selection process remains open.
 
 A child's minimum required size may be computed from its descendants. How that minimum is calculated remains open.
