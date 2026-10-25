@@ -9,7 +9,7 @@ Status: the user has accepted the high-level terrain direction: sparse signed sc
 - A tree must permit cuts at arbitrary locations rather than only predetermined break points. This does not yet specify cut geometry, numerical precision, detachment rules, or the object representation.
 - Initial editable terrain detail is roughly fist-sized. This is a feature-size target, not an agreed voxel spacing or exact measurement.
 - Efficiency and scalability matter even though the user's current hardware is powerful. No minimum target machine, frame-rate, memory, or latency budget is set yet.
-- Ordinary digging is gradual; earth magic can cause much larger changes. Maximum affected volume, simultaneity, and acceptable visible delay remain open.
+- Ordinary digging is gradual. Earth magic must support both an explosion-like change that appears essentially instant and a large transformation unfolding over several seconds. Example dimensions and durations from the discussion are illustrative, not fixed budgets. Maximum affected volume, simultaneity, and acceptable preparation delay remain open.
 
 ## Current resolution and editing discussion
 
@@ -17,7 +17,9 @@ Status: the user has accepted the high-level terrain direction: sparse signed sc
 
 Separate two edit workloads: repeated small digging operations and large earth-magic operations spanning many chunks. Candidate scheduling strategies include bounded background work, merging overlapping dirty-chunk requests, skipping obsolete rebuilds, and prioritizing nearby collision/visible results. Their ownership and synchronization contracts are not designed.
 
-A completed operation must still leave a consistent world. Background computation must not accidentally expose contradictory terrain and collision. Whether a large spell commits as one logical change or is intentionally modeled as several visible, consistent smaller changes is a gameplay/design decision still to make.
+A completed operation must still leave a consistent world. Background computation must not accidentally expose contradictory terrain and collision. Both instant-looking and progressive spell behavior are confirmed requirements.
+
+**Assistant proposal:** an instant edit prepares its affected data and required presentation/physics changes before publishing a coherent result. A progressive transformation consists of intentional steps, each leaving a valid world. These could share the same edit-request and validation concepts. Preparation latency, chunk coordination, conflicts with simultaneous edits, cancellation, and publication mechanisms are not yet designed. Instant appearance does not establish an unlimited zero-cost edit budget.
 
 Scalability controls should distinguish visual quality and residency budgets from authoritative world resolution. Lowering a visual setting must not silently change terrain edits or remove a traversable feature from the underlying world. The exact LOD/collision policies remain open.
 
