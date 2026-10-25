@@ -68,6 +68,8 @@ The editor tree expresses reusable generation definitions; generated regions are
 
 ## Architecture work still ahead
 
+The proposed separation of region layout, terrain formation, and detail generation is recorded in [the architecture draft](ARCHITECTURE.md). It complements the definition/instance distinction below; neither is yet an approved class design.
+
 **Initial assistant proposal, not agreed:** separate three responsibilities before choosing classes:
 
 - **Definitions:** reusable authoring rules such as Ocean, its child biomes, selection weights, and size ranges.

@@ -1,6 +1,7 @@
 # World Generator Development
 
 - Read `VISION.md`; confirmed vision is separate from proposals. Module name is provisional.
+- Read `ARCHITECTURE.md` for the current unapproved design discussion. Keep user proposals and assistant interpretations explicit; do not treat a recorded proposal as architecture approval.
 - Keep module code reusable and independent of Astray content and paths. C++ is the default.
 - Architecture is jointly designed with the user. Explain responsibilities, data flow, tradeoffs, and C++ clearly enough for user review. Critically evaluate suggestions; do not rubber-stamp them.
 - User knows C++; Godot internals/module development are new. Explain Godot-specific conventions at first use; avoid basic C++ tutorials unless requested.
