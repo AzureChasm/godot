@@ -4,6 +4,7 @@
 - Read `ARCHITECTURE.md` for the current unapproved design discussion. Keep user proposals and assistant interpretations explicit; do not treat a recorded proposal as architecture approval.
 - Read `REPRESENTATION.md` and the dated handoff in `ARCHITECTURE.md`. High-level sparse signed-field terrain plus materials is accepted, along with separate objects, chunks, multiple LODs, and arbitrary tree cut locations. Concrete storage, meshing, object cutting, sample spacing, and budgets remain undecided; full architecture is not approved.
 - Keep module code reusable and independent of Astray content and paths. C++ is the default.
+- Authoring tree contains containers only; decorators are list-property entries, not child/attachment nodes. Root area present means bounded generation; absent means unbounded. Resource-backed decorator references are the proposed Godot mapping; don't mutate shared ancestor config to implement local overrides.
 - Current focus is terrain architecture and a terrain-first milestone. City/building generation is deferred; preserve its recorded ideas without expanding that design unless requested.
 - Architecture is jointly designed with the user. Explain responsibilities, data flow, tradeoffs, and C++ clearly enough for user review. Critically evaluate suggestions; do not rubber-stamp them.
 - User knows C++; Godot internals/module development are new. Explain Godot-specific conventions at first use; avoid basic C++ tutorials unless requested.

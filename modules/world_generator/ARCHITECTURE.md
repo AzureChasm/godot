@@ -29,7 +29,7 @@ The user proposes extensible container and decorator interfaces, concrete terrai
 | Candidate role/name | Responsibility | Possible Godot relationship |
 | --- | --- | --- |
 | RegionContainer | Author nested scope, child layout/selection, enclosure, and attached rules. Extensible base with shared behavior. | Node3D is a candidate for authoring in the scene tree. |
-| WorldDecorator | Common contract for configurable generation/modification behaviors; terrain implementations can raise, carve, or paint. | Abstract Resource or an authoring Node; choice still open. |
+| WorldDecorator | Common contract for configurable generation/modification behaviors; terrain implementations can raise, carve, or paint. | Stored in a container property list, never a child node. Abstract Resource is the proposed mapping. |
 | TerrainData / TerrainChunk | Addressing, field/material payloads, residency, revisions, and read access. | Prefer data-focused C++ types; editor exposure only where useful. |
 | TerrainEditCoordinator | Turn requests into staged edits; enforce validation, conflict/order, budgets, and coherent publication. | Internal C++ service with an eventual engine-facing entry point. |
 | TerrainMesher | Derive geometry from a specified terrain snapshot; support the selected meshing/LOD contract. | Internal replaceable backend contract, not the chunk authority. |
@@ -45,7 +45,7 @@ The distinction between authoring and generation must remain explicit. Godot's a
 
 References: [Godot object registration](https://docs.godotengine.org/en/stable/engine_details/architecture/object_class.html), [Resources](https://docs.godotengine.org/en/stable/tutorials/scripting/resources.html), and [thread-safe APIs](https://docs.godotengine.org/en/stable/tutorials/performance/thread_safe_apis.html).
 
-**Authoring choice still open:** decorators can be visible child nodes in the scene hierarchy, or reusable Resource entries configured on containers in the Inspector, potentially with lightweight attachment nodes referencing those resources. Node authoring matches the user's tree examples; resources provide saveable reusable configuration. We have not selected a representation. Partial overrides, inherited attachment identity, and shared-resource editing behavior need an explicit contract in either case.
+**Confirmed authoring model:** only region containers form the world-definition tree. Decorators are entries in each container's list property, not child nodes or attachment nodes. The earlier attachment-node suggestion is superseded. **Assistant mapping proposal:** use reusable Godot Resource objects for decorator list entries. A reference points to a configuration object rather than embedding a scene-tree child. Shared resource edits and per-container overrides require explicit semantics; inheritance must not mutate an ancestor's shared configuration accidentally.
 
 This section is an assistant proposal for joint review. Exact types, ownership primitives, grid dimensions, and failure/publication mechanisms are not selected.
 
@@ -100,13 +100,17 @@ These are responsibility boundaries, not a mandated class per bullet. Registrati
 
 ## Containers
 
-Containers structure, size, shape, and position nested regions. The original World Generator, Ocean, and Continent authoring concepts belong to this role. Containers can contain smaller containers recursively, without a fixed conceptual nesting depth.
+**Confirmed:** the root is a region container. With an explicit assigned area, it generates only within that area. With no area, its generation domain is unbounded. The shape representation and bounded-domain edge behavior still need design. Unbounded generation uses the chunk/LOD demand model rather than eagerly materializing the entire domain.
 
-A container's boundary and enclosure structure generation scope. They are not automatically hard clipping boundaries: flora and structures may extend beyond their originating region, subject to placement restrictions. Terrain modifications belong to decorators. How the parent allocates space while respecting a child's chosen region shape remains open. Runtime termination, minimum-size handling, and allocation validation also need design.
+Root boundedness must be explicit; do not silently encode "no area" as a zero-sized area. Whether the API uses an optional shape, a bounds mode, or another representation is not selected. Root-domain restrictions are distinct from ordinary child-region boundaries, which earlier requirements allow flora and structures to overreach subject to constraints.
+
+The root's children are region container definitions, recursively. Containers structure, size, shape, and position nested regions and have a decorator-list property. Ocean and Continent are examples of container definitions. No fixed conceptual nesting depth is assumed.
+
+A container's boundary and enclosure structure generation scope. Terrain modifications belong to decorators. How the parent allocates space while respecting a child's chosen region shape remains open. Runtime termination, minimum-size handling, and allocation validation also need design.
 
 ## Decorators
 
-Decorators supply modifications: terrain shaping, carving, materials, vegetation, structures, and potentially fauna generation. There is no longer a required terminal Terrain Formation role in the working model. Terrain formation is one kind of decorator behavior.
+Decorators are list-property entries on containers and supply modifications: terrain shaping, carving, materials, vegetation, structures, and potentially fauna generation. There is no longer a required terminal Terrain Formation role in the working model. Terrain formation is one kind of decorator behavior.
 
 A shared authoring concept does not require every decorator to perform identical internal work. Terrain changes and object placement need appropriate inputs, outputs, and dependencies. Fauna placement does not yet specify a runtime animal or ecosystem simulation.
 
@@ -159,18 +163,25 @@ The selection/retry policy remains configurable design work. Trying another buil
 
 ## Example authoring structure
 
-Names below describe roles, not approved C++ classes. Decorators are listed together with containers to show attachment and scope, not execution order.
+Only containers appear as nodes in this world-definition tree:
 
 ```text
-World container
-├── Hills decorator
-├── Forest decorator
-├── Clearing container
-│   ├── Suppress inherited forest
-│   └── Flatten terrain decorator
-└── Birch grove container
-    └── Modify inherited forest: birch trees
+Root region container [assigned area, or unbounded]
+├── Continent container
+│   ├── Hills container
+│   └── Clearing container
+└── Ocean container
 ```
+
+Their Inspector properties can describe decoration independently of the child tree:
+
+```text
+Continent.decorators = [Hills, Forest]
+Clearing.decorators  = [SuppressForest, FlattenTerrain]
+Ocean.decorators     = [OceanFloor]
+```
+
+This notation illustrates list properties, not implementation syntax or final class names. Inherited effective rules and operation order are resolved separately from tree membership and local list storage. Decorators may be reused across containers if desired; override processing must preserve local scope.
 
 ## Definitions, instances, and materialized output
 

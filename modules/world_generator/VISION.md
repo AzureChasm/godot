@@ -16,7 +16,7 @@ The current development priority is terrain. Structure generation is deferred; f
 
 ## Authoring worlds in the editor
 
-The working authoring model has two concepts: containers structure and position nested regions; decorators supply modifications. The original World Generator, Ocean, and Continent are container/region-layouter concepts. Containers can recursively contain smaller containers. Terrain formation, vegetation, structures, and other modifications are decorator behaviors, replacing the earlier terminal-formation requirement.
+The working authoring model has two concepts: containers structure and position nested regions; decorators supply modifications. The root is a region container with an optional assigned generation area: defined means bounded to that area, absent means unbounded. Only containers form the authoring child tree. Decorators are entries in a container's list property, not child nodes. The original World Generator, Ocean, and Continent are container/region-layouter concepts. Containers can recursively contain smaller containers. Terrain formation, vegetation, structures, and other modifications are decorator behaviors, replacing the earlier terminal-formation requirement.
 
 The unmodified base is a flat surface at world-space `Y = 0`, with air above and solid below. A container completely below zero starts solid; one completely above starts air. Decorators modify this shared world-space base. This does not select the internal terrain representation.
 
