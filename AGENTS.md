@@ -38,4 +38,4 @@ Use concise, capitalized, imperative commit titles, preferably under 72 characte
 
 ## Fork Maintenance
 
-`misc/fork-maintenance/` contains the local-only upstream update script and Friday 05:00 Europe/Berlin timer. Updates merge upstream `master` into `develop`; never push without explicit authorization. Rebuild and smoke-test the editor after integrating upstream changes.
+`misc/fork-maintenance/` contains the Friday 05:00 Europe/Berlin updater. It fast-forwards clean `master` to upstream, pushes only `master` to `origin`, and merges into local `develop`. Automatic pushes of clean `master` are authorized; never push `develop` without explicit authorization. Rebuild and smoke-test after upstream changes.

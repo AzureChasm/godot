@@ -1,13 +1,28 @@
 # Weekly Godot updates
 
-`update-godot.sh` fetches `upstream/master` and merges it into local `develop`.
-It never pushes, switches branches, builds the engine, or updates local `master`.
+`update-godot.sh` fetches official `upstream/master`, fast-forwards local `master`
+to that exact commit, pushes only `master` to your fork (`origin`), then merges
+that commit into local `develop`. It never pushes `develop` or tags, force-pushes,
+switches branches, or builds the engine. Custom commits on local or remote
+`master` cause the update to fail rather than overwrite them. Keep all custom
+work, including these maintenance files, on `develop`.
 Merge commits preserve custom module history without rewriting it. Divergent
 history requires a configured Git author (`user.name` and `user.email`).
 
 The script refuses dirty trees, another checked-out branch, and unfinished Git
 operations. Conflicting merges are aborted; inspect the journal and integrate
 the changes manually. Avoid editing the repository while an update runs.
+`master` must not be checked out in another worktree. If publishing fails,
+local `master` may already be updated, but `develop` is left unchanged; rerun
+after fixing the problem. If merging into `develop` fails, the clean local and
+remote `master` remain updated.
+
+The timer needs noninteractive SSH access to `origin`. SSH uses batch mode and
+fails instead of prompting for passwords or host-key confirmation. For an
+encrypted key, ensure the user service can access an unlocked SSH agent
+(including its `SSH_AUTH_SOCK` environment); an interactive terminal's agent is
+not automatically available to systemd services. Check the service journal
+after the first scheduled run.
 
 Run manually from the Godot repository root:
 

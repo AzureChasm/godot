@@ -1,5 +1,5 @@
 [Unit]
-Description=Update local Godot develop branch from upstream master
+Description=Mirror clean Godot master to fork and update local develop
 
 [Service]
 Type=oneshot
