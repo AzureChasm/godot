@@ -20,7 +20,21 @@ How a terrain formation internally composes hills, caves, or other operations re
 
 Details are a separate role that can be attached at any level of the tree. They apply throughout that node's descendant regions. A forest detail rule can therefore cover several nested regions with different terrain formations, yielding one forest across hills, plains, and other terrain.
 
-Authoring scope differs from execution order: a forest rule can be authored on a high-level region while placing its trees using terrain generated farther down the hierarchy. Detail passes may also make local terrain adjustments. How inherited rules combine, override, or exclude one another remains open.
+Authoring scope differs from execution order: a forest rule can be authored on a high-level region while placing its trees using terrain generated farther down the hierarchy. Detail passes may also make local terrain adjustments.
+
+### Containers and cascading decorations
+
+The user wants regions to behave like nested HTML-style containers: decorations on a container affect its descendants, and descendants can also declare their own decorations. A forest island can contain different terrain formations while sharing forest decoration. A clearing suppresses inherited forest decoration; a birch forest modifies or replaces it locally.
+
+This is scoped inheritance through the region tree, not necessarily C++ class inheritance. The analogy does not commit us to a browser, CSS parser, selector language, or a particular Godot node representation.
+
+The user's suggested name for a suppression rule is an **antidecorator**. The behavior is part of the intended direction; whether it becomes a separate type, an operation on a decoration rule, or another representation remains open.
+
+**Assistant interpretation for discussion:** distinguish adding a decoration, modifying selected settings of an inherited decoration, replacing an inherited decoration, and suppressing a targeted decoration. For a birch forest, changing tree species need not discard unrelated inherited settings. Whether clearing suppression targets a whole forest package or only tree placement needs definition.
+
+**Assistant proposal:** resolve the effective decoration rules for a target region before placing content, so suppression prevents generation rather than generating objects only to delete them. Local rules affect their own subtree, leaving siblings unchanged. Runtime edits to existing objects are a separate concern; suppression must not silently erase saved player modifications.
+
+Rule identity, selection by category, precedence, and the ability of deeper descendants to restore a suppressed decoration are undecided. A candidate default is that the nearest explicit setting wins, but this is not approved.
 
 ## Example authoring structure
 
@@ -31,11 +45,15 @@ Region Layouter: Forest area
 ├── Details: Forest vegetation [applies across descendant regions]
 ├── Region Layouter: Rolling country
 │   └── Terrain Formation: Hills
-└── Region Layouter: Open country
-    └── Terrain Formation: Plains
+├── Region Layouter: Clearing
+│   ├── Antidecorator: Suppress inherited forest
+│   └── Terrain Formation: Plains
+└── Region Layouter: Birch grove
+    ├── Decoration override: Birch forest
+    └── Terrain Formation: Hills
 ```
 
-Forest vegetation is shared in scope while the two terminal regions have different formations. More nested layouters can be inserted before either terminal formation. The exact representation of attached detail rules is still undecided.
+Forest vegetation is inherited by default, suppressed in the clearing, and changed in the birch grove. More nested layouters can be inserted before any terminal formation. Decoration and antidecorator names in the diagram describe authoring roles, not approved C++ classes.
 
 The earlier assistant suggestion of giving every biome a fixed layout/terrain/detail component bundle is superseded by these separate roles.
 
@@ -54,7 +72,7 @@ Reference: [Godot heightmap limitations](https://docs.godotengine.org/en/stable/
 ## Dependencies and remaining decisions
 
 - Define inputs and outputs for layouters, formations, and details, preserving same-input/same-output behavior and independence from exploration order.
-- Define detail inheritance, local overrides or exclusions, rule identity, and evaluation scope. Ancestor rules must not accidentally multiply placement density merely because the tree has more levels.
+- Define decoration identities/targets, precedence, partial modifications versus replacement, and whether descendants can restore suppressed decorations. Ancestor rules must not accidentally multiply placement density merely because the tree has more levels.
 - Determine when details query or alter terrain, and how changes reach terrain queries, geometry, collision, and persistence.
 - Place transition responsibility and reconcile it with recursive layout and terminal formations.
 - Decide child minimum-size failure behavior, layer ordering, and bounded generation.
