@@ -1,0 +1,10 @@
+[Unit]
+Description=Update Godot every Friday at 05:00 Europe/Berlin
+
+[Timer]
+OnCalendar=Fri *-*-* 05:00:00 Europe/Berlin
+Persistent=true
+AccuracySec=1s
+
+[Install]
+WantedBy=timers.target

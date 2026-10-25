@@ -1,0 +1,9 @@
+[Unit]
+Description=Update local Godot develop branch from upstream master
+
+[Service]
+Type=oneshot
+WorkingDirectory=/home/riku/Desktop/projects/godot
+ExecStart=/usr/bin/bash /home/riku/Desktop/projects/godot/misc/fork-maintenance/update-godot.sh
+Environment=GIT_TERMINAL_PROMPT=0
+TimeoutStartSec=20min
