@@ -21,6 +21,10 @@ A completed operation must still leave a consistent world. Background computatio
 
 **Assistant proposal:** an instant edit prepares its affected data and required presentation/physics changes before publishing a coherent result. A progressive transformation consists of intentional steps, each leaving a valid world. These could share the same edit-request and validation concepts. Preparation latency, chunk coordination, conflicts with simultaneous edits, cancellation, and publication mechanisms are not yet designed. Instant appearance does not establish an unlimited zero-cost edit budget.
 
+The user clarifies that spell magnitude depends on the wizard; no fixed house/street/hillside maximum is specified. Wizard levels and spell strength belong to game rules, while the reusable engine receives the resulting edit parameters and affected space. Do not require a single gameplay maximum to continue architecture discussion.
+
+**Assistant proposal:** separate variable edit magnitude from configurable execution budgets. An edit description expresses desired shape, material changes, and instant/progressive presentation intent; a scheduler bounds concurrent work and coordinates affected chunks. Small and large edits share the same contract without promising equal latency. Handling overload through preparation delay, rejection, cancellation, or a different presentation policy remains undecided; do not silently change an instant request into a progressive spell.
+
 Scalability controls should distinguish visual quality and residency budgets from authoritative world resolution. Lowering a visual setting must not silently change terrain edits or remove a traversable feature from the underlying world. The exact LOD/collision policies remain open.
 
 The remaining question about voxel terrain is its appearance. The candidate stores scalar samples and extracts the intervening surface, rather than drawing a cube for each occupied sample. A sampled grid therefore need not create Minecraft-style steps. Coarse sampling can still produce faceting, lose thin features, and change silhouettes; smooth shading cannot recover absent geometry.
