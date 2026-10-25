@@ -1,0 +1,64 @@
+[gd_scene format=3 uid="uid://ea27g27uk30r"]
+
+[ext_resource type="Script" uid="uid://ms33bayh03uh" path="res://demo.gd" id="1_demo"]
+
+[sub_resource type="WorldSphereDecorator" id="Hill"]
+radius = 0.14
+material_id = 2
+
+[sub_resource type="WorldSphereDecorator" id="Cavity"]
+priority = 10
+center = Vector3(-0.9, 0.35, 0.95)
+radius = 0.85
+operation = 1
+
+[sub_resource type="WorldSphereDecorator" id="Floating"]
+radius = 0.65
+material_id = 3
+
+[sub_resource type="WorldSphereDecorator" id="ChildMound"]
+center = Vector3(0, -0.25, 0)
+radius = 0.65
+material_id = 3
+
+[sub_resource type="Environment" id="Environment"]
+background_mode = 1
+background_color = Color(0.075, 0.095, 0.13, 1)
+ambient_light_source = 3
+ambient_light_color = Color(0.75, 0.82, 1, 1)
+ambient_light_energy = 0.55
+reflected_light_source = 2
+
+[node name="TerrainPrototype" type="Node3D" unique_id=1343351751]
+script = ExtResource("1_demo")
+
+[node name="World" type="RegionContainer" parent="." unique_id=843647918]
+bounded = false
+decorators = Array[WorldDecorator]([SubResource("Hill"), SubResource("Cavity")])
+
+[node name="FloatingRegion" type="RegionContainer" parent="World" unique_id=271154392]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1.9, -1.4)
+area = AABB(-0.9, -0.9, -0.9, 1.8, 1.8, 1.8)
+decorators = Array[WorldDecorator]([SubResource("Floating")])
+
+[node name="SmallMound" type="RegionContainer" parent="World" unique_id=1965450971]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.3, 0, 1.9)
+area = AABB(-0.9, -1, -0.9, 1.8, 2, 1.8)
+decorators = Array[WorldDecorator]([SubResource("ChildMound")])
+
+[node name="TerrainView" type="TerrainView" parent="." unique_id=679291369]
+preview_area = AABB(-5, -5, -5, 10, 10, 10)
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=45677368]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 7, 11)
+current = true
+far = 200.0
+
+[node name="Sun" type="DirectionalLight3D" parent="." unique_id=565993324]
+transform = Transform3D(0.8480481, 0.3938068, -0.35458517, 0, 0.66913056, 0.74314487, 0.52991927, -0.63022256, 0.5674549, 0, 0, 0)
+light_color = Color(1, 0.92, 0.8, 1)
+light_energy = 1.4
+shadow_enabled = true
+
+[node name="Environment" type="WorldEnvironment" parent="." unique_id=1936904945]
+environment = SubResource("Environment")

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="WorldDecorator" inherits="Resource" api_type="core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+	<brief_description>
+		Abstract reusable configuration for a world modification.
+	</brief_description>
+	<description>
+		Subclasses compile their settings into immutable terrain modifiers. Editing a resource does not change an already generated preview until it is regenerated. Shared resources remain shared configurations; use separate resources when independently authored settings are desired. Resources may be attached at different container levels. Full override and antidecorator behavior is not implemented in this slice.
+	</description>
+	<tutorials>
+	</tutorials>
+	<members>
+		<member name="enabled" type="bool" setter="set_enabled" getter="is_enabled" default="true">
+			Whether this attachment participates in the next generated snapshot.
+		</member>
+		<member name="priority" type="int" setter="set_priority" getter="get_priority" default="0">
+			Lower values execute earlier. Equal values retain scene-tree preorder and local list order. Priority is independent of scope inheritance.
+		</member>
+	</members>
+</class>

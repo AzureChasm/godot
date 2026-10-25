@@ -1,6 +1,6 @@
 # World Generator Architecture Draft
 
-Status: joint design in progress, not approved for implementation. The working authoring model is containers and decorators. Concrete C++/Godot types, data contracts, terrain representation, and prototype scope remain undecided.
+Status: user approved the current architecture for a first prototype. The container/decorator terrain slice is implemented on `feature/world-generator-prototype` and has been reviewed with initial corrections; the user authorized its first implementation commit. `PROTOTYPE_PLAN.md` defines this slice; `README.md` distinguishes implemented behavior, provisional choices, and deferred long-term design.
 
 ## Current focus: terrain first
 
@@ -8,11 +8,11 @@ The high-level representation direction is accepted: sparse signed scalar terrai
 
 **Confirmed priority:** terrain comes first. Structure and city generation are later work. Preserve those ideas below without continuing their detailed design now. The next architecture discussion should concentrate on terrain representation, container scope, terrain decorators, ordering/composition, and an editor-reviewable terrain milestone.
 
-**Assistant scope proposal, not yet agreed:** use a bounded editor preview to establish the flat solid/air base, nested containers, deterministic terrain decorators that can add and remove ground, configurable ordering, and visible three-dimensional results. This should exercise hills, a cave, and floating land without selecting a complete biome catalogue or implementing vegetation, buildings, fauna, city layout, or time simulation. Collision, interactive editing, persistence, and streaming inclusion need explicit milestone decisions. The bounded preview does not replace the long-term expandable-world requirement.
+**Approved first slice:** use a bounded editor preview to establish the flat solid/air base, nested containers, deterministic terrain decorators that can add and remove ground, configurable ordering, and visible three-dimensional results. This should exercise hills, a cave, and floating land without selecting a complete biome catalogue or implementing vegetation, buildings, fauna, city layout, or time simulation. Static collision is included; interactive runtime editing, persistence, and streaming are deferred. The bounded preview does not replace the long-term expandable-world requirement.
 
 ## Base world
 
-The concrete chunk data and staged edit lifecycle proposed below are under discussion. They do not authorize implementation.
+The first slice implements bounded synchronous candidate generation; the production chunk/edit lifecycle below remains a design direction. It is not a claim that streaming or concurrent atomic publication has been implemented.
 
 **Confirmed:** before decorators act, the world has a flat surface at world-space `Y = 0`. Everything above is air and everything below is solid. No vegetation or structures are present initially.
 

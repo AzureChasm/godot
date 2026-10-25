@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="TerrainView" inherits="Node3D" api_type="core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+	<brief_description>
+		Generates and displays a bounded, chunk-backed terrain preview.
+	</brief_description>
+	<description>
+		Compiles the selected [RegionContainer] hierarchy, samples candidate field/material chunks, extracts a provisional marching-tetrahedra surface, and prepares static triangle collision. It then replaces its previous generated scene and data after success. Failures retain the last successful preview and set [member status]. Generation is synchronous and bounded by sample/triangle budgets. Streaming, multi-LOD transitions, saves, runtime edit transactions, and production render/physics synchronization remain future work. This node requires an identity global transform.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="generate_preview">
+			<return type="bool" />
+			<description>
+				Generates synchronously and returns true on success. Invalid hierarchy, bounds, transforms, or resource budgets return false without replacing the previous preview. The prototype limits candidates to 512 chunks, 4.5 million samples, and 500000 triangles. It is intended for small editor previews, not real-time large-area editing.
+			</description>
+		</method>
+		<method name="get_statistics" qualifiers="const">
+			<return type="Dictionary" />
+			<description>
+				Returns a copy of the last successful preview statistics: revision, chunk_count, uniform_chunks, sample_payload_bytes, mesh_chunks, triangles, bounds, and generation_ms. Sample payload excludes metadata, compiled operations, meshes, collision, and temporary memory. Returns an empty dictionary before any successful generation.
+			</description>
+		</method>
+		<method name="sample_field" qualifiers="const">
+			<return type="float" />
+			<param index="0" name="world_position" type="Vector3" />
+			<description>
+				Evaluates the last published immutable modifier snapshot at a world position. Negative values mean solid, positive values mean air, and zero marks the surface. This is the analytic generation field, not interpolation of the cached voxel array or a physics query. It can be evaluated outside the finite view request; container scopes still apply. Requires a successful generation and finite coordinates.
+			</description>
+		</method>
+	</methods>
+	<members>
+		<member name="auto_generate" type="bool" setter="set_auto_generate" getter="is_auto_generate" default="true">
+			Queues one preview generation when the scene starts running. Automatic generation is disabled in editor mode; the Generate Preview Inspector action remains available for an explicit editor preview. Property changes do not continuously rebuild terrain.
+		</member>
+		<member name="chunk_cells" type="int" setter="set_chunk_cells" getter="get_chunk_cells" default="32">
+			Cells per chunk edge, from 4 to 64. Each dense chunk includes one additional border sample per edge.
+		</member>
+		<member name="collision_enabled" type="bool" setter="set_collision_enabled" getter="is_collision_enabled" default="true">
+			Build static concave triangle collision for generated mesh chunks. Only use this collider as static terrain.
+		</member>
+		<member name="generate_action" type="Callable" setter="" getter="get_generate_action" default="Callable()">
+			Inspector action that calls [method generate_preview]. This editor-only callable is not saved in the scene.
+		</member>
+		<member name="preview_area" type="AABB" setter="set_preview_area" getter="get_preview_area" default="AABB(-4, -4, -4, 8, 8, 8)">
+			Finite world-space request box, intersected with the bounded root area. Mesh triangles are clipped to this exact box without adding artificial edge walls.
+		</member>
+		<member name="root_path" type="NodePath" setter="set_root_path" getter="get_root_path" default="NodePath(&quot;../World&quot;)">
+			Path to the top [RegionContainer] for this view.
+		</member>
+		<member name="sample_spacing" type="float" setter="set_sample_spacing" getter="get_sample_spacing" default="0.1">
+			Experimental grid spacing in metres, accepted from 0.025 to 2. Smaller values increase cost and may exceed the preview budget. A chosen spacing does not guarantee preservation of every feature of that size.
+		</member>
+		<member name="status" type="String" setter="" getter="get_status" default="&quot;Not generated&quot;">
+			Description of the latest success or failure. Inspect this after a failed generation; [method get_statistics] still describes the previous successful result.
+		</member>
+	</members>
+	<signals>
+		<signal name="preview_generated">
+			<param index="0" name="statistics" type="Dictionary" />
+			<description>
+				Emitted after a successful preview replacement, with a copy of its statistics.
+			</description>
+		</signal>
+	</signals>
+</class>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="WorldSphereDecorator" inherits="WorldDecorator" api_type="core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+	<brief_description>
+		Adds or removes sphere-shaped solid terrain.
+	</brief_description>
+	<description>
+		A signed sphere operation centered relative to the [RegionContainer] holding this resource. [constant ADD_SOLID] unions solid into the field, and [constant REMOVE_SOLID] carves it away. The operation respects the enclosing container chain. This is smooth volumetric terrain generation, not cube-face rendering. Boundary falloff and random generation are not implemented.
+	</description>
+	<tutorials>
+	</tutorials>
+	<members>
+		<member name="center" type="Vector3" setter="set_center" getter="get_center" default="Vector3(0, 0, 0)">
+			Sphere center relative to the attaching container origin. Reusing this resource in two containers places the same local shape relative to each.
+		</member>
+		<member name="material_id" type="int" setter="set_material_id" getter="get_material_id" default="1">
+			Material assigned where this additive sphere supplies the field. Values 1, 2, and 3 have earth, green, and stone preview palettes; other IDs use the fallback palette. This is a prototype palette, not a material database.
+		</member>
+		<member name="operation" type="int" setter="set_operation" getter="get_operation" enum="WorldSphereDecorator.Operation" default="0">
+			Whether the sphere adds or removes solid.
+		</member>
+		<member name="radius" type="float" setter="set_radius" getter="get_radius" default="1.0">
+			Finite positive sphere radius in metres.
+		</member>
+	</members>
+	<constants>
+		<constant name="ADD_SOLID" value="0" enum="Operation">
+			Add the sphere to solid terrain using a signed-field union.
+		</constant>
+		<constant name="REMOVE_SOLID" value="1" enum="Operation">
+			Remove the sphere volume from solid terrain using signed-field subtraction.
+		</constant>
+	</constants>
+</class>

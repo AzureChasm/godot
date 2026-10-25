@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="RegionContainer" inherits="Node3D" api_type="core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+	<brief_description>
+		A region-authoring node with optional bounds and a list of world decorators.
+	</brief_description>
+	<description>
+		Containers form the world-definition child tree. Decorators are resources in [member decorators], not child nodes. A bounded container limits its operations and descendants to its translated local [member area]. An unbounded container adds no local enclosure. The root may be unbounded while [TerrainView] requests only a finite preview. This prototype supports translation only and rejects rotated/scaled containers. Child areas are explicitly authored; procedural child layout is not implemented.
+	</description>
+	<tutorials>
+	</tutorials>
+	<members>
+		<member name="area" type="AABB" setter="set_area" getter="get_area" default="AABB(-4, -4, -4, 8, 8, 8)">
+			Local axis-aligned enclosure, used when [member bounded] is true. Every dimension must be finite and positive. It does not create a new local ground plane; the flat base remains at world-space Y = 0.
+		</member>
+		<member name="bounded" type="bool" setter="set_bounded" getter="is_bounded" default="true">
+			When true, apply [member area] as a scope constraint. When false, no local bounds are imposed; a root then has an unbounded generation domain. Zero-sized bounds are not an unbounded sentinel.
+		</member>
+		<member name="decorators" type="WorldDecorator[]" setter="set_decorators" getter="get_decorators" default="[]">
+			Ordered resource attachments owned by this container configuration. Enabled attachments are applied once within their inherited scope. Equal priorities use scene-tree preorder, then this list order. Null entries are ignored.
+		</member>
+	</members>
+</class>

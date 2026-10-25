@@ -1,6 +1,6 @@
 # World Generator Vision
 
-Status: vision discussed; architecture not yet agreed; no implementation started. `world_generator` is the proposed module name and provisional directory name.
+Status: user approved the current architecture and authorized the first prototype, now implemented and user-reviewed on `feature/world-generator-prototype`. `world_generator` remains the working module name. See `README.md` for the implemented slice and limitations.
 
 ## Purpose and scope
 
@@ -12,7 +12,7 @@ The target experience includes natural-looking surfaces, persistent destruction 
 
 Physical behavior and exceptions should be compatible with a game's rules. Astray-specific magic, skill levels, dimensions, and content must not be hard-coded into reusable module logic. Interesting content need not exist at every coordinate or altitude.
 
-The current development priority is terrain. Structure generation is deferred; future ideas include filling city building plots with flexible vertical extent and reusing adjacent walls. The first terrain milestone and its architecture still need joint agreement before implementation.
+The current development priority is terrain. Structure generation is deferred; future ideas include filling city building plots with flexible vertical extent and reusing adjacent walls. The first bounded terrain preview is approved and implemented for review; later milestones still need joint agreement.
 
 ## Authoring worlds in the editor
 
@@ -68,7 +68,7 @@ The editor tree expresses reusable generation definitions; generated regions are
 
 ## Architecture work still ahead
 
-The working container/decorator topology and ordering discussion are recorded in [the architecture draft](ARCHITECTURE.md). They complement the definition/instance distinction below. The full architecture is not yet approved for implementation.
+The working container/decorator topology and ordering discussion are recorded in [the architecture draft](ARCHITECTURE.md). They complement the definition/instance distinction below. The current architecture is approved for the first prototype; the broader future contracts remain subject to joint design.
 
 **Initial assistant proposal, not agreed:** separate three responsibilities before choosing classes:
 
@@ -80,6 +80,6 @@ For example, a single Ocean definition could describe multiple generated oceans.
 
 We must jointly define responsibility boundaries, data flow, public APIs, generation inputs, coordinate and space semantics, transition behavior, reproducibility, terrain representation, lifecycle, persistence interactions, and the first prototype's visible success criteria. The number of classes and exact abstractions should follow those decisions.
 
-No prototype or implementation scaffolding is authorized until the user and assistant are both satisfied with the planned architecture. Discuss strengths and weaknesses of suggestions candidly. Keep the resulting C++ understandable through focused explanations and a guided review.
+The joint architecture checkpoint was satisfied when the user explicitly authorized this first prototype. Material design changes still return to discussion. Discuss strengths and weaknesses of suggestions candidly. Keep the resulting C++ understandable through focused explanations and a guided review.
 
 Implementation will happen on a new feature branch. After the user reviews the prototype in the editor and we make the initial adjustments, create its initial implementation commit. Establish the module's automated testing structure afterward. Builds and appropriate manual validation still accompany the prototype.
