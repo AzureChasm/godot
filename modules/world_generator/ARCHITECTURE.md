@@ -2,7 +2,23 @@
 
 Status: joint design in progress; not approved for implementation. Read `VISION.md` for requirements. The authoring topology below follows the user's direction. Concrete classes, Godot base classes, data contracts, terrain storage, and prototype scope are undecided.
 
-## Separate authoring roles
+## Current alternative under discussion: containers and decorators
+
+The user proposes two public authoring concepts: containers structure and position regions; decorators supply modifications. Generation starts from a simple, otherwise empty flat surface. This is an alternative under evaluation, not full architecture approval.
+
+Under this proposal, hills, caves, terrain materials, vegetation, and structures can all be decorators with different effects. A separate terminal Terrain Formation node would no longer be required. The earlier three-role model below is retained for comparison while this choice is discussed.
+
+**Assistant assessment:** this can simplify authoring and allow reuse across terrain and detail work. Internally, terrain modification and object placement still need explicit contracts, inputs, and dependencies. A tree placer may query the surface after terrain modifiers have acted; a structure may also request a foundation edit. A common decorator concept does not yet imply one undifferentiated execution method or a fixed pass order.
+
+Containers retain spatial layout responsibilities. Decorators change world content within their effective scope. Whether a decorator may also change a container's boundary, and how that would interact with child allocation, remains open.
+
+**Assistant proposal for the base:** represent ground below a configurable flat elevation and empty space above it, with no vegetation or structures initially. This would supply a three-dimensional starting solid that can be carved or extended. The user has not yet clarified whether "flat surface" means this volume or a different starting condition. It does not choose the terrain storage or meshing method. Other base conditions could be considered later for reusable bounded generation.
+
+The cascading decoration intent still applies: inherited rules can be locally modified, replaced, or suppressed. However, suppressing a terrain modification raises new questions: does a local region inherit the base terrain instead, remove only one modifier, or apply another transformation? Resolving rule inheritance before evaluation is an assistant proposal, not an agreed implementation.
+
+Remaining decisions include the base's meaning, decorator capabilities and dependencies, composition order, spatial falloff at boundaries, and suppression semantics. If this alternative is adopted, the earlier rule requiring one terminal formation per final region must be explicitly superseded.
+
+## Earlier three-role model for comparison
 
 ### Region layouters
 
@@ -36,7 +52,7 @@ The user's suggested name for a suppression rule is an **antidecorator**. The be
 
 Rule identity, selection by category, precedence, and the ability of deeper descendants to restore a suppressed decoration are undecided. A candidate default is that the nearest explicit setting wins, but this is not approved.
 
-## Example authoring structure
+## Example of the earlier three-role authoring structure
 
 The following notation illustrates responsibilities and scope, not final Godot class names or required scene-node relationships:
 
