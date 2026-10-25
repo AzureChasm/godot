@@ -10,8 +10,8 @@ config_version=5
 
 [application]
 
-config/name="World Generator — Terrain Prototype"
-run/main_scene="res://demo.tscn"
+config/name="World Generator — Unbounded World"
+run/main_scene="res://unbounded_world.tscn"
 config/features=PackedStringArray("4.8", "GL Compatibility")
 
 [display]

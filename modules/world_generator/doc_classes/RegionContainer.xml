@@ -4,7 +4,7 @@
 		A region-authoring node with optional bounds and a list of world decorators.
 	</brief_description>
 	<description>
-		Containers form the world-definition child tree. Decorators are resources in [member decorators], not child nodes. A bounded container limits its operations and descendants to its translated local [member area]. An unbounded container adds no local enclosure. The root may be unbounded while [TerrainView] requests only a finite preview. This prototype supports translation only and rejects rotated/scaled containers. Child areas are explicitly authored; procedural child layout is not implemented.
+		Containers form the world-definition child tree. Decorators are resources in [member decorators], not child nodes. A bounded container limits its operations and descendants to its translated local [member area]. An unbounded container adds no local enclosure. The root may be unbounded while [TerrainView] requests only a finite preview. This prototype supports translation only and rejects rotated/scaled containers. Ordinary child areas are explicitly authored. [WorldRegionLayout] instead uses its children as weighted definitions and supplies their instance areas.
 	</description>
 	<tutorials>
 	</tutorials>
@@ -17,6 +17,9 @@
 		</member>
 		<member name="decorators" type="WorldDecorator[]" setter="set_decorators" getter="get_decorators" default="[]">
 			Ordered resource attachments owned by this container configuration. Enabled attachments are applied once within their inherited scope. Equal priorities use scene-tree preorder, then this list order. Null entries are ignored.
+		</member>
+		<member name="occurrence_weight" type="float" setter="set_occurrence_weight" getter="get_occurrence_weight" default="1.0">
+			Relative chance of selection when this container is a child definition of [WorldRegionLayout]. Zero excludes it. This is a selection weight, not a guaranteed area percentage. It has no effect under ordinary manually positioned containers.
 		</member>
 	</members>
 </class>

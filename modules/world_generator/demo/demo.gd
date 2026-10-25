@@ -26,7 +26,11 @@ func _ready() -> void:
 	terrain.preview_generated.connect(_show_statistics)
 	_show_statistics(terrain.get_statistics())
 	if "--capture" in OS.get_cmdline_user_args():
-		for frame in range(20):
+		var deadline := Time.get_ticks_msec() + 60000
+		while terrain.get_statistics().is_empty() or terrain.is_generating():
+			if Time.get_ticks_msec() > deadline:
+				get_tree().quit(1)
+				return
 			await get_tree().process_frame
 		await RenderingServer.frame_post_draw
 		get_viewport().get_texture().get_image().save_png("/tmp/world-generator-prototype.png")

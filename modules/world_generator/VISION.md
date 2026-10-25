@@ -82,4 +82,8 @@ We must jointly define responsibility boundaries, data flow, public APIs, genera
 
 The joint architecture checkpoint was satisfied when the user explicitly authorized this first prototype. Material design changes still return to discussion. Discuss strengths and weaknesses of suggestions candidly. Keep the resulting C++ understandable through focused explanations and a guided review.
 
-Implementation will happen on a new feature branch. After the user reviews the prototype in the editor and we make the initial adjustments, create its initial implementation commit. Establish the module's automated testing structure afterward. Builds and appropriate manual validation still accompany the prototype.
+Implementation will happen on a new feature branch. After the user reviews the prototype in the editor and we make the initial adjustments, create its initial implementation commit. A dedicated unit-test suite is deferred by the user while the prototype is evolving; demo-led review, builds, and useful targeted checks continue. Builds and appropriate manual validation still accompany the prototype.
+
+## Confirmed chunk sizing (2026-10-25)
+
+World chunks have a fixed physical size of 16 × 16 × 16 m so the spatial scale remains understandable when sample resolution changes. Smaller internal sections may handle generation, meshing and edits. The next reviewed slice adds parent-arranged weighted biome occurrence and visible transitions in an unbounded-definition demo; the seeded grid, grouped Voronoi allocation and field blends are prototype strategies, not the final organic layout or biome-transition rule system.

@@ -13,7 +13,7 @@
 			Sphere center relative to the attaching container origin. Reusing this resource in two containers places the same local shape relative to each.
 		</member>
 		<member name="material_id" type="int" setter="set_material_id" getter="get_material_id" default="1">
-			Material assigned where this additive sphere supplies the field. Values 1, 2, and 3 have earth, green, and stone preview palettes; other IDs use the fallback palette. This is a prototype palette, not a material database.
+			Material assigned where this additive sphere supplies the field. Values 1 through 5 have earth, green, stone, sand, and deep-slate preview palettes; other IDs use the fallback palette. This is a prototype palette, not a material database.
 		</member>
 		<member name="operation" type="int" setter="set_operation" getter="get_operation" enum="WorldSphereDecorator.Operation" default="0">
 			Whether the sphere adds or removes solid.

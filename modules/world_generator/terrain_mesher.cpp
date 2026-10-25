@@ -37,7 +37,6 @@ namespace {
 constexpr int TETRAHEDRA[6][4] = { { 0, 5, 1, 6 }, { 0, 1, 2, 6 }, { 0, 2, 3, 6 }, { 0, 3, 7, 6 }, { 0, 7, 4, 6 }, { 0, 4, 5, 6 } };
 constexpr int EDGES[6][2] = { { 0, 1 }, { 0, 2 }, { 0, 3 }, { 1, 2 }, { 1, 3 }, { 2, 3 } };
 const Vector3i CORNERS[8] = { Vector3i(0, 0, 0), Vector3i(1, 0, 0), Vector3i(1, 1, 0), Vector3i(0, 1, 0), Vector3i(0, 0, 1), Vector3i(1, 0, 1), Vector3i(1, 1, 1), Vector3i(0, 1, 1) };
-constexpr int64_t MAX_VERTICES = 1500000;
 
 Color terrain_color(uint16_t p_material, const Vector3 &p_normal) {
 	Color color;
@@ -48,6 +47,12 @@ Color terrain_color(uint16_t p_material, const Vector3 &p_normal) {
 		case 3:
 			color = Color(0.56, 0.60, 0.65);
 			break;
+		case 4:
+			color = Color(0.72, 0.63, 0.39);
+			break;
+		case 5:
+			color = Color(0.25, 0.36, 0.44);
+			break;
 		default:
 			color = Color(0.48, 0.34, 0.22);
 			break;
@@ -56,7 +61,7 @@ Color terrain_color(uint16_t p_material, const Vector3 &p_normal) {
 	return color.lerp(Color(0.29, 0.35, 0.22), MAX(real_t(0), p_normal.y) * 0.3);
 }
 
-bool emit_triangle(const TerrainData &p_data, TerrainSurface &r_surface, Vector3 p_a, Vector3 p_b, Vector3 p_c, const Vector3 &p_surface_normal, int64_t &r_vertices) {
+bool emit_triangle(const TerrainData &p_data, TerrainSurface &r_surface, const TerrainSection &p_section, Vector3 p_a, Vector3 p_b, Vector3 p_c, const Vector3 &p_surface_normal, int64_t &r_vertices) {
 	Vector3 cross = (p_b - p_a).cross(p_c - p_a);
 	if (cross.length_squared() < 1e-15) {
 		return true;
@@ -65,22 +70,30 @@ bool emit_triangle(const TerrainData &p_data, TerrainSurface &r_surface, Vector3
 	if (cross.dot(p_surface_normal) > 0) {
 		SWAP(p_b, p_c);
 	}
-	if (r_vertices + 3 > MAX_VERTICES) {
+	if (r_vertices + 3 > p_data.triangle_budget * 3) {
 		return false;
 	}
 	for (const Vector3 &point : { p_a, p_b, p_c }) {
-		const Vector3 vertex_normal = p_data.normal(point);
-		const uint16_t material = p_data.sample(point - vertex_normal * p_data.spacing * 0.1).material;
+		const int *existing = r_surface.vertex_lookup.getptr(point);
+		if (existing) {
+			r_surface.indices.push_back(*existing);
+			continue;
+		}
+		const int index = r_surface.vertices.size();
+		r_surface.vertex_lookup.insert(point, index);
+		uint16_t material = 1;
+		const Vector3 vertex_normal = p_data.sampled_normal(p_section, point, material);
 		r_surface.vertices.push_back(point - r_surface.origin);
 		r_surface.normals.push_back(vertex_normal);
 		r_surface.colors.push_back(terrain_color(material, vertex_normal));
+		r_surface.indices.push_back(index);
 	}
 	r_vertices += 3;
 	return true;
 }
 
-bool clip_and_emit(const TerrainData &p_data, TerrainSurface &r_surface, const Vector3 &p_a, const Vector3 &p_b, const Vector3 &p_c, const Vector3 &p_surface_normal, int64_t &r_vertices) {
-	// Clip output to the precise requested/root box, not an expanded chunk box.
+bool clip_and_emit(const TerrainData &p_data, TerrainSurface &r_surface, const TerrainSection &p_section, const Vector3 &p_a, const Vector3 &p_b, const Vector3 &p_c, const Vector3 &p_surface_normal, int64_t &r_vertices) {
+	// Clip output to the precise requested/root box, not an expanded section box.
 	Vector3 polygon[12] = { p_a, p_b, p_c };
 	int count = 3;
 	for (int plane = 0; plane < 6 && count > 0; ++plane) {
@@ -107,14 +120,14 @@ bool clip_and_emit(const TerrainData &p_data, TerrainSurface &r_surface, const V
 		}
 	}
 	for (int i = 1; i + 1 < count; ++i) {
-		if (!emit_triangle(p_data, r_surface, polygon[0], polygon[i], polygon[i + 1], p_surface_normal, r_vertices)) {
+		if (!emit_triangle(p_data, r_surface, p_section, polygon[0], polygon[i], polygon[i + 1], p_surface_normal, r_vertices)) {
 			return false;
 		}
 	}
 	return true;
 }
 
-bool polygonize_tetrahedron(const TerrainData &p_data, TerrainSurface &r_surface, const Vector3 *p_points, const float *p_values, const int *p_tetrahedron, int64_t &r_vertices) {
+bool polygonize_tetrahedron(const TerrainData &p_data, TerrainSurface &r_surface, const TerrainSection &p_section, const Vector3 *p_points, const float *p_values, const int *p_tetrahedron, int64_t &r_vertices) {
 	Vector3 intersections[4];
 	int count = 0;
 	for (int edge = 0; edge < 6; ++edge) {
@@ -173,7 +186,7 @@ bool polygonize_tetrahedron(const TerrainData &p_data, TerrainSurface &r_surface
 		}
 	}
 	for (int i = 1; i + 1 < count; ++i) {
-		if (!clip_and_emit(p_data, r_surface, intersections[0], intersections[i], intersections[i + 1], normal, r_vertices)) {
+		if (!clip_and_emit(p_data, r_surface, p_section, intersections[0], intersections[i], intersections[i + 1], normal, r_vertices)) {
 			return false;
 		}
 	}
@@ -181,47 +194,64 @@ bool polygonize_tetrahedron(const TerrainData &p_data, TerrainSurface &r_surface
 }
 } // namespace
 
-bool TerrainMesher::build(const TerrainData &p_data, Vector<TerrainSurface> &r_surfaces, String &r_error) {
-	r_surfaces.clear();
+bool TerrainMesher::build_section(const TerrainData &p_data, const TerrainSection &section, TerrainSurface &surface, String &r_error, const SafeFlag *p_cancel) {
+	if (section.uniform) {
+		return true;
+	}
 	int64_t vertices = 0;
-	for (const TerrainChunk &chunk : p_data.chunks) {
-		if (chunk.uniform) {
-			continue;
+	surface.origin = section.origin;
+	for (int z = 0; z < section.cells; ++z) {
+		if (p_cancel && p_cancel->is_set()) {
+			return false;
 		}
-		TerrainSurface surface;
-		surface.origin = chunk.origin;
-		for (int z = 0; z < chunk.cells; ++z) {
-			for (int y = 0; y < chunk.cells; ++y) {
-				for (int x = 0; x < chunk.cells; ++x) {
-					const Vector3i cell = chunk.address * chunk.cells + Vector3i(x, y, z);
-					const Vector3 origin = Vector3(cell) * p_data.spacing;
-					if (!AABB(origin, Vector3(p_data.spacing, p_data.spacing, p_data.spacing)).intersects(p_data.bounds)) {
-						continue;
+		for (int y = 0; y < section.cells; ++y) {
+			for (int x = 0; x < section.cells; ++x) {
+				const Vector3i cell = section.address * section.cells + Vector3i(x, y, z);
+				const Vector3 origin = Vector3(cell) * p_data.spacing;
+				if (!AABB(origin, Vector3(p_data.spacing, p_data.spacing, p_data.spacing)).intersects(p_data.bounds)) {
+					continue;
+				}
+				Vector3 points[8];
+				float values[8];
+				int solid_count = 0;
+				for (int i = 0; i < 8; ++i) {
+					points[i] = Vector3(cell + CORNERS[i]) * p_data.spacing;
+					values[i] = section.field_at(x + CORNERS[i].x, y + CORNERS[i].y, z + CORNERS[i].z);
+					// Values at mathematical zero can differ by a few float ulps.
+					// Snap consistently before classification to avoid micro-slivers.
+					if (Math::abs(values[i]) <= p_data.spacing * 0.00001) {
+						values[i] = 0;
 					}
-					Vector3 points[8];
-					float values[8];
-					int solid_count = 0;
-					for (int i = 0; i < 8; ++i) {
-						points[i] = Vector3(cell + CORNERS[i]) * p_data.spacing;
-						values[i] = chunk.field_at(x + CORNERS[i].x, y + CORNERS[i].y, z + CORNERS[i].z);
-						// Values at mathematical zero can differ by a few float ulps.
-						// Snap consistently before classification to avoid micro-slivers.
-						if (Math::abs(values[i]) <= p_data.spacing * 0.00001) {
-							values[i] = 0;
-						}
-						solid_count += values[i] < 0;
-					}
-					if (solid_count == 0 || solid_count == 8) {
-						continue;
-					}
-					for (int i = 0; i < 6; ++i) {
-						if (!polygonize_tetrahedron(p_data, surface, points, values, TETRAHEDRA[i], vertices)) {
-							r_error = "Preview triangle budget exceeded (500000 triangles).";
-							return false;
-						}
+					solid_count += values[i] < 0;
+				}
+				if (solid_count == 0 || solid_count == 8) {
+					continue;
+				}
+				for (int i = 0; i < 6; ++i) {
+					if (!polygonize_tetrahedron(p_data, surface, section, points, values, TETRAHEDRA[i], vertices)) {
+						r_error = "Preview triangle budget exceeded in a section.";
+						return false;
 					}
 				}
 			}
+		}
+	}
+	surface.vertex_lookup.clear();
+	return true;
+}
+
+bool TerrainMesher::build(const TerrainData &p_data, Vector<TerrainSurface> &r_surfaces, String &r_error) {
+	r_surfaces.clear();
+	int64_t triangles = 0;
+	for (const TerrainSection &section : p_data.sections) {
+		TerrainSurface surface;
+		if (!build_section(p_data, section, surface, r_error)) {
+			return false;
+		}
+		triangles += surface.indices.size() / 3;
+		if (triangles > p_data.triangle_budget) {
+			r_error = "Preview triangle budget exceeded.";
+			return false;
 		}
 		if (!surface.vertices.is_empty()) {
 			r_surfaces.push_back(surface);

@@ -24,7 +24,7 @@ The long-term consistency contract remains required; this prototype must honestl
 
 ## Review and validation
 
-Build the custom editor, perform an appropriate module smoke check, and review the result in Godot. Explain the C++ structure and Godot registration/property bindings. The user reviews and requests initial adjustments before the first implementation commit. Establish the dedicated automated test structure after that commit, as agreed. No branch pushes are authorized.
+Build the custom editor, perform an appropriate module smoke check, and review the result in Godot. Explain the C++ structure and Godot registration/property bindings. The user reviews and requests initial adjustments before the first implementation commit. Updated review agreement: defer a dedicated unit-test suite for now; use the demo, user inspection, builds, and targeted smoke/regression checks. No branch pushes are authorized.
 
 ## Working setup
 

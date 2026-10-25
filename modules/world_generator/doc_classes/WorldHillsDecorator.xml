@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="WorldHillsDecorator" inherits="WorldTerrainDecorator" api_type="core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+	<brief_description>
+		Rolling terrain with broad waves.
+	</brief_description>
+	<description>
+		Uses layered smooth noise for grassy hills. Elevation, amplitude, wavelength and seed are adjustable through [WorldTerrainDecorator].
+	</description>
+	<tutorials>
+	</tutorials>
+	<members>
+		<member name="amplitude" type="float" setter="set_amplitude" getter="get_amplitude" overrides="WorldTerrainDecorator" default="1.1" />
+		<member name="elevation" type="float" setter="set_elevation" getter="get_elevation" overrides="WorldTerrainDecorator" default="0.65" />
+		<member name="octaves" type="int" setter="set_octaves" getter="get_octaves" overrides="WorldTerrainDecorator" default="3" />
+		<member name="wavelength" type="float" setter="set_wavelength" getter="get_wavelength" overrides="WorldTerrainDecorator" default="4.5" />
+	</members>
+</class>

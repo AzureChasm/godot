@@ -200,3 +200,35 @@ Reusable authored definitions, particular generated region instances, and visibl
 ## Session handoff 2026-10-25
 
 We stopped after agreeing the high-level terrain representation. Next discuss the smallest editable terrain feature and target performance budgets, then sample spacing/precision, chunk data, surface extraction, LOD boundaries, and decorator data contracts. No numeric resolution or chunk size has been selected. Finish the architecture and prototype scope together before creating an implementation branch or writing a prototype. Structure/city generation remains deferred.
+
+## Terrain-profile prototype extension (2026-10-25)
+
+`WorldTerrainDecorator` now provides shared tunable surface-profile controls, with plains, hills, mountains, sea and deep-sea subclasses. Each compiles immutable noise settings into a modifier; the chunk field and meshing contracts are unchanged. Profiles default to replacement at priority -100, before sphere carving. Add/remove composition is explicit. These are topographic starting operations, not a restriction of the world representation to heightmaps. The standalone terrain gallery compares them with optional 3D cave carving and a visual sea-level guide. Transition blending, water simulation and procedural container allocation remain deferred.
+
+## Fixed chunks and parent allocation extension (2026-10-25)
+
+The user selected fixed 16 m world chunks and requested optimization plus an unbounded, weighted-biome demo with transitions. Internal `TerrainSection` arrays subdivide those chunks; spacing snaps to a whole-chunk lattice. A halo supports sampled shading gradients and indexed surfaces. Pure column profiles can reuse XZ evaluations without restricting the 3D field representation; sphere edits use the general path.
+
+`WorldRegionLayout : RegionContainer` owns equal-sized, vertically extruded XZ allocations. Child containers are weighted reusable definitions; their immediate box/position is superseded by the parent allocation, while manually authored descendants keep relative scopes. Layouts can nest. Immutable template programs evaluate demanded logical instances; no infinite scene tree is built. Selection hashes seed and signed cell coordinates, independent of preview movement or discovery order. Current per-instance template noise patterns repeat.
+
+Smoothstep weights blend up to four child signed fields across configurable transition bands. The full child program is grouped at the layout's priority -100; its internal ordering is local, not globally interleaved with ancestor operations. Ancestor decorations are evaluated once; later ancestor operations can modify the blended result. This is a provisional grid-allocation strategy, not the final organic region-shape algorithm. Materials still select the strongest cell. Pair-specific beach/cliff rules, material mixtures, variable sizes, vertical layout, streaming, LODs and persistent edits remain open.
+
+Generation still rebuilds a finite preview synchronously. Stage timings and local benchmark results are in README.md; the new demo moves that request through the unbounded definition in 16 m steps. Automatic editor generation remains disabled.
+
+## Voronoi allocation and independent camera (2026-10-25)
+
+User requested organic biome outlines, configurable parent allocation, multi-cell Voronoi regions, and arrow keys that move the camera rather than immediately replacing the terrain beneath a recentered view.
+
+`WorldRegionLayout` now offers grid and grouped Voronoi strategies. Deterministic fine sites stay within their lattice cells; their owners are the nearest sites of a coarser Voronoi partition with spacing scaled by sqrt(cells_per_region). This assigns a union of fine polygons to one logical region. Its weight-selected biome and template origin are shared across the union. Fine-cell proximity weights combine by region before program evaluation. A 5x5 site search is complete for bounded jitter and blend support capped to half a fine cell. Axis stretch acts in allocation space. This is 2D extruded allocation, not a full 3D Voronoi generator. Cell counts are approximate and connectivity is not guaranteed. Hard region diagnostics return both fine cell and owner IDs; material blending remains deferred.
+
+The demo separates camera focus from loaded preview center. Arrows pan the camera continuously. The terrain window refreshes only after a movement pause or explicit Generate; native publication never changes camera transforms. Automatic refresh is optional, remains synchronous, and rebuilds a finite chunk-aligned window. The diagnostic map shows internal cell borders and outer region borders independently of the 16 m storage grid. Earlier notes describing square-only allocation and arrow-triggered recentering are superseded by this extension.
+
+## Parallel generation and staged publication (2026-10-26)
+
+User explicitly requested multithreaded terrain generation off the main thread, configurable view distance, and a responsive menu. This supersedes the earlier synchronous-preview implementation notes.
+
+`TerrainView` captures node/resource configuration into an immutable request. A dedicated `TerrainBuildJob` coordinator performs validation/cache planning and dispatches worker-pool section tasks, then waits away from the main thread. Each callback owns one pre-sized output slot; the outer COW container is detached before dispatch, never resized concurrently, and shared compiled modifiers are read-only. Workers produce field arrays, indexed surfaces and collision faces. They aggregate by stable section order, making output independent of scheduling. Completion/progress/cancellation use atomic acquire/release handoffs; no scene objects or server APIs are accessed by generation callbacks. Actual worker IDs and a main-thread-violation diagnostic are recorded.
+
+The main thread polls completion and registers at most 1024-triangle pieces under a soft frame budget. Hidden staging has collision layer/mask zero; only a complete latest candidate replaces the old visible/collidable preview. Old nodes retire incrementally. Physics/render server calls and the final activation cannot be preempted; this is not production physics-tick atomicity or a hard frame-time guarantee. More small mesh pieces increase draw calls/node counts.
+
+Requests coalesce to one active and one latest pending immutable snapshot. Superseded jobs cooperatively cancel; cancelled/failed results never replace published data. Node destruction cancels and joins callbacks before freeing their data. `generate_preview` returns acceptance, with completion/failure signals and progress polling. The UI adds radius/spacing/worker/collision controls, Cancel, progress, scrollable layout and incremental diagnostic-map work. Whole-window regeneration remains; incremental streaming/LOD/cache reuse are deferred. Default safety budgets are 16 million halo-inclusive samples and 2 million triangles.

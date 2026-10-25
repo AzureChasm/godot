@@ -7,7 +7,19 @@ def configure(env):
 
 
 def get_doc_classes():
-    return ["RegionContainer", "TerrainView", "WorldDecorator", "WorldSphereDecorator"]
+    return [
+        "RegionContainer",
+        "WorldRegionLayout",
+        "TerrainView",
+        "WorldDecorator",
+        "WorldSphereDecorator",
+        "WorldTerrainDecorator",
+        "WorldPlainsDecorator",
+        "WorldHillsDecorator",
+        "WorldMountainsDecorator",
+        "WorldSeaDecorator",
+        "WorldDeepSeaDecorator",
+    ]
 
 
 def get_doc_path():

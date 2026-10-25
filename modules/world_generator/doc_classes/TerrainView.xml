@@ -1,24 +1,49 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="TerrainView" inherits="Node3D" api_type="core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
-		Generates and displays a bounded, chunk-backed terrain preview.
+		Generates terrain on worker threads and publishes a finite preview across frames.
 	</brief_description>
 	<description>
-		Compiles the selected [RegionContainer] hierarchy, samples candidate field/material chunks, extracts a provisional marching-tetrahedra surface, and prepares static triangle collision. It then replaces its previous generated scene and data after success. Failures retain the last successful preview and set [member status]. Generation is synchronous and bounded by sample/triangle budgets. Streaming, multi-LOD transitions, saves, runtime edit transactions, and production render/physics synchronization remain future work. This node requires an identity global transform.
+		Captures the selected [RegionContainer] hierarchy into immutable C++ modifiers, then generates samples, indexed meshes and collision-face arrays on parallel section workers. A dedicated coordinator waits for the worker group; the main thread never performs sampling/meshing or waits for active generation during normal operation. Scene/render/physics-server registration necessarily remains on the main thread and is staged in small pieces across frames.
+		The previous preview remains visible and collidable until the complete candidate is ready. Staging geometry is hidden and collision-disabled; errors/cancellation retain the previous preview. New accepted requests cancel obsolete work and coalesce to one latest pending snapshot. Node destruction cancels and joins outstanding workers for safe lifetime management. Runtime automatic generation remains disabled in the editor; explicit Inspector previews use the same asynchronous path. This node requires identity global transform and a threaded engine build. This is not production atomic physics-tick publication or incremental streaming.
 	</description>
 	<tutorials>
 	</tutorials>
 	<methods>
+		<method name="cancel_generation">
+			<return type="void" />
+			<description>
+				Requests cooperative cancellation without blocking the main loop and clears any pending replacement. The previous published preview remains. is_generating stays true until workers/staging have been discarded. Node destruction joins cancelled workers to prevent callbacks outliving their data.
+			</description>
+		</method>
 		<method name="generate_preview">
 			<return type="bool" />
 			<description>
-				Generates synchronously and returns true on success. Invalid hierarchy, bounds, transforms, or resource budgets return false without replacing the previous preview. The prototype limits candidates to 512 chunks, 4.5 million samples, and 500000 triangles. It is intended for small editor previews, not real-time large-area editing.
+				Captures settings and queues worker generation. Returns true when accepted, not when finished. Listen for preview_generated, generation_failed or generation_cancelled, or poll is_generating. Authoring errors can return false immediately; worker budget/geometry failures arrive later through generation_failed. A new accepted request cancels obsolete work and replaces the one pending snapshot; only the latest accepted request can publish. Call from the main thread.
+			</description>
+		</method>
+		<method name="get_chunk_cells" qualifiers="const">
+			<return type="int" />
+			<description>
+				Compatibility alias returning section_cells from the original prototype. World chunks now always span 16 metres.
+			</description>
+		</method>
+		<method name="get_progress" qualifiers="const">
+			<return type="Dictionary" />
+			<description>
+				Returns active, stage, request_id, completed_sections, total_sections, published_pieces and total_pieces. Counts are a thread-safe progress snapshot. total_pieces is available only after workers finish.
 			</description>
 		</method>
 		<method name="get_statistics" qualifiers="const">
 			<return type="Dictionary" />
 			<description>
-				Returns a copy of the last successful preview statistics: revision, chunk_count, uniform_chunks, sample_payload_bytes, mesh_chunks, triangles, bounds, and generation_ms. Sample payload excludes metadata, compiled operations, meshes, collision, and temporary memory. Returns an empty dictionary before any successful generation.
+				Returns the last successful revision, request_id, bounds, chunk_count (16 metre spatial groups), chunk_size, section_count, section_cells, effective_spacing, column_samples, uniform_sections, mesh_sections, mesh_pieces, triangles and sample_payload_bytes. Includes worker_threads_used and generation_on_main_thread for diagnostics. worker_ms is worker wall time; sampling_cpu_ms and meshing_cpu_ms sum elapsed durations of concurrent section callbacks, including scheduling/preemption; they are not OS CPU-time counters and may exceed worker wall time. Legacy sampling_ms/meshing_ms keys alias those CPU sums. layout_ms measures main-thread configuration capture; publication_ms accumulates main-thread registration elapsed time; commit_ms measures the final swap; max_publication_step_ms records the largest registration batch/commit. generation_ms includes queueing and frame scheduling. Legacy uniform_chunks/mesh_chunks refer to sections. Payload excludes meshes, collision, metadata and simultaneous old/staging previews. Failed/cancelled jobs do not replace these statistics.
+			</description>
+		</method>
+		<method name="is_generating" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns true while a worker, staged publication or pending replacement is active. Retiring hidden old scene nodes alone does not count as generation.
 			</description>
 		</method>
 		<method name="sample_field" qualifiers="const">
@@ -28,16 +53,20 @@
 				Evaluates the last published immutable modifier snapshot at a world position. Negative values mean solid, positive values mean air, and zero marks the surface. This is the analytic generation field, not interpolation of the cached voxel array or a physics query. It can be evaluated outside the finite view request; container scopes still apply. Requires a successful generation and finite coordinates.
 			</description>
 		</method>
+		<method name="set_chunk_cells">
+			<return type="void" />
+			<param index="0" name="cells" type="int" />
+			<description>
+				Compatibility alias assigning section_cells for earlier scripts and saved scenes. World chunk size is fixed.
+			</description>
+		</method>
 	</methods>
 	<members>
 		<member name="auto_generate" type="bool" setter="set_auto_generate" getter="is_auto_generate" default="true">
 			Queues one preview generation when the scene starts running. Automatic generation is disabled in editor mode; the Generate Preview Inspector action remains available for an explicit editor preview. Property changes do not continuously rebuild terrain.
 		</member>
-		<member name="chunk_cells" type="int" setter="set_chunk_cells" getter="get_chunk_cells" default="32">
-			Cells per chunk edge, from 4 to 64. Each dense chunk includes one additional border sample per edge.
-		</member>
 		<member name="collision_enabled" type="bool" setter="set_collision_enabled" getter="is_collision_enabled" default="true">
-			Build static concave triangle collision for generated mesh chunks. Only use this collider as static terrain.
+			Prepare collision-face arrays on workers and register static concave triangle shapes during staged main-thread publication. Disable for rendering-only view-distance experiments. Captured per request.
 		</member>
 		<member name="generate_action" type="Callable" setter="" getter="get_generate_action" default="Callable()">
 			Inspector action that calls [method generate_preview]. This editor-only callable is not saved in the scene.
@@ -45,21 +74,53 @@
 		<member name="preview_area" type="AABB" setter="set_preview_area" getter="get_preview_area" default="AABB(-4, -4, -4, 8, 8, 8)">
 			Finite world-space request box, intersected with the bounded root area. Mesh triangles are clipped to this exact box without adding artificial edge walls.
 		</member>
+		<member name="publication_budget_ms" type="float" setter="set_publication_budget_ms" getter="get_publication_budget_ms" default="4.0">
+			Soft per-frame main-thread registration budget, from 1 to 16 ms, default 4. Geometry is split into pieces of at most 1024 triangles by workers. A single scene/server operation and the final visibility/collision swap cannot be preempted and may exceed the budget. Hidden old nodes retire separately under a small cleanup budget.
+		</member>
 		<member name="root_path" type="NodePath" setter="set_root_path" getter="get_root_path" default="NodePath(&quot;../World&quot;)">
 			Path to the top [RegionContainer] for this view.
 		</member>
+		<member name="sample_budget" type="int" setter="set_sample_budget" getter="get_sample_budget" default="16000000">
+			Maximum candidate lattice samples including section halos, from 1000000 to 64000000; default 16000000. Requests also have a 4096-section limit. Exceeding either fails asynchronously before dense arrays are allocated, retaining the previous preview. This is not a total process-memory limit.
+		</member>
 		<member name="sample_spacing" type="float" setter="set_sample_spacing" getter="get_sample_spacing" default="0.1">
-			Experimental grid spacing in metres, accepted from 0.025 to 2. Smaller values increase cost and may exceed the preview budget. A chosen spacing does not guarantee preservation of every feature of that size.
+			Requested experimental grid spacing in metres, accepted from 0.025 to 2. The generated lattice is snapped to fit whole sections inside fixed 16 metre world chunks, at the requested spacing or finer. Read effective_spacing from statistics for the actual value. Smaller values increase cost and may exceed the preview budget. A chosen spacing does not guarantee preservation of every feature of that size.
+		</member>
+		<member name="section_cells" type="int" setter="set_section_cells" getter="get_section_cells" default="32">
+			Preferred cells per internal section edge, from 4 to 64. Generation chooses a nearby divisor of the 16 metre world chunk lattice; actual values are reported in statistics. Dense sections include border samples plus a one-sample gradient halo on both sides (actual cells + 3 samples per edge). World chunk dimensions never change. The old serialized chunk_cells property is retained as a compatibility alias.
 		</member>
 		<member name="status" type="String" setter="" getter="get_status" default="&quot;Not generated&quot;">
 			Description of the latest success or failure. Inspect this after a failed generation; [method get_statistics] still describes the previous successful result.
 		</member>
+		<member name="triangle_budget" type="int" setter="set_triangle_budget" getter="get_triangle_budget" default="2000000">
+			Maximum generated triangles, from 10000 to 4000000; default 2000000. Workers cancel the candidate if aggregate section output exceeds this budget; no partial candidate is published.
+		</member>
+		<member name="worker_count" type="int" setter="set_worker_count" getter="get_worker_count" default="8">
+			Requested maximum parallel section tasks, from 1 to 16; default 8. Actual usage is limited by available worker-pool threads, work size and shared pool scheduling. A dedicated waiting coordinator is additional. One worker still keeps generation off the main thread. Captured per request.
+		</member>
 	</members>
 	<signals>
+		<signal name="generation_cancelled">
+			<description>
+				Emitted when explicit cancellation is requested while work is active. Worker cleanup may still be in progress; poll is_generating to observe completion.
+			</description>
+		</signal>
+		<signal name="generation_failed">
+			<param index="0" name="error" type="String" />
+			<description>
+				Emitted on the main thread for immediate authoring errors or later worker budget/geometry failures. The previous successful preview/statistics remain available.
+			</description>
+		</signal>
+		<signal name="generation_started">
+			<param index="0" name="request_id" type="int" />
+			<description>
+				Emitted on the main thread when a request snapshot is accepted. Its ID also appears in progress and successful statistics.
+			</description>
+		</signal>
 		<signal name="preview_generated">
 			<param index="0" name="statistics" type="Dictionary" />
 			<description>
-				Emitted after a successful preview replacement, with a copy of its statistics.
+				Emitted on the main thread after a complete candidate becomes visible/collidable and its data/statistics are published. Cancelled or superseded jobs never emit success.
 			</description>
 		</signal>
 	</signals>

@@ -1,0 +1,87 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://unbounded_world.gd" id="1"]
+
+[sub_resource type="WorldPlainsDecorator" id="Plains"]
+elevation = 1.0
+amplitude = 0.25
+wavelength = 16.0
+
+[sub_resource type="WorldHillsDecorator" id="Hills"]
+elevation = 2.0
+amplitude = 3.5
+wavelength = 18.0
+
+[sub_resource type="WorldMountainsDecorator" id="Mountains"]
+elevation = 1.0
+amplitude = 11.0
+wavelength = 24.0
+
+[sub_resource type="WorldSeaDecorator" id="Sea"]
+elevation = -3.0
+amplitude = 0.6
+wavelength = 20.0
+
+[sub_resource type="WorldDeepSeaDecorator" id="DeepSea"]
+elevation = -9.0
+amplitude = 1.5
+wavelength = 18.0
+
+[sub_resource type="Environment" id="Environment"]
+background_mode = 1
+background_color = Color(0.055, 0.075, 0.105, 1)
+ambient_light_source = 3
+ambient_light_color = Color(0.78, 0.84, 1, 1)
+ambient_light_energy = 0.65
+reflected_light_source = 2
+
+[node name="UnboundedWorld" type="Node3D"]
+script = ExtResource("1")
+
+[node name="World" type="WorldRegionLayout" parent="."]
+bounded = false
+layout_mode = 1
+region_size = 12.0
+transition_width = 4.0
+cell_jitter = 1.0
+cells_per_region = 4
+seed = 2026
+
+[node name="Plains" type="RegionContainer" parent="World"]
+occurrence_weight = 3.0
+decorators = Array[WorldDecorator]([SubResource("Plains")])
+
+[node name="Hills" type="RegionContainer" parent="World"]
+occurrence_weight = 3.0
+decorators = Array[WorldDecorator]([SubResource("Hills")])
+
+[node name="Mountains" type="RegionContainer" parent="World"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("Mountains")])
+
+[node name="Sea" type="RegionContainer" parent="World"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("Sea")])
+
+[node name="DeepSea" type="RegionContainer" parent="World"]
+occurrence_weight = 1.0
+decorators = Array[WorldDecorator]([SubResource("DeepSea")])
+
+[node name="TerrainView" type="TerrainView" parent="."]
+root_path = NodePath("../World")
+preview_area = AABB(-32, -16, -32, 64, 32, 64)
+sample_spacing = 0.5
+
+[node name="Camera3D" type="Camera3D" parent="."]
+current = true
+near = 0.1
+far = 500.0
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+rotation_degrees = Vector3(-52, -25, 0)
+light_color = Color(1, 0.94, 0.82, 1)
+light_energy = 1.3
+shadow_enabled = true
+
+[node name="Environment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment")

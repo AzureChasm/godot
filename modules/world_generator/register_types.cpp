@@ -33,6 +33,8 @@
 #include "region_container.h"
 #include "terrain_view.h"
 #include "world_decorator.h"
+#include "world_region_layout.h"
+#include "world_terrain_decorator.h"
 
 #include "core/object/class_db.h"
 
@@ -42,7 +44,14 @@ void initialize_world_generator_module(ModuleInitializationLevel p_level) {
 	}
 	GDREGISTER_ABSTRACT_CLASS(WorldDecorator);
 	GDREGISTER_CLASS(WorldSphereDecorator);
+	GDREGISTER_ABSTRACT_CLASS(WorldTerrainDecorator);
+	GDREGISTER_CLASS(WorldPlainsDecorator);
+	GDREGISTER_CLASS(WorldHillsDecorator);
+	GDREGISTER_CLASS(WorldMountainsDecorator);
+	GDREGISTER_CLASS(WorldSeaDecorator);
+	GDREGISTER_CLASS(WorldDeepSeaDecorator);
 	GDREGISTER_CLASS(RegionContainer);
+	GDREGISTER_CLASS(WorldRegionLayout);
 	GDREGISTER_CLASS(TerrainView);
 }
 

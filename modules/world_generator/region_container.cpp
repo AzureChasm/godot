@@ -33,6 +33,9 @@
 #include "core/object/class_db.h"
 
 void RegionContainer::_bind_methods() {
+	ClassDB::bind_method(D_METHOD("set_occurrence_weight", "weight"), &RegionContainer::set_occurrence_weight);
+	ClassDB::bind_method(D_METHOD("get_occurrence_weight"), &RegionContainer::get_occurrence_weight);
+	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "occurrence_weight", PROPERTY_HINT_RANGE, "0,100,0.1,or_greater"), "set_occurrence_weight", "get_occurrence_weight");
 	ClassDB::bind_method(D_METHOD("set_bounded", "bounded"), &RegionContainer::set_bounded);
 	ClassDB::bind_method(D_METHOD("is_bounded"), &RegionContainer::is_bounded);
 	ClassDB::bind_method(D_METHOD("set_area", "area"), &RegionContainer::set_area);
@@ -68,7 +71,15 @@ TypedArray<WorldDecorator> RegionContainer::get_decorators() const {
 	return decorators;
 }
 
-bool RegionContainer::collect_operations(Vector<TerrainOperation> &r_operations, String &r_error, const Vector<AABB> &p_scopes, int p_depth) const {
+void RegionContainer::set_occurrence_weight(real_t p_weight) {
+	ERR_FAIL_COND(!Math::is_finite(p_weight) || p_weight < 0 || p_weight > 1000000);
+	occurrence_weight = p_weight;
+}
+real_t RegionContainer::get_occurrence_weight() const {
+	return occurrence_weight;
+}
+
+bool RegionContainer::collect_local_operations(Vector<TerrainOperation> &r_operations, String &r_error, Vector<AABB> &scopes, int p_depth, bool p_assigned) const {
 	if (p_depth > 64 || r_operations.size() > 128) {
 		r_error = "Prototype budget exceeded: at most 64 nesting levels and 128 decorators.";
 		return false;
@@ -78,8 +89,7 @@ bool RegionContainer::collect_operations(Vector<TerrainOperation> &r_operations,
 		r_error = String(get_path()) + ": the first prototype supports translated, axis-aligned containers only (no rotation/scale).";
 		return false;
 	}
-	Vector<AABB> scopes = p_scopes;
-	if (bounded) {
+	if (bounded && !p_assigned) {
 		if (!area.position.is_finite() || !area.size.is_finite() || area.size.x <= 0 || area.size.y <= 0 || area.size.z <= 0) {
 			r_error = String(get_path()) + ": bounded area must be finite with positive dimensions.";
 			return false;
@@ -104,6 +114,14 @@ bool RegionContainer::collect_operations(Vector<TerrainOperation> &r_operations,
 			r_error = "Prototype budget exceeded: at most 128 decorators.";
 			return false;
 		}
+	}
+	return true;
+}
+
+bool RegionContainer::collect_operations(Vector<TerrainOperation> &r_operations, String &r_error, const Vector<AABB> &p_scopes, int p_depth, bool p_assigned) const {
+	Vector<AABB> scopes = p_scopes;
+	if (!collect_local_operations(r_operations, r_error, scopes, p_depth, p_assigned)) {
+		return false;
 	}
 	for (int i = 0; i < get_child_count(); ++i) {
 		const RegionContainer *child = Object::cast_to<RegionContainer>(get_child(i));

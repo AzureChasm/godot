@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="WorldMountainsDecorator" inherits="WorldTerrainDecorator" api_type="core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+	<brief_description>
+		Raised terrain with ridged mountain relief.
+	</brief_description>
+	<description>
+		Uses squared ridged noise with reduced high-frequency contributions to retain broad mountain masses. Defaults use the stone preview material.
+	</description>
+	<tutorials>
+	</tutorials>
+	<members>
+		<member name="amplitude" type="float" setter="set_amplitude" getter="get_amplitude" overrides="WorldTerrainDecorator" default="3.3" />
+		<member name="elevation" type="float" setter="set_elevation" getter="get_elevation" overrides="WorldTerrainDecorator" default="0.3" />
+		<member name="material_id" type="int" setter="set_material_id" getter="get_material_id" overrides="WorldTerrainDecorator" default="3" />
+		<member name="octaves" type="int" setter="set_octaves" getter="get_octaves" overrides="WorldTerrainDecorator" default="3" />
+		<member name="wavelength" type="float" setter="set_wavelength" getter="get_wavelength" overrides="WorldTerrainDecorator" default="8.0" />
+	</members>
+</class>

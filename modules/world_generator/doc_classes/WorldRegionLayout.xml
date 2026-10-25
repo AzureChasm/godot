@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="WorldRegionLayout" inherits="RegionContainer" api_type="core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+	<brief_description>
+		Allocates weighted child regions using a grid or grouped Voronoi cells.
+	</brief_description>
+	<description>
+		A parent layouter whose child [RegionContainer] nodes are reusable biome definitions. Selects children using [member RegionContainer.occurrence_weight] and evaluates immutable child programs in their assigned regions. Immediate child template bounds/placement are superseded by parent allocation; manually authored descendants keep relative scopes. Layouts can nest. An unbounded root still generates only the finite [TerrainView] request.
+		Voronoi mode starts with deterministic jittered fine sites. Each fine cell belongs to the nearest coarse region site; cells with a common owner form a region, which selects one biome and shares one template origin. [member cells_per_region] controls average region size independently of biome occurrence weights. One produces separate fine-cell regions. All sites and choices depend on coordinates and seed, not discovery order. Grouping is an approximate density target, not an exact cell-count or connectivity guarantee. Regions are extruded vertically; 3D cell allocation is not implemented.
+		Neighboring region fields blend using normalized compact proximity weights in Voronoi mode and smoothstep bands in grid mode. Fine-cell weights are combined per region before template evaluation, so internal cell borders do not restart the terrain pattern. Material IDs select the strongest region. Child programs execute in local priority order as one layout operation at priority -100; later ancestor decorators can modify the blended result.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="get_region_at" qualifiers="const">
+			<return type="Dictionary" />
+			<param index="0" name="world_position" type="Vector3" />
+			<description>
+				Queries current authoring settings, not the published snapshot. Returns cell (fine-cell Vector3i, Y=0), region (shared owner Vector3i), biome (child name), center (world-space region template origin), and size (nominal XZ span, not polygon bounds). Grid mode uses identical cell and region IDs. This diagnoses the hard owner, not the transition mixture; the center need not be inside the union's sampled visible portion. Returns an empty dictionary for no eligible child. Positions must be finite and within the prototype's 100000 metre local range.
+			</description>
+		</method>
+	</methods>
+	<members>
+		<member name="cell_jitter" type="float" setter="set_cell_jitter" getter="get_cell_jitter" default="1.0">
+			Voronoi site displacement from lattice centers, from 0 to 1. Maximum displacement is 0.4 cell widths per axis, keeping sites inside their own cells and the local search bounded. Applied to fine and coarse sites.
+		</member>
+		<member name="cells_per_region" type="int" setter="set_cells_per_region" getter="get_cells_per_region" default="4">
+			Target average number of fine Voronoi cells per region, from 1 to 16. Coarse site spacing is multiplied by the square root of this value. Actual group size varies, and groups may include disconnected pieces. Ignored in grid mode.
+		</member>
+		<member name="distribution_scale" type="Vector2" setter="set_distribution_scale" getter="get_distribution_scale" default="Vector2(1, 1)">
+			Parent XZ allocation stretch, with each component from 0.25 to 4. For example Vector2(2, 1) stretches cells and regions along X. Site distances and blend support are measured in the unstretched allocation space.
+		</member>
+		<member name="layout_mode" type="int" setter="set_layout_mode" getter="get_layout_mode" enum="WorldRegionLayout.LayoutMode" default="0">
+			Parent allocation strategy. Defaults to grid for compatibility with earlier scenes; the unbounded demo explicitly selects Voronoi.
+		</member>
+		<member name="region_size" type="float" setter="set_region_size" getter="get_region_size" default="24.0">
+			Base site spacing in metres before distribution_scale, from 4 to 4096. In grid mode this is the square cell edge. In Voronoi mode this controls the typical fine-cell scale, not the exact polygon or region diameter. Independent of the fixed 16 metre world chunks.
+		</member>
+		<member name="seed" type="int" setter="set_seed" getter="get_seed" default="2026">
+			Seed for deterministic site positions, region ownership and weighted child selection. Child terrain seeds are separate. Regenerate after changes.
+		</member>
+		<member name="transition_width" type="float" setter="set_transition_width" getter="get_transition_width" default="8.0">
+			Grid mode: total smoothstep band width, capped at region_size. Voronoi mode: proximity blend support in metres before axis stretch, capped at half region_size so the local candidate search remains complete. Physical band thickness varies with site geometry. Zero chooses hard boundaries. Field geometry blends; specialized beach/cliff rules and material blending remain future work.
+		</member>
+	</members>
+	<constants>
+		<constant name="GRID" value="0" enum="LayoutMode">
+			Regular XZ cells with one independently selected region per cell. Retained for comparison and earlier scene compatibility.
+		</constant>
+		<constant name="VORONOI" value="1" enum="LayoutMode">
+			Jittered Voronoi cells grouped by shared coarse-region ownership. The parent configures cell scale, jitter, grouping density and axis stretch.
+		</constant>
+	</constants>
+</class>

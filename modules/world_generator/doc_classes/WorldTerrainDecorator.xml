@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="WorldTerrainDecorator" inherits="WorldDecorator" api_type="core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+	<brief_description>
+		Shared controls for deterministic terrain surface profiles.
+	</brief_description>
+	<description>
+		Abstract base for terrain decorators attached through [member RegionContainer.decorators]. Profiles evaluate a three-dimensional signed field from a noise-shaped surface. Later sphere operations can still carve caves or add floating solids. Coordinates are relative to the owning container. Default priority is -100, before sphere operations at 0. Replacement after a cave will overwrite that cave inside the shared scope. These fields are not exact signed distances.
+	</description>
+	<tutorials>
+	</tutorials>
+	<members>
+		<member name="amplitude" type="float" setter="set_amplitude" getter="get_amplitude" default="0.08">
+			Vertical relief scale in metres. Zero produces a flat surface. Noise contributions are normalized across octaves.
+		</member>
+		<member name="blend_mode" type="int" setter="set_blend_mode" getter="get_blend_mode" enum="WorldTerrainDecorator.BlendMode" default="0">
+			How the profile combines with the earlier signed field. Defaults to replacement; use additive mode to preserve existing solid and subtractive mode to preserve existing air.
+		</member>
+		<member name="elevation" type="float" setter="set_elevation" getter="get_elevation" default="0.1">
+			Base surface height in metres relative to the owning container. A translated container shifts the profile vertically.
+		</member>
+		<member name="material_id" type="int" setter="set_material_id" getter="get_material_id" default="2">
+			Preview material ID: 1 earth, 2 green, 3 stone, 4 sand, 5 deep slate; other IDs use a fallback palette.
+		</member>
+		<member name="octaves" type="int" setter="set_octaves" getter="get_octaves" default="2">
+			Number of noise layers, from 1 to 6. More layers add smaller details and increase sampling cost.
+		</member>
+		<member name="priority" type="int" setter="set_priority" getter="get_priority" overrides="WorldDecorator" default="-100" />
+		<member name="seed" type="int" setter="set_seed" getter="get_seed" default="13579">
+			Deterministic noise seed. Regenerate the preview to publish parameter changes.
+		</member>
+		<member name="wavelength" type="float" setter="set_wavelength" getter="get_wavelength" default="5.0">
+			Horizontal noise scale in metres. Larger values spread features farther apart. This is a characteristic scale, not a repeating period.
+		</member>
+	</members>
+	<constants>
+		<constant name="REPLACE_TERRAIN" value="0" enum="BlendMode">
+			Replace the earlier field and material inside the attachment scope.
+		</constant>
+		<constant name="ADD_SOLID" value="1" enum="BlendMode">
+			Union the profile solid with earlier solid using the minimum field value. Cannot excavate existing terrain.
+		</constant>
+		<constant name="REMOVE_SOLID" value="2" enum="BlendMode">
+			Intersect the earlier solid with the profile using the maximum field value. Removes solid above the profile; preserves earlier material IDs.
+		</constant>
+	</constants>
+</class>

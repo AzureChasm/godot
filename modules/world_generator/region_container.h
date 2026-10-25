@@ -41,9 +41,11 @@ class RegionContainer : public Node3D {
 	bool bounded = true;
 	AABB area = AABB(Vector3(-4, -4, -4), Vector3(8, 8, 8));
 	TypedArray<WorldDecorator> decorators;
+	real_t occurrence_weight = 1.0;
 
 protected:
 	static void _bind_methods();
+	bool collect_local_operations(Vector<TerrainOperation> &r_operations, String &r_error, Vector<AABB> &r_scopes, int p_depth, bool p_assigned) const;
 
 public:
 	void set_bounded(bool p_bounded);
@@ -52,5 +54,7 @@ public:
 	AABB get_area() const;
 	void set_decorators(const TypedArray<WorldDecorator> &p_decorators);
 	TypedArray<WorldDecorator> get_decorators() const;
-	bool collect_operations(Vector<TerrainOperation> &r_operations, String &r_error, const Vector<AABB> &p_scopes = Vector<AABB>(), int p_depth = 0) const;
+	void set_occurrence_weight(real_t p_weight);
+	real_t get_occurrence_weight() const;
+	virtual bool collect_operations(Vector<TerrainOperation> &r_operations, String &r_error, const Vector<AABB> &p_scopes = Vector<AABB>(), int p_depth = 0, bool p_assigned = false) const;
 };
