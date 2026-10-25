@@ -32,17 +32,28 @@ A forest island can contain a clearing that suppresses forest decoration and a b
 
 Rule identity, categories, partial settings, precedence, and whether a deeper descendant can restore a suppressed rule remain open. A candidate nearest-explicit-setting rule is still only an assistant proposal.
 
-## Generation order
+## Generation order and combined operations
 
-**Confirmed direction:** decorators need an ordering mechanism; terrain work precedes dependent structure and fauna generation. The user suggests priorities. The precise phase system and priority semantics are not agreed.
+**Confirmed:** generation order must be adjustable, with sensible defaults.
 
-**Assistant proposal:** use broad generation phases, plus priority or explicit ordering within a phase. Terrain formation would precede content that queries the resulting terrain. Possible further phases include structures, vegetation, and fauna, but their ordering is not yet selected.
+**User proposal, supported by the assistant as a candidate default:** run decorators in a logical forward order. Later decorators can read and modify earlier results. A phase describes a decorator's main purpose, not exclusive ownership of one kind of world data.
 
-Scope resolution and execution order are different concerns: a forest rule can be authored on an ancestor but evaluated after descendant terrain modifiers. Likewise, a local suppression rule can affect which inherited decorators participate before any relevant placement occurs.
+| Default order under discussion | Main work | Permitted earlier-result edits in this proposal |
+| --- | --- | --- |
+| Terrain | Form the initial landscape. | Base solid/air state and existing terrain modifications. |
+| Vegetation | Place trees and plants. | Terrain, for example around roots. |
+| Structures | Place buildings and other constructions. | Terrain and vegetation, for foundations and clearing. |
+| Fauna, proposed later stage | Place or spawn animals using the resulting environment. | Exact capabilities and ordering remain open. |
 
-A structure may need to choose a site, prepare a foundation, and then place its objects. This may require several operations or dependencies rather than one priority number on one indivisible action. How decorators express these requirements remains open.
+A structure decorator can group several operations at its logical position: inspect a site, prepare terrain, remove or alter vegetation in the footprint, and place the structure. Its terrain edits need not be moved back into the initial terrain phase. This updates the earlier assistant suggestion that every foundation edit should be scheduled there.
 
-Within terrain work, raising hills and flattening a clearing can produce different results depending on order. We must define intentional composition, stable tie-breaking, and the handling of incompatible dependencies. Loading order must not determine output.
+**Assistant proposal:** each operation group identifies the world data it reads, what it changes, and its affected area. Group preparation and validation should avoid leaving a cleared site with no building if placement fails; rollback or another failure mechanism is not yet selected.
+
+Later terrain edits may affect vegetation already placed, including nearby trees the structure did not explicitly target. We need a policy for revalidation, removal, adaptation, or rejection, plus updates to affected geometry and collision. Re-running whole earlier generation passes could undo intentional later changes, so any repair/revalidation mechanism needs a defined scope.
+
+Scope resolution and execution order are different concerns: an inherited forest rule can be authored on an ancestor but evaluated after descendant terrain modifiers. Local suppression can determine which inherited decorators participate before placement.
+
+The phase list, numeric priority direction, allowed reordering, dependency validation, and stable tie-breaking remain undecided. The same inputs must produce the same results regardless of actual task scheduling or exploration order. Priority changes intentionally change generation inputs.
 
 ## Example authoring structure
 
@@ -68,7 +79,7 @@ Reusable authored definitions, particular generated region instances, and visibl
 - Decorator input/output contracts, terrain representation, and composition operations.
 - Ordering phases, priority direction, dependency expression, and deterministic tie-breaking.
 - Inheritance targets, modification/replacement rules, and suppression/restoration behavior.
-- Structure planning and terrain preparation without circular dependencies.
+- Grouped decorator operations, failure behavior, and reconciliation of earlier content after later edits.
 - Container boundaries, falloff, biome transitions, size constraints, and bounded generation.
 - Terrain queries, rendering, collision, streaming, level of detail, persistent changes, and optional simulation boundaries.
 - C++/Godot types, lifecycle, and prototype success criteria, followed by joint architecture agreement before implementation.

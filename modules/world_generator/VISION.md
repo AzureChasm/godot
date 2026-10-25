@@ -20,7 +20,7 @@ The unmodified base is a flat surface at world-space `Y = 0`, with air above and
 
 Decorations apply throughout a container's descendants. A forest rule can span hills and plains produced by other decorators. Descendants can add decorations, modify or replace inherited ones, or suppress them through the antidecorator concept. An island can thus contain a clearing and a birch forest. Exact targeting and inheritance precedence remain open.
 
-Generation needs an ordering mechanism: terrain modifications precede dependent structures and fauna. Priorities are the user's proposed mechanism; a phase-plus-priority system is an assistant proposal. The complete architecture remains under discussion in [the architecture draft](ARCHITECTURE.md).
+Generation order is adjustable with sensible defaults. The current proposed sequence is terrain, vegetation, then structures, with fauna potentially later. Later decorators can modify earlier results: vegetation may edit terrain, and structures may edit both terrain and vegetation. One decorator can group several operations. Exact priorities, ordering contracts, and affected-content reconciliation remain under discussion in [the architecture draft](ARCHITECTURE.md).
 
 Adding ocean and continent children lets the author configure selection chances and size ranges independently. A 70% ocean chance means selecting Ocean 70% of the time, not targeting 70% ocean coverage. An ocean definition with a 10% selection chance can still dominate the visible world if its generated instances are much larger than continents. How eligibility and space constraints affect the selection process remains open.
 
