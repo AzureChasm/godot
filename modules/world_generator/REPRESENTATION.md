@@ -7,6 +7,19 @@ Status: the user has accepted the high-level terrain direction: sparse signed sc
 - Terrain and other objects may use separate representations.
 - The world uses chunks and multiple levels of detail.
 - A tree must permit cuts at arbitrary locations rather than only predetermined break points. This does not yet specify cut geometry, numerical precision, detachment rules, or the object representation.
+- Initial editable terrain detail is roughly fist-sized. This is a feature-size target, not an agreed voxel spacing or exact measurement.
+- Efficiency and scalability matter even though the user's current hardware is powerful. No minimum target machine, frame-rate, memory, or latency budget is set yet.
+- Ordinary digging is gradual; earth magic can cause much larger changes. Maximum affected volume, simultaneity, and acceptable visible delay remain open.
+
+## Current resolution and editing discussion
+
+**Assistant proposal:** evaluate candidate fine sample spacings against fist-sized positive and negative features, including features between sample points and near chunk/LOD boundaries. A provisional comparison of 5 cm and 10 cm spacing could expose the cost/detail tradeoff; neither value is selected or guaranteed to preserve every fist-sized feature. Smooth interpolation alone does not establish an adequate minimum feature size.
+
+Separate two edit workloads: repeated small digging operations and large earth-magic operations spanning many chunks. Candidate scheduling strategies include bounded background work, merging overlapping dirty-chunk requests, skipping obsolete rebuilds, and prioritizing nearby collision/visible results. Their ownership and synchronization contracts are not designed.
+
+A completed operation must still leave a consistent world. Background computation must not accidentally expose contradictory terrain and collision. Whether a large spell commits as one logical change or is intentionally modeled as several visible, consistent smaller changes is a gameplay/design decision still to make.
+
+Scalability controls should distinguish visual quality and residency budgets from authoritative world resolution. Lowering a visual setting must not silently change terrain edits or remove a traversable feature from the underlying world. The exact LOD/collision policies remain open.
 
 The remaining question about voxel terrain is its appearance. The candidate stores scalar samples and extracts the intervening surface, rather than drawing a cube for each occupied sample. A sampled grid therefore need not create Minecraft-style steps. Coarse sampling can still produce faceting, lose thin features, and change silhouettes; smooth shading cannot recover absent geometry.
 
@@ -46,7 +59,7 @@ A hybrid requires coordination between terrain and objects, but a single world q
 
 ## Decisions and evidence still needed
 
-- Smallest editable terrain feature and numerical precision/detail for arbitrary tree cuts.
+- Convert the agreed fist-sized terrain feature target into validated sample spacing/precision; define numerical precision/detail for arbitrary tree cuts separately.
 - Target machines, view/edit distances, memory budget, and acceptable update latency.
 - Object cutting representation and its interaction with identity, detached pieces, collision, and persistence; separate from the terrain grid's resolution.
 - Representation, chunking, quantization, meshing, collision, edits, and LOD boundaries, evaluated together.
