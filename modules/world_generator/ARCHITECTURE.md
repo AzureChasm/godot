@@ -2,6 +2,12 @@
 
 Status: joint design in progress, not approved for implementation. The working authoring model is containers and decorators. Concrete C++/Godot types, data contracts, terrain representation, and prototype scope remain undecided.
 
+## Current focus: terrain first
+
+**Confirmed priority:** terrain comes first. Structure and city generation are later work. Preserve those ideas below without continuing their detailed design now. The next architecture discussion should concentrate on terrain representation, container scope, terrain decorators, ordering/composition, and an editor-reviewable terrain milestone.
+
+**Assistant scope proposal, not yet agreed:** use a bounded editor preview to establish the flat solid/air base, nested containers, deterministic terrain decorators that can add and remove ground, configurable ordering, and visible three-dimensional results. This should exercise hills, a cave, and floating land without selecting a complete biome catalogue or implementing vegetation, buildings, fauna, city layout, or time simulation. Collision, interactive editing, persistence, and streaming inclusion need explicit milestone decisions. The bounded preview does not replace the long-term expandable-world requirement.
+
 ## Base world
 
 **Confirmed:** before decorators act, the world has a flat surface at world-space `Y = 0`. Everything above is air and everything below is solid. No vegetation or structures are present initially.
@@ -65,7 +71,7 @@ A watermill is a special interaction case, but must still preserve the river rat
 
 Validation must consider the proposed result, including terrain preparation and vegetation edits, rather than only whether a building's object bounds fit. It must cover affected neighboring space as well as the originating region. Relevant constraints must be available for that space; how this works across unloaded areas remains open.
 
-**User option under consideration:** restricting containers can constrain building placement to an assigned space. We have not decided whether they impose a hard outer limit, require a structure to fill an exact footprint/volume, or support both. River protection is a semantic restriction that a simple bounding box alone does not express.
+**Future structure-generation ideas, deferred:** filling an assigned city space is a desirable building feature. Buildings may need vertical freedom rather than an exact fixed-height box. Adjacent buildings could reuse an existing wall as a finished boundary to avoid duplicate construction and save resources. Exact footprint/height rules, wall ownership, and editing behavior are not designed. Restricting containers, exact-fit generation, and river constraints remain future structure topics; a simple bounding box alone does not express river protection.
 
 The selection/retry policy remains configurable design work. Trying another building is the user's example; another site, adaptation, or skipping placement are assistant-suggested alternatives, not yet selected defaults. Any retry process must retain the deterministic generation contract.
 

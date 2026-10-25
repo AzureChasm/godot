@@ -12,6 +12,8 @@ The target experience includes natural-looking surfaces, persistent destruction 
 
 Physical behavior and exceptions should be compatible with a game's rules. Astray-specific magic, skill levels, dimensions, and content must not be hard-coded into reusable module logic. Interesting content need not exist at every coordinate or altitude.
 
+The current development priority is terrain. Structure generation is deferred; future ideas include filling city building plots with flexible vertical extent and reusing adjacent walls. The first terrain milestone and its architecture still need joint agreement before implementation.
+
 ## Authoring worlds in the editor
 
 The working authoring model has two concepts: containers structure and position nested regions; decorators supply modifications. The original World Generator, Ocean, and Continent are container/region-layouter concepts. Containers can recursively contain smaller containers. Terrain formation, vegetation, structures, and other modifications are decorator behaviors, replacing the earlier terminal-formation requirement.
