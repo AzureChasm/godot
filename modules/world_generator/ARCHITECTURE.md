@@ -12,11 +12,66 @@ The high-level representation direction is accepted: sparse signed scalar terrai
 
 ## Base world
 
+The concrete chunk data and staged edit lifecycle proposed below are under discussion. They do not authorize implementation.
+
 **Confirmed:** before decorators act, the world has a flat surface at world-space `Y = 0`. Everything above is air and everything below is solid. No vegetation or structures are present initially.
 
 A container entirely below zero starts completely solid; one entirely above zero starts entirely air. A container crossing zero contains the surface. Each container samples the same world-space base: moving a container does not create a new local zero-level surface.
 
 Decorators can change this starting state. An underground decorator could carve caves; an airborne decorator could add floating land. The flat base is a generation rule, not a decision to use heightmap storage. The terrain representation and surface extraction method remain open.
+
+## Proposed terrain chunk data and edit lifecycle
+
+This section is an assistant proposal for joint review. Exact types, ownership primitives, grid dimensions, and failure/publication mechanisms are not selected.
+
+### Authored regions and technical chunks
+
+Containers describe authored regions; chunks partition terrain storage and work. They are independent: a continent can span many chunks, and a chunk can intersect several containers. Container layout must not depend on the camera's current LOD. Terrain sampling resolves the relevant effective decorator rules at world locations.
+
+Proposed chunk addressing uses integer coordinates, with 64-bit components as a candidate for large worlds, and a detail level where needed for derived data. Local sample positions are computed relative to a chunk/grid origin. World extent limits, negative-coordinate division, transforms, and floating-point rendering origins need explicit decisions.
+
+### Chunk contents and ownership
+
+| Concept | Proposed contents or responsibility |
+| --- | --- |
+| Chunk address | Grid coordinates and relevant detail level, separate from container identity. |
+| Terrain data | Signed field and material channels, represented implicitly/uniformly where valid or as compact dense sample arrays where needed. |
+| Data revision | Identity/version of the published terrain contents, plus enough provenance to validate derived work. |
+| Derived output | Meshes, collision, and coarse LOD products built from specified terrain revisions. |
+
+The finest authoritative terrain and its edits are conceptually distinct from coarser rendering/streaming caches. A coarse mesh is not a replacement for persistent fine-detail changes. Finest detail need not be resident for the entire world.
+
+An absent chunk means data is not resident, not that the region is air. Queries may resolve the procedural base/decorators and saved changes or request residency. The nonblocking/blocking query contract is still to design.
+
+Sample boundaries require one consistent global lattice/ownership rule. Meshing may read neighboring samples; an edit near a border must invalidate all dependent meshes, not just the chunk containing its center. Padding/halo width, overlapping caches, and exact sample-versus-cell dimensions depend on the chosen mesher.
+
+**Recommended ownership model for discussion:** published chunk data is read-only. An edit prepares replacement data for affected chunks while readers retain the previous published revision. Initially, copying only affected chunk payloads is a candidate simple implementation; smaller copy-on-write bricks or other optimizations require evidence. Staging memory and retained readers count against the runtime budget.
+
+### One edit crossing a chunk boundary
+
+Consider digging a spherical hole spanning chunks A and B:
+
+1. Describe the desired edit independently of resident mesh nodes: operation shape, world position/extent, material behavior, presentation intent, and deterministic inputs where relevant.
+2. Resolve the complete affected region and required neighboring/read data. Capture the revisions used by the operation, including relevant constraints.
+3. Prepare proposed field/material changes and required dependent updates in staged data. Validate the proposed combined result before publishing changes to the live world; intermediate calculation may be necessary for validation.
+4. Prepare required meshes, collision, and boundary/LOD updates for the agreed publication policy. The exact safe engine synchronization mechanism is undecided.
+5. Check that the input revisions are still current. If an overlapping edit changed them, re-evaluate or retry according to an explicit deterministic conflict policy; never publish stale data over newer changes.
+6. Publish the operation's coherent result at a controlled synchronization point. If preparation or validation fails, keep the previous published world. Multi-chunk publication and failure recovery need a concrete design.
+7. Mark the accepted edit/state for persistence and release old data once no readers need it. Save durability, crash recovery, and generator-version compatibility are separate unresolved contracts.
+
+The user requires consistency after every completed operation. An instant edit coordinates all chunks in its logical change. A progressive spell consists of intentional consistent steps. Background jobs may complete in any physical order, but conflicting logical edit order must be explicit and deterministic for the same inputs. Only redundant derived-output rebuilds may be coalesced without changing edit semantics.
+
+Published terrain, its active collision, and visible output need a defined version/publication policy; merely swapping a data pointer does not prove they are synchronized. Large operations must account for preparation latency and peak memory, without silently converting requested instant effects to progressive ones.
+
+### Proposed responsibility boundaries
+
+- Terrain data/store: addressing, residency, versioned chunk data, and query access.
+- Edit coordinator: candidate edits, validation, affected regions, conflict handling, budgets, and publication.
+- Surface/collision builders: derived output from specified immutable inputs.
+- Persistence: accepted modifications and reconstruction metadata, independently of disposable meshes.
+- Godot integration: editor properties, scene objects, and required engine synchronization.
+
+These are responsibility boundaries, not a mandated class per bullet. Registration, ownership types, task APIs, and editor exposure will follow the agreed contracts.
 
 ## Containers
 
