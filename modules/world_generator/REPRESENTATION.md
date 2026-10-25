@@ -1,6 +1,14 @@
 # World Representation Discussion
 
-Status: researched assistant proposal for joint discussion, not an approved architecture or dependency choice. The user prioritizes representation before prototype scope and asks whether terrain, vegetation, and structures can share it for simplicity and efficiency.
+Status: joint representation discussion, not approved for implementation. Separate terrain and other-object representations, chunks, and multiple LODs are confirmed. The signed scalar terrain field remains a candidate; storage, meshing, object cutting, and resolution are not chosen.
+
+## Confirmed representation requirements
+
+- Terrain and other objects may use separate representations.
+- The world uses chunks and multiple levels of detail.
+- A tree must permit cuts at arbitrary locations rather than only predetermined break points. This does not yet specify cut geometry, numerical precision, detachment rules, or the object representation.
+
+The remaining question about voxel terrain is its appearance. The candidate stores scalar samples and extracts the intervening surface, rather than drawing a cube for each occupied sample. A sampled grid therefore need not create Minecraft-style steps. Coarse sampling can still produce faceting, lose thin features, and change silhouettes; smooth shading cannot recover absent geometry.
 
 ## Candidate: sparse chunked scalar terrain with materials
 
@@ -30,7 +38,7 @@ At fixed world volume, halving sample spacing in each axis produces eight times 
 
 Using the same volumetric technique for ground, tree trunks, and walls could unify some material queries and destructive edits. However, geometry alone does not describe a tree's identity, a door hinge, shared-wall ownership, construction rules, or a detached log's motion. These need additional state even if their geometry is voxelized.
 
-**Assistant recommendation:** begin by evaluating the scalar volume for terrain, while allowing world objects to retain independent identity, geometry, and state. Repeated foliage can use instanced meshes; objects needing local volumetric damage could eventually own their own volumes. Do not commit every object to the terrain's fixed world-space resolution.
+**Confirmed direction:** terrain and other objects are separate. **Assistant recommendation:** evaluate the scalar volume for terrain, while allowing world objects to retain independent identity, geometry, and state. Repeated foliage can use instanced meshes; objects needing local volumetric damage could eventually own their own volumes. The specific object representation is not selected.
 
 Godot provides batched mesh instancing through [MultiMesh](https://docs.godotengine.org/en/stable/tutorials/performance/using_multimesh.html); spatial grouping and culling still matter. This does not solve tree destruction or structure simulation by itself.
 
@@ -38,9 +46,9 @@ A hybrid requires coordination between terrain and objects, but a single world q
 
 ## Decisions and evidence still needed
 
-- Smallest editable terrain feature and desired building/vegetation damage granularity.
+- Smallest editable terrain feature and numerical precision/detail for arbitrary tree cuts.
 - Target machines, view/edit distances, memory budget, and acceptable update latency.
-- Whether universal volumetric editing is important enough to justify its detail and object-management costs.
+- Object cutting representation and its interaction with identity, detached pieces, collision, and persistence; separate from the terrain grid's resolution.
 - Representation, chunking, quantization, meshing, collision, edits, and LOD boundaries, evaluated together.
 - Compare existing C++ backends and relevant algorithms before deciding what to implement ourselves.
 

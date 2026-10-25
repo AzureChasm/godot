@@ -4,7 +4,7 @@ Status: joint design in progress, not approved for implementation. The working a
 
 ## Current focus: terrain first
 
-Representation is the immediate discussion priority. Candidate sparse scalar-field terrain, material data, and the all-volumetric versus hybrid-object tradeoff are recorded in [the representation discussion](REPRESENTATION.md). These are researched proposals, not selected storage or dependency choices.
+Representation is the immediate discussion priority. Separate terrain/objects, chunks, and multiple LODs are confirmed. Trees require arbitrary cut locations. Candidate scalar-field terrain and unresolved storage/meshing/object-cutting choices are recorded in [the representation discussion](REPRESENTATION.md); no backend is selected.
 
 **Confirmed priority:** terrain comes first. Structure and city generation are later work. Preserve those ideas below without continuing their detailed design now. The next architecture discussion should concentrate on terrain representation, container scope, terrain decorators, ordering/composition, and an editor-reviewable terrain milestone.
 
