@@ -1,6 +1,6 @@
 # World Representation Discussion
 
-Status: joint representation discussion, not approved for implementation. Separate terrain and other-object representations, chunks, and multiple LODs are confirmed. The signed scalar terrain field remains a candidate; storage, meshing, object cutting, and resolution are not chosen.
+Status: the user has accepted the high-level terrain direction: sparse signed scalar field plus material data, separate objects, chunks, and multiple LODs. Full architecture is not yet approved for implementation. Concrete storage, meshing, object cutting, and resolution remain open.
 
 ## Confirmed representation requirements
 
@@ -10,7 +10,7 @@ Status: joint representation discussion, not approved for implementation. Separa
 
 The remaining question about voxel terrain is its appearance. The candidate stores scalar samples and extracts the intervening surface, rather than drawing a cube for each occupied sample. A sampled grid therefore need not create Minecraft-style steps. Coarse sampling can still produce faceting, lose thin features, and change silhouettes; smooth shading cannot recover absent geometry.
 
-## Candidate: sparse chunked scalar terrain with materials
+## Agreed direction: sparse chunked scalar terrain with materials
 
 Represent terrain through a signed scalar field sampled in three dimensions, plus material data. Negative field values mean solid, positive mean air, and zero locates the surface. Distance-like values allow interpolation when extracting a smooth mesh. Arbitrary edits need not maintain an exact distance-to-nearest-surface field, so the field's guarantees must be specified rather than assumed.
 

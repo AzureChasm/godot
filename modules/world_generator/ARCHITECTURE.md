@@ -4,7 +4,7 @@ Status: joint design in progress, not approved for implementation. The working a
 
 ## Current focus: terrain first
 
-Representation is the immediate discussion priority. Separate terrain/objects, chunks, and multiple LODs are confirmed. Trees require arbitrary cut locations. Candidate scalar-field terrain and unresolved storage/meshing/object-cutting choices are recorded in [the representation discussion](REPRESENTATION.md); no backend is selected.
+The high-level representation direction is accepted: sparse signed scalar terrain plus material data, separate terrain/objects, chunks, and multiple LODs. Trees require arbitrary cut locations. Storage, meshing, resolution, and object-cutting choices remain open in [the representation discussion](REPRESENTATION.md); no backend is selected.
 
 **Confirmed priority:** terrain comes first. Structure and city generation are later work. Preserve those ideas below without continuing their detailed design now. The next architecture discussion should concentrate on terrain representation, container scope, terrain decorators, ordering/composition, and an editor-reviewable terrain milestone.
 
@@ -105,3 +105,7 @@ Reusable authored definitions, particular generated region instances, and visibl
 - Container boundaries, falloff, biome transitions, size constraints, and bounded generation.
 - Terrain queries, rendering, collision, streaming, level of detail, persistent changes, and optional simulation boundaries.
 - C++/Godot types, lifecycle, and prototype success criteria, followed by joint architecture agreement before implementation.
+
+## Session handoff 2026-10-25
+
+We stopped after agreeing the high-level terrain representation. Next discuss the smallest editable terrain feature and target performance budgets, then sample spacing/precision, chunk data, surface extraction, LOD boundaries, and decorator data contracts. No numeric resolution or chunk size has been selected. Finish the architecture and prototype scope together before creating an implementation branch or writing a prototype. Structure/city generation remains deferred.
