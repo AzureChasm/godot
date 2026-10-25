@@ -68,6 +68,14 @@ The editor tree expresses reusable generation definitions; generated regions are
 
 ## Architecture work still ahead
 
+**Initial assistant proposal, not agreed:** separate three responsibilities before choosing classes:
+
+- **Definitions:** reusable authoring rules such as Ocean, its child biomes, selection weights, and size ranges.
+- **Generated regions:** particular ocean or biome instances, with identity, assigned space, chosen shape, and child relationships.
+- **Materialized world:** terrain, meshes, collision, and placed objects produced for the areas currently needed. The exact storage and streaming model remain open.
+
+For example, a single Ocean definition could describe multiple generated oceans. Their region descriptions need not disappear merely because their visible terrain is unloaded. How much region state is retained, regenerated, or saved needs a separate decision. These responsibilities do not yet prescribe separate subsystems, Godot base classes, or a generation pipeline.
+
 We must jointly define responsibility boundaries, data flow, public APIs, generation inputs, coordinate and space semantics, transition behavior, reproducibility, terrain representation, lifecycle, persistence interactions, and the first prototype's visible success criteria. The number of classes and exact abstractions should follow those decisions.
 
 No prototype or implementation scaffolding is authorized until the user and assistant are both satisfied with the planned architecture. Discuss strengths and weaknesses of suggestions candidly. Keep the resulting C++ understandable through focused explanations and a guided review.
