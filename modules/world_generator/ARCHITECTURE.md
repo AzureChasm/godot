@@ -22,6 +22,31 @@ Decorators can change this starting state. An underground decorator could carve 
 
 ## Proposed terrain chunk data and edit lifecycle
 
+### Candidate class responsibilities for joint review
+
+The user proposes extensible container and decorator interfaces, concrete terrain decorators, a chunk-backed data model, and a view that represents it in the world. The following is an assistant refinement, not an approved class/API design.
+
+| Candidate role/name | Responsibility | Possible Godot relationship |
+| --- | --- | --- |
+| RegionContainer | Author nested scope, child layout/selection, enclosure, and attached rules. Extensible base with shared behavior. | Node3D is a candidate for authoring in the scene tree. |
+| WorldDecorator | Common contract for configurable generation/modification behaviors; terrain implementations can raise, carve, or paint. | Abstract Resource or an authoring Node; choice still open. |
+| TerrainData / TerrainChunk | Addressing, field/material payloads, residency, revisions, and read access. | Prefer data-focused C++ types; editor exposure only where useful. |
+| TerrainEditCoordinator | Turn requests into staged edits; enforce validation, conflict/order, budgets, and coherent publication. | Internal C++ service with an eventual engine-facing entry point. |
+| TerrainMesher | Derive geometry from a specified terrain snapshot; support the selected meshing/LOD contract. | Internal replaceable backend contract, not the chunk authority. |
+| TerrainView | Present accepted geometry and coordinate required collision/LOD integration. | Node3D is a candidate scene/editor adapter. |
+
+These names describe responsibilities; implementations may combine or split them after interface review. Collision building/publication may need its own adapter rather than being hidden inside a rendering-only view. Persistence remains a separate responsibility to design.
+
+An extensible base class can already provide a C++ interface and common state. Do not add a separate pure `IContainer` hierarchy only to enable subclasses; consider a pure interface when unrelated implementations actually need the same contract. Configurable presets can express Ocean versus Continent content without necessarily requiring an engine subclass for each biome. Different layout algorithms may justify subclasses or replaceable layout strategies; this choice is open.
+
+**Assistant flow proposal:** editor container/decorator definitions -> immutable generation inputs -> coordinator and constrained staging context -> candidate chunk changes -> validation and derived-output builders -> coordinated data/view/collision publication. Decorators do not directly mutate live published chunks or scene meshes.
+
+The distinction between authoring and generation must remain explicit. Godot's active scene tree is not generally thread-safe. Background work should consume appropriately owned snapshots/data rather than mutate editor nodes or shared configuration resources. Resource reference counting alone does not make concurrent modification safe.
+
+References: [Godot object registration](https://docs.godotengine.org/en/stable/engine_details/architecture/object_class.html), [Resources](https://docs.godotengine.org/en/stable/tutorials/scripting/resources.html), and [thread-safe APIs](https://docs.godotengine.org/en/stable/tutorials/performance/thread_safe_apis.html).
+
+**Authoring choice still open:** decorators can be visible child nodes in the scene hierarchy, or reusable Resource entries configured on containers in the Inspector, potentially with lightweight attachment nodes referencing those resources. Node authoring matches the user's tree examples; resources provide saveable reusable configuration. We have not selected a representation. Partial overrides, inherited attachment identity, and shared-resource editing behavior need an explicit contract in either case.
+
 This section is an assistant proposal for joint review. Exact types, ownership primitives, grid dimensions, and failure/publication mechanisms are not selected.
 
 ### Authored regions and technical chunks
