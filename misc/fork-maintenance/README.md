@@ -1,5 +1,13 @@
 # Weekly Godot updates
 
+Open `astray-engine.code-workspace` at the repository root for the C++ workspace.
+It includes development builds with tests, compilation database generation for
+clangd, GDB launch configurations, and an interactive Codex task. The Codex IDE
+extension may require you to sign in. Game editing uses
+`../astray/tools/open-editor.sh` and the custom Godot editor's built-in script
+editor. Shared project decisions live in `../astray/docs/project-context.json`;
+each repository's `AGENTS.md` tells local assistants to read that record.
+
 `update-godot.sh` fetches official `upstream/master`, fast-forwards local `master`
 to that exact commit, pushes only `master` to your fork (`origin`), then merges
 that commit into local `develop`. It never pushes `develop` or tags, force-pushes,

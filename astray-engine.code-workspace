@@ -1,0 +1,159 @@
+{
+  "folders": [
+    {
+      "name": "Godot \u2014 Astray Engine",
+      "path": "."
+    }
+  ],
+  "settings": {
+    "clangd.arguments": [
+      "--background-index",
+      "--compile-commands-dir=${workspaceFolder}"
+    ],
+    "[cpp]": {
+      "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd",
+      "editor.formatOnSave": true
+    },
+    "[c]": {
+      "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd",
+      "editor.formatOnSave": true
+    },
+    "files.associations": {
+      "*.inc": "cpp",
+      "SCsub": "python",
+      "SConstruct": "python"
+    },
+    "search.exclude": {
+      "**/bin": true,
+      "**/.cache": true
+    }
+  },
+  "extensions": {
+    "recommendations": [
+      "llvm-vs-code-extensions.vscode-clangd",
+      "kylinideteam.cppdebug",
+      "openai.chatgpt"
+    ]
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Astray: Build Engine",
+        "type": "process",
+        "command": "scons",
+        "args": [
+          "platform=linuxbsd",
+          "target=editor",
+          "dev_build=yes",
+          "tests=yes",
+          "compiledb=yes",
+          "-j16"
+        ],
+        "options": {
+          "cwd": "${workspaceFolder}"
+        },
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
+        "problemMatcher": [
+          "$gcc"
+        ]
+      },
+      {
+        "label": "Astray: Refresh C++ Index",
+        "type": "process",
+        "command": "scons",
+        "args": [
+          "platform=linuxbsd",
+          "target=editor",
+          "dev_build=yes",
+          "tests=yes",
+          "compiledb=yes",
+          "-j16",
+          "compiledb_gen_only=yes"
+        ],
+        "options": {
+          "cwd": "${workspaceFolder}"
+        },
+        "problemMatcher": [
+          "$gcc"
+        ]
+      },
+      {
+        "label": "Astray: Test Engine",
+        "type": "process",
+        "command": "${workspaceFolder}/bin/godot.linuxbsd.editor.dev.x86_64",
+        "args": [
+          "--headless",
+          "--test"
+        ],
+        "options": {
+          "cwd": "${workspaceFolder}"
+        },
+        "dependsOn": "Astray: Build Engine",
+        "group": "test",
+        "problemMatcher": []
+      },
+      {
+        "label": "Astray: Open Game Editor",
+        "type": "process",
+        "command": "${workspaceFolder}/../astray/tools/open-editor.sh",
+        "problemMatcher": []
+      },
+      {
+        "label": "Astray: Codex Engine Session",
+        "type": "process",
+        "command": "codex",
+        "args": [
+          "--cd",
+          "${workspaceFolder}",
+          "--add-dir",
+          "${workspaceFolder}/../astray"
+        ],
+        "problemMatcher": [],
+        "presentation": {
+          "panel": "dedicated",
+          "focus": true
+        }
+      }
+    ]
+  },
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Astray: Debug Game Editor",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "${workspaceFolder}/bin/godot.linuxbsd.editor.dev.x86_64",
+        "args": [
+          "--editor",
+          "--path",
+          "${workspaceFolder}/../astray"
+        ],
+        "cwd": "${workspaceFolder}",
+        "MIMode": "gdb",
+        "miDebuggerPath": "/usr/bin/gdb",
+        "stopAtEntry": false,
+        "preLaunchTask": "Astray: Build Engine"
+      },
+      {
+        "name": "Astray: Debug Engine Tests",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "${workspaceFolder}/bin/godot.linuxbsd.editor.dev.x86_64",
+        "args": [
+          "--headless",
+          "--test"
+        ],
+        "cwd": "${workspaceFolder}",
+        "MIMode": "gdb",
+        "miDebuggerPath": "/usr/bin/gdb",
+        "stopAtEntry": false,
+        "preLaunchTask": "Astray: Build Engine"
+      }
+    ]
+  }
+}

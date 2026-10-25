@@ -214,6 +214,7 @@ cscope.po.out
 # Visual Studio Code
 .vscode/
 *.code-workspace
+!astray-engine.code-workspace
 .history/
 
 # Xcode

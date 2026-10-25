@@ -4,6 +4,12 @@
 
 This is the Astray Godot fork. Keep custom terrain and database features in `modules/` where practical. Game scenes and UI belong in the separate game repository. Run commands from this root.
 
+## Workspace & Shared Context
+
+Use VS Code for engine development. Default to C++ for engine features; suggest another language only when its benefits are substantial, explaining the tradeoff first. Existing build and maintenance tooling may keep its native language. Prefer modules and expose focused APIs for the game.
+
+At the start of an Astray task, read `../astray/docs/project-context.json` when available. It is the shared record of confirmed decisions and dated validation results. Update it after meaningful decisions or milestones; preserve unrelated entries and never store secrets or raw transcripts. Verify recorded state against the checkout. Repository-specific instructions apply only to their own repository.
+
 - `core/` contains foundational types; `scene/` implements scene nodes and resources.
 - `servers/`, `drivers/`, and `platform/` contain engine services, backend integrations, and platform support.
 - `editor/` contains editor code and icons; `modules/` contains optional engine features.
