@@ -6,6 +6,8 @@ This is the Astray Godot fork. Keep custom terrain and database features in `mod
 
 ## Workspace & Shared Context
 
+Keep the fork and modules independent of Astray and reusable by other games. Do not hard-code Astray content, paths, or gameplay into reusable modules. The first planned module is a configurable world generator; its design is under discussion. For design work, read `../astray/docs/vision-and-collaboration.md` when available; distinguish confirmed requirements from proposals.
+
 Use VS Code for engine development. Default to C++ for engine features; suggest another language only when its benefits are substantial, explaining the tradeoff first. Existing build and maintenance tooling may keep its native language. Prefer modules and expose focused APIs for the game.
 
 At the start of an Astray task, read `../astray/docs/project-context.json` when available. It is the shared record of confirmed decisions and dated validation results. Update it after meaningful decisions or milestones; preserve unrelated entries and never store secrets or raw transcripts. Verify recorded state against the checkout. Repository-specific instructions apply only to their own repository.
