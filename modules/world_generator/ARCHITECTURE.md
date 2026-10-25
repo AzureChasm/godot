@@ -4,6 +4,8 @@ Status: joint design in progress, not approved for implementation. The working a
 
 ## Current focus: terrain first
 
+Representation is the immediate discussion priority. Candidate sparse scalar-field terrain, material data, and the all-volumetric versus hybrid-object tradeoff are recorded in [the representation discussion](REPRESENTATION.md). These are researched proposals, not selected storage or dependency choices.
+
 **Confirmed priority:** terrain comes first. Structure and city generation are later work. Preserve those ideas below without continuing their detailed design now. The next architecture discussion should concentrate on terrain representation, container scope, terrain decorators, ordering/composition, and an editor-reviewable terrain milestone.
 
 **Assistant scope proposal, not yet agreed:** use a bounded editor preview to establish the flat solid/air base, nested containers, deterministic terrain decorators that can add and remove ground, configurable ordering, and visible three-dimensional results. This should exercise hills, a cave, and floating land without selecting a complete biome catalogue or implementing vegetation, buildings, fauna, city layout, or time simulation. Collision, interactive editing, persistence, and streaming inclusion need explicit milestone decisions. The bounded preview does not replace the long-term expandable-world requirement.
