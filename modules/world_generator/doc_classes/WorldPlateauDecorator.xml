@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="WorldPlateauDecorator" inherits="WorldTerrainDecorator" api_type="core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+	<brief_description>
+		Creates broad elevated areas with gently rounded margins.
+	</brief_description>
+	<description>
+		Remaps low-frequency noise into raised flatter areas. detail_strength adds subtle variation; amplitude controls relief. Shared elevation, seed, composition, material and interior controls are inherited from [WorldTerrainDecorator].
+	</description>
+	<tutorials>
+	</tutorials>
+</class>

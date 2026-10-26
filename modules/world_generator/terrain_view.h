@@ -47,6 +47,10 @@ class TerrainView : public Node3D {
 	bool collision_enabled = true;
 	Node3D *generated = nullptr;
 	TerrainData published_data;
+	bool program_snapshot_enabled = false;
+	bool program_snapshot_bounded = false;
+	AABB program_snapshot_area;
+	Vector<TerrainOperation> program_snapshot;
 	Dictionary statistics;
 	String status = "Not generated";
 	int64_t revision = 0;
@@ -58,7 +62,15 @@ class TerrainView : public Node3D {
 	int publication_index = 0;
 	int64_t next_request = 0;
 	bool request_cancelled = false;
-	int worker_count = 8;
+	bool lod_enabled = false;
+	Vector3 lod_origin;
+	real_t lod_distance = 16;
+	real_t lod_error = 0.15;
+	real_t lod_near_error = 0;
+	int lod_max_level = 2;
+	String heightmap_csv_path;
+	int heightmap_stride = 1;
+	int worker_count = 1;
 	int64_t sample_budget = 16000000;
 	int64_t triangle_budget = 2000000;
 	real_t publication_budget_ms = 4.0;
@@ -94,6 +106,18 @@ public:
 	bool is_auto_generate() const;
 	void set_collision_enabled(bool p_enabled);
 	bool is_collision_enabled() const;
+	void set_lod_enabled(bool p_value) { lod_enabled = p_value; }
+	bool is_lod_enabled() const { return lod_enabled; }
+	void set_lod_origin(const Vector3 &p_value);
+	Vector3 get_lod_origin() const { return lod_origin; }
+	void set_lod_distance(real_t p_value);
+	real_t get_lod_distance() const { return lod_distance; }
+	void set_lod_max_level(int p_value);
+	int get_lod_max_level() const { return lod_max_level; }
+	void set_lod_near_error(real_t p_value);
+	real_t get_lod_near_error() const { return lod_near_error; }
+	void set_lod_error(real_t p_value);
+	real_t get_lod_error() const { return lod_error; }
 	void set_worker_count(int p_count);
 	int get_worker_count() const;
 	void set_sample_budget(int64_t p_samples);
@@ -106,6 +130,20 @@ public:
 	Dictionary get_progress() const;
 	void cancel_generation();
 	bool generate_preview();
+	void set_heightmap_csv_path(const String &p_path) { heightmap_csv_path = p_path; }
+	String get_heightmap_csv_path() const { return heightmap_csv_path; }
+	void set_heightmap_stride(int p_stride);
+	int get_heightmap_stride() const { return heightmap_stride; }
+	void set_program_snapshot(const Vector<TerrainOperation> &p_operations, bool p_bounded, const AABB &p_area) {
+		program_snapshot = p_operations;
+		program_snapshot_bounded = p_bounded;
+		program_snapshot_area = p_area;
+		program_snapshot_enabled = true;
+	}
+	void release_sample_cache() { published_data.sections.clear(); }
+	void retire_preview();
+	bool has_pending_retirement() const { return !retiring.is_empty(); }
+	TerrainView();
 	~TerrainView();
 	float sample_field(const Vector3 &p_world_position) const;
 	Dictionary get_statistics() const;

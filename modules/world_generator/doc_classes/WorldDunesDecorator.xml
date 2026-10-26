@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="WorldDunesDecorator" inherits="WorldTerrainDecorator" api_type="core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+	<brief_description>
+		Creates gently warped, directional sand dunes.
+	</brief_description>
+	<description>
+		Combines a main sinusoidal cross-section with a weaker harmonic and broad sideways warp. Wavelength controls spacing; amplitude controls relief. This is an analytic dune shape, not wind simulation. Shared elevation, seed, composition, material and interior controls are inherited from [WorldTerrainDecorator].
+	</description>
+	<tutorials>
+	</tutorials>
+</class>

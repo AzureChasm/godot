@@ -51,11 +51,17 @@ private:
 	real_t region_size = 24.0;
 	real_t transition_width = 8.0;
 	int seed = 2026;
+	bool biome_edges = false;
+	real_t boundary_noise = 0;
 
 protected:
 	static void _bind_methods();
 
 public:
+	void set_boundary_noise(real_t p_value);
+	real_t get_boundary_noise() const { return boundary_noise; }
+	void set_biome_edges(bool p_enabled) { biome_edges = p_enabled; }
+	bool has_biome_edges() const { return biome_edges; }
 	void set_layout_mode(LayoutMode p_mode);
 	LayoutMode get_layout_mode() const;
 	void set_cell_jitter(real_t p_jitter);
@@ -64,7 +70,7 @@ public:
 	int get_cells_per_region() const;
 	void set_distribution_scale(const Vector2 &p_scale);
 	Vector2 get_distribution_scale() const;
-	Dictionary get_region_at(const Vector3 &p_world_position) const;
+	Dictionary get_region_at(const Vector3 &p_world_position, int64_t p_instance_seed = 0) const;
 	void set_region_size(real_t p_size);
 	real_t get_region_size() const;
 	void set_transition_width(real_t p_width);

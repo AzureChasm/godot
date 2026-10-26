@@ -25,7 +25,11 @@ var camera_status: Label
 var controls: Dictionary = {}
 var guides: Node3D
 var water: MeshInstance3D
+var guide_token := 0
 var grid_visible := true
+var preview_height := 32.0
+var camera_horizontal_offset := -13.0
+var capture_path := "/tmp/worldgen-unbounded.png"
 
 func _ready() -> void:
 	_build_ui()
@@ -43,16 +47,17 @@ func _ready() -> void:
 	get_viewport().size_changed.connect(_resize_ui)
 	_resize_ui()
 	if "--capture" in OS.get_cmdline_user_args():
-		var deadline := Time.get_ticks_msec() + 60000
-		while terrain.get_statistics().is_empty() or terrain.is_generating() or map_ready_revision != terrain.get_statistics().get("revision", 0):
+		var deadline := Time.get_ticks_msec() + 120000
+		while _terrain_statistics().is_empty() or terrain.is_generating() or map_ready_revision != _terrain_statistics().get("revision", 0):
 			if Time.get_ticks_msec() > deadline:
 				push_error("Capture timed out: " + terrain.status)
 				get_tree().quit(1)
 				return
 			await get_tree().process_frame
 		await RenderingServer.frame_post_draw
-		get_viewport().get_texture().get_image().save_png("/tmp/worldgen-unbounded.png")
-		get_tree().quit()
+		DirAccess.make_dir_recursive_absolute(capture_path.get_base_dir())
+		var capture_error := get_viewport().get_texture().get_image().save_png(capture_path)
+		get_tree().quit(0 if capture_error == OK else 1)
 
 func _build_ui() -> void:
 	var canvas := CanvasLayer.new()
@@ -74,16 +79,17 @@ func _build_ui() -> void:
 	var box := VBoxContainer.new()
 	margin.add_child(box)
 	var title := Label.new()
-	title.text = "Voronoi world · 16 m chunks"
+	title.text = _demo_title()
 	title.add_theme_font_size_override("font_size", 20)
 	box.add_child(title)
+	_build_extra_controls(box)
 	var weights := HBoxContainer.new()
 	box.add_child(weights)
-	for index in range(BIOMES.size()):
-		if index == 3:
+	for index in range(_biome_names().size()):
+		if index > 0 and index % 3 == 0:
 			weights = HBoxContainer.new()
 			box.add_child(weights)
-		var biome: String = BIOMES[index]
+		var biome: String = _biome_names()[index]
 		_add_field(weights, biome, biome, 0, 100, 1, world.get_node(biome).occurrence_weight)
 	var row := HBoxContainer.new()
 	box.add_child(row)
@@ -113,9 +119,9 @@ func _build_ui() -> void:
 	_add_field(row, "camera_speed", "Camera m/s", 2, 60, 1, 18)
 	row = HBoxContainer.new()
 	box.add_child(row)
-	_add_field(row, "view_radius", "View radius (m)", 16, 128, 16, 32)
+	_add_field(row, "view_radius", "View radius (m)", 16, 256, 16, terrain.preview_area.size.x * 0.5)
 	_add_field(row, "spacing", "Samples (m)", 0.125, 2, 0.125, terrain.sample_spacing)
-	_add_field(row, "workers", "Workers", 1, 16, 1, terrain.worker_count)
+	_add_field(row, "workers", "Workers", 1, max(256, OS.get_processor_count()), 1, terrain.worker_count)
 	row = HBoxContainer.new()
 	box.add_child(row)
 	var collision := CheckButton.new()
@@ -124,6 +130,18 @@ func _build_ui() -> void:
 	collision.focus_mode = Control.FOCUS_NONE
 	row.add_child(collision)
 	controls["collision"] = collision
+	var lod := CheckButton.new()
+	lod.text = "Distance LOD"
+	lod.button_pressed = terrain.lod_enabled
+	lod.focus_mode = Control.FOCUS_NONE
+	row.add_child(lod)
+	controls["lod"] = lod
+	row = HBoxContainer.new()
+	box.add_child(row)
+	_add_field(row, "lod_distance", "Full detail (m)", 4, 128, 4, terrain.lod_distance)
+	_add_field(row, "lod_error", "LOD error (m)", 0.01, 2, 0.01, terrain.lod_error)
+	row = HBoxContainer.new()
+	box.add_child(row)
 	_add_button(row, "Cancel", terrain.cancel_generation)
 	_add_button(row, "Frame view", _frame_view)
 	row = HBoxContainer.new()
@@ -158,7 +176,7 @@ func _build_ui() -> void:
 	var help := Label.new()
 	help.custom_minimum_size.x = 360
 	help.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	help.text = "Arrows: pan camera · Shift: faster\nRight-drag: orbit · Wheel: zoom\nG: chunk grid/labels · V: Voronoi map\nW: water guide · Change settings → Generate"
+	help.text = "Arrows: pan camera · Speed: slider/control\nRight-drag: orbit · Wheel: zoom\nG: chunk grid/labels · V: Voronoi map\nW: water guide · Change settings → Generate"
 	box.add_child(help)
 	map_panel = VBoxContainer.new()
 	map_panel.position = Vector2(1040, 16)
@@ -209,11 +227,14 @@ func _build_water() -> void:
 func _generate() -> bool:
 	map_token += 1
 	terrain.cancel_generation()
-	for biome in BIOMES:
+	for biome in _biome_names():
 		world.get_node(biome).occurrence_weight = controls[biome].value
 	terrain.worker_count = int(controls.workers.value)
 	terrain.sample_spacing = controls.spacing.value
 	terrain.collision_enabled = controls.collision.button_pressed
+	terrain.lod_enabled = controls.lod.button_pressed
+	terrain.lod_distance = controls.lod_distance.value
+	terrain.lod_error = controls.lod_error.value
 	world.layout_mode = controls.layout_mode.get_selected_id()
 	world.cell_jitter = controls.cell_jitter.value
 	world.cells_per_region = int(controls.cells_per_region.value)
@@ -221,6 +242,7 @@ func _generate() -> bool:
 	world.seed = int(controls.seed.value)
 	world.region_size = controls.region_size.value
 	world.transition_width = controls.transition_width.value
+	_apply_extra_controls()
 	return _refresh_preview()
 
 func _refresh_preview() -> bool:
@@ -229,8 +251,9 @@ func _refresh_preview() -> bool:
 	# camera transforms never change when generation publishes a replacement.
 	var requested := Vector3(snappedf(center.x, 16), 0, snappedf(center.z, 16))
 	var radius: float = controls.view_radius.value
-	requested_area = AABB(requested + Vector3(-radius, -16, -radius), Vector3(radius * 2, 32, radius * 2))
+	requested_area = AABB(requested + Vector3(-radius, -preview_height * 0.5, -radius), Vector3(radius * 2, preview_height, radius * 2))
 	terrain.preview_area = requested_area
+	terrain.lod_origin = center
 	if not terrain.generate_preview():
 		message.text = terrain.status
 		return false
@@ -263,7 +286,7 @@ func _process(delta: float) -> void:
 		return
 	var direction := Vector2(float(Input.is_physical_key_pressed(KEY_RIGHT)) - float(Input.is_physical_key_pressed(KEY_LEFT)), float(Input.is_physical_key_pressed(KEY_DOWN)) - float(Input.is_physical_key_pressed(KEY_UP)))
 	if direction.length_squared() > 0:
-		var speed: float = controls.camera_speed.value * (3 if Input.is_physical_key_pressed(KEY_SHIFT) else 1)
+		var speed: float = controls.camera_speed.value
 		_pan(direction.normalized() * speed * minf(delta, 0.05))
 
 func _input(event: InputEvent) -> void:
@@ -278,6 +301,7 @@ func _generated(stats: Dictionary) -> void:
 	metrics.text = "%d chunks (16 m) · %d sections\n%d triangles · %.0f ms total\n%d worker threads · %.0f ms worker wall\nScene/physics: %.0f ms spread over frames" % [stats.chunk_count, stats.section_count, stats.triangles, stats.generation_ms, stats.worker_threads_used, stats.worker_ms, stats.publication_ms]
 	preview_center = stats.bounds.get_center()
 	var distribution := "Voronoi: ~%d cells/region" % world.cells_per_region if world.layout_mode == WorldRegionLayout.VORONOI else "Grid: one cell/region"
+	metrics.text += "\nLOD: %d → %d triangles · %d sections" % [stats.source_triangles, stats.triangles, stats.lod_sections]
 	message.text = "Loaded center (%d, %d) · %.3f m samples\n%s · Runtime settings" % [preview_center.x, preview_center.z, stats.effective_spacing, distribution]
 	(water.mesh as PlaneMesh).size = Vector2(stats.bounds.size.x, stats.bounds.size.z)
 	water.position = Vector3(preview_center.x, 0, preview_center.z)
@@ -301,7 +325,7 @@ func _update_progress() -> void:
 	if not is_instance_valid(progress_label):
 		return
 	if not terrain.is_generating():
-		progress_bar.value = 100 if not terrain.get_statistics().is_empty() else 0
+		progress_bar.value = 100 if not _terrain_statistics().is_empty() else 0
 		if terrain.status.begins_with("Generation failed"):
 			progress_label.text = "Failed · previous terrain retained"
 		elif terrain.status.begins_with("Cancelled"):
@@ -324,13 +348,18 @@ func _frame_view() -> void:
 	_update_camera()
 
 func _build_guides() -> void:
+	guide_token += 1
+	var token := guide_token
+	var started := Time.get_ticks_usec()
+	if _terrain_statistics().is_empty():
+		return
 	if guides:
 		remove_child(guides)
 		guides.queue_free()
 	guides = Node3D.new()
 	guides.visible = grid_visible
 	add_child(guides)
-	var bounds: AABB = terrain.get_statistics().bounds
+	var bounds: AABB = _terrain_statistics().bounds
 	var mesh := ImmediateMesh.new()
 	mesh.surface_begin(Mesh.PRIMITIVE_LINES)
 	for axis in [0, 2]:
@@ -358,30 +387,40 @@ func _build_guides() -> void:
 	for z in range(9):
 		for x in range(9):
 			var query := bounds.position + Vector3((x + 0.5) * bounds.size.x / 9, -bounds.position.y, (z + 0.5) * bounds.size.z / 9)
-			var info := world.get_region_at(query)
-			if info.is_empty() or seen.has(info.region):
+			var info := _diagnostic_region(query)
+			if Time.get_ticks_usec() - started > 2000:
+				await get_tree().process_frame
+				if token != guide_token or not is_inside_tree():
+					return
+				started = Time.get_ticks_usec()
+			if not _guide_can_sample(query) or info.is_empty() or seen.has(info.region):
 				continue
 			seen[info.region] = true
 			var point: Vector3 = info.center
-			if not bounds.has_point(point) or world.get_region_at(point).region != info.region:
+			if not bounds.has_point(point) or _diagnostic_region(point).region != info.region:
 				point = query
 			var label := Label3D.new()
-			label.text = "%s\nregion [%d, %d]" % [info.biome, info.region.x, info.region.z]
-			label.position = point + Vector3(0, maxf(0, -terrain.sample_field(point)) + 1.2, 0)
+			label.text = str(info.label) if info.has("label") else "%s\nregion %s" % [info.biome, info.region]
+			if not _guide_can_sample(point):
+				point = query
+			label.position = Vector3(point.x, _surface_height(point, bounds) + 1.5, point.z)
 			label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 			label.font_size = 32
-			label.pixel_size = 0.035
+			label.pixel_size = 0.0012
+			label.fixed_size = true
 			label.no_depth_test = true
 			guides.add_child(label)
 
 func _build_map(token: int) -> void:
 	const SIDE := 96
-	var bounds: AABB = terrain.get_statistics().bounds
+	var merge_borders := _merge_biome_borders()
+	map_panel.get_child(0).text = "Cells: dark · Biome borders: white" if merge_borders else "Cell edges: dark · Region edges: white"
+	var bounds: AABB = _terrain_statistics().bounds
 	var image := Image.create(SIDE, SIDE, false, Image.FORMAT_RGB8)
 	var cells: Array[Vector3i] = []
 	var regions: Array[Vector3i] = []
 	var colors: Array[Color] = []
-	var palette := {"Plains": Color(0.5, 0.7, 0.3), "Hills": Color(0.25, 0.48, 0.2), "Mountains": Color(0.75, 0.78, 0.82), "Sea": Color(0.15, 0.52, 0.7), "DeepSea": Color(0.08, 0.17, 0.35)}
+	var palette := {"Land": Color(0.4,0.6,0.25), "Oceans": Color(0.06,0.25,0.45), "Drylands": Color(0.8,0.6,0.22), "Humid": Color(0.14,0.5,0.25), "Temperate": Color(0.45,0.65,0.3), "Coldlands": Color(0.65,0.75,0.72), "Uplands": Color(0.6,0.6,0.55), "Trenches": Color(0.015,0.05,0.14), "Plains": Color(0.5, 0.7, 0.3), "Hills": Color(0.25, 0.48, 0.2), "Mountains": Color(0.75, 0.78, 0.82), "Sea": Color(0.15, 0.52, 0.7), "DeepSea": Color(0.08, 0.17, 0.35), "Desert": Color(0.85, 0.7, 0.3), "Canyons": Color(0.65, 0.29, 0.16), "Badlands": Color(0.77, 0.42, 0.2), "Savanna": Color(0.65, 0.65, 0.23), "Wetlands": Color(0.25, 0.4, 0.3), "Tundra": Color(0.65, 0.66, 0.58), "Forest": Color(0.18, 0.39, 0.16), "Taiga": Color(0.17, 0.33, 0.3), "Rainforest": Color(0.1, 0.48, 0.27), "Highlands": Color(0.53, 0.57, 0.39), "AlpineMeadows": Color(0.6, 0.7, 0.45), "Steppe": Color(0.68, 0.63, 0.34), "Mangroves": Color(0.18, 0.35, 0.3), "Volcanic": Color(0.28, 0.25, 0.27), "Karst": Color(0.75, 0.72, 0.6)}
 	var frame_started := Time.get_ticks_usec()
 	for z in range(SIDE):
 		if Time.get_ticks_usec() - frame_started > 2000:
@@ -391,7 +430,7 @@ func _build_map(token: int) -> void:
 			frame_started = Time.get_ticks_usec()
 		for x in range(SIDE):
 			var point := Vector3(bounds.position.x + (x + 0.5) * bounds.size.x / SIDE, 0, bounds.position.z + (z + 0.5) * bounds.size.z / SIDE)
-			var info := world.get_region_at(point)
+			var info := _diagnostic_region(point)
 			if info.is_empty():
 				return
 			cells.append(info.cell)
@@ -407,7 +446,7 @@ func _build_map(token: int) -> void:
 			var index := x + z * SIDE
 			var color := colors[index]
 			for neighbor in [index - 1 if x > 0 else index, index - SIDE if z > 0 else index]:
-				if regions[index] != regions[neighbor]:
+				if regions[index] != regions[neighbor] and (not merge_borders or colors[index] != colors[neighbor]):
 					color = Color.WHITE
 					break
 				if cells[index] != cells[neighbor]:
@@ -416,7 +455,7 @@ func _build_map(token: int) -> void:
 	if token != map_token:
 		return
 	map_view.texture = ImageTexture.create_from_image(image)
-	map_ready_revision = terrain.get_statistics().revision
+	map_ready_revision = _terrain_statistics().revision
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion and Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT):
@@ -428,21 +467,71 @@ func _unhandled_input(event: InputEvent) -> void:
 		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
 			distance = maxf(12, distance * 0.9)
 		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
-			distance = minf(600, distance / 0.9)
+			distance = minf(10000, distance / 0.9)
 		_update_camera()
 	elif event is InputEventKey and event.pressed and not event.echo:
 		match event.keycode:
 			KEY_R: _generate()
 			KEY_G:
 				grid_visible = not grid_visible
-				guides.visible = grid_visible
+				if not is_instance_valid(guides) and grid_visible:
+					_build_guides()
+				if is_instance_valid(guides):
+					guides.visible = grid_visible
 			KEY_W: water.visible = not water.visible
 			KEY_V: map_panel.visible = not map_panel.visible
 
 func _update_camera() -> void:
 	camera.position = center + Vector3(sin(yaw) * cos(pitch), sin(pitch), cos(yaw) * cos(pitch)) * distance
 	camera.look_at(center)
-	camera.h_offset = -13.0
+	camera.h_offset = camera_horizontal_offset
 	camera.far = maxf(camera.far, distance * 3)
 	if is_instance_valid(camera_status):
 		camera_status.text = "Camera focus: (%.1f, %.1f)" % [center.x, center.z]
+
+# Cumulative demos extend the shared camera, map, scheduling and performance UI.
+func _build_extra_controls(_box: VBoxContainer) -> void:
+	pass
+
+func _apply_extra_controls() -> void:
+	pass
+
+func _diagnostic_region(point: Vector3) -> Dictionary:
+	return world.get_region_at(point)
+
+func _demo_title() -> String:
+	return "003 · Voronoi world"
+
+func _merge_biome_borders() -> bool:
+	return false
+
+func _biome_names() -> Array:
+	return BIOMES
+
+func _terrain_statistics() -> Dictionary:
+	return terrain.get_statistics()
+
+func _sample_field(point: Vector3) -> float:
+	return terrain.sample_field(point)
+
+func _guide_can_sample(_point: Vector3) -> bool:
+	return true
+
+func _surface_height(point: Vector3, bounds: AABB) -> float:
+	var upper := bounds.end.y
+	if _sample_field(Vector3(point.x, upper, point.z)) <= 0:
+		return upper
+	var step: float = maxf(1, _terrain_statistics().get("effective_spacing", 1))
+	var lower := upper - step
+	while lower >= bounds.position.y:
+		if _sample_field(Vector3(point.x, lower, point.z)) <= 0:
+			for iteration in range(10):
+				var middle := (lower + upper) * 0.5
+				if _sample_field(Vector3(point.x, middle, point.z)) <= 0:
+					lower = middle
+				else:
+					upper = middle
+			return (lower + upper) * 0.5
+		upper = lower
+		lower -= step
+	return bounds.position.y

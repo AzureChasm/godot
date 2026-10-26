@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="TerrainStreamer" inherits="Node3D" api_type="core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+	<brief_description>
+		Incrementally retains terrain patches around a moving focus and schedules nearby work first.
+	</brief_description>
+	<description>
+		Uses a [TerrainView] template as configuration and keeps resident 64-metre XZ patches made from fixed 16-metre world chunks. One worker batch is active at a time; low-priority worker sampling and meshing never run on the main thread. Each completed patch publishes with a soft 1 ms frame budget; retirement is also staged. Moving focus retains overlapping patches, removes outgoing patches, reprioritizes pending work and preempts distant work when nearby terrain is absent. LOD refresh has hysteresis. Source sample spacing stays uniform so adjacent patch borders share a lattice. This is an initial bounded-memory residency implementation, not persistent world edits or adaptive-distance source sampling. Nodes require identity global transforms. Sample arrays are released after publication; immutable programs remain for diagnostic sampling. Changing generation resources requires [method rebuild].
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="get_statistics" qualifiers="const">
+			<return type="Dictionary" />
+			<description>
+				Returns residency counts, queued and resident patch cells, active cell/priority, focus/direction, total resident triangles, elapsed time, desired bounds and errors. Counts describe patches, not individual world chunks. Bounds describe requested residency, including patches not loaded yet. The template triangle budget caps resident output; a patch can be refused and reported when it cannot fit. Retiring meshes and an active candidate add temporary memory.
+			</description>
+		</method>
+		<method name="has_terrain_at" qualifiers="const">
+			<return type="bool" />
+			<param index="0" name="position" type="Vector3" />
+			<description>
+				Returns whether the XZ patch containing [param position] is resident. This does not guarantee solid terrain or a collision surface at that position.
+			</description>
+		</method>
+		<method name="rebuild">
+			<return type="void" />
+			<description>
+				Cancels active work, stages retirement of resident patches, increments the generation epoch and queues a fresh immutable snapshot from the template. Call after generation settings change. Movement only needs [method set_focus].
+			</description>
+		</method>
+		<method name="sample_field" qualifiers="const">
+			<return type="float" />
+			<param index="0" name="position" type="Vector3" />
+			<description>
+				Evaluates a resident immutable terrain program at [param position]. This is a diagnostic field query, not an assurance that geometry is loaded there. Before any patch exists, returns the undecorated Y field.
+			</description>
+		</method>
+		<method name="set_focus">
+			<return type="void" />
+			<param index="0" name="position" type="Vector3" />
+			<param index="1" name="direction" type="Vector3" default="Vector3(0, 0, 0)" />
+			<description>
+				Sets the world-space residency focus and preferred horizontal movement direction. Replans on 16-metre focus-cell changes or direction reversal. Distance dominates priority; forward preference applies within nearby rings. Finite coordinates within 96000 metres are supported by this prototype.
+			</description>
+		</method>
+	</methods>
+	<members>
+		<member name="paused" type="bool" setter="set_paused" getter="is_paused" default="false">
+			Pauses scheduling and publication while retaining resident terrain. Already-running workers may finish. Resume after preparing replacement settings; call rebuild to capture changed terrain resources.
+		</member>
+		<member name="enabled" type="bool" setter="set_enabled" getter="is_enabled" default="true">
+			Enables runtime streaming. Disabling cancels and retires streamed terrain. The editor does not generate automatically.
+		</member>
+		<member name="template_path" type="NodePath" setter="set_template_path" getter="get_template_path" default="NodePath(&quot;&quot;)">
+			Path to a configured TerrainView supplying root_path, sample spacing, worker count, vertical preview enclosure, mesh LOD, collision and allocation/triangle budgets. Keep its auto_generate disabled when used solely as a streaming template.
+		</member>
+		<member name="view_distance" type="float" setter="set_view_distance" getter="get_view_distance" default="256.0">
+			Horizontal residency radius in metres, from 32 to 2048. Patches intersecting the radius are demanded and arrive progressively. Increasing this value does not increase per-patch source resolution or bypass the resident triangle budget.
+		</member>
+	</members>
+	<signals>
+		<signal name="stream_updated">
+			<description>
+				Emitted after a patch completes or fails; poll statistics for focus-driven residency changes as well.
+			</description>
+		</signal>
+	</signals>
+</class>

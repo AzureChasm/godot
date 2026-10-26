@@ -1,0 +1,602 @@
+[gd_scene load_steps=34 format=3]
+
+[ext_resource type="Script" path="res://004_nested_regions_and_ravines.gd" id="1"]
+
+[sub_resource type="WorldStrataDecorator" id="Strata"]
+priority = -150
+soil_depth = 2.0
+
+[sub_resource type="WorldRavineDecorator" id="Ravine1"]
+width = 9.0
+length = 40.0
+depth = 16.0
+meander = 2.6999999999999997
+seed = 71
+probability = 0.04
+variation = 0.8
+
+[sub_resource type="WorldRavineDecorator" id="Ravine2"]
+width = 5.0
+length = 21.0
+depth = 10.0
+meander = 1.5
+seed = 142
+probability = 0.08
+variation = 0.8
+
+[sub_resource type="WorldRavineDecorator" id="Ravine3"]
+width = 3.0
+length = 12.0
+depth = 7.0
+meander = 0.8999999999999999
+seed = 213
+probability = 0.08
+variation = 0.8
+
+[sub_resource type="WorldRavineDecorator" id="Ravine4"]
+width = 2.0
+length = 7.0
+depth = 4.0
+meander = 0.6
+seed = 284
+probability = 0.08
+variation = 0.8
+
+[sub_resource type="WorldSphereDecorator" id="Cave"]
+center = Vector3(0, -3, 0)
+radius = 7.0
+operation = 1
+priority = 10
+
+[sub_resource type="WorldBaseElevationDecorator" id="PlainsBase"]
+elevation = 0.0
+
+[sub_resource type="WorldPlainsDecorator" id="PlainsProfile"]
+priority = -200
+elevation = 0.0
+amplitude = 0.3
+wavelength = 24.0
+seed = 100
+world_space_noise = true
+
+[sub_resource type="WorldBaseElevationDecorator" id="HillsBase"]
+elevation = 3.0
+
+[sub_resource type="WorldHillsDecorator" id="HillsProfile"]
+priority = -200
+elevation = 0.0
+amplitude = 3.5
+wavelength = 24.0
+seed = 101
+world_space_noise = true
+
+[sub_resource type="WorldBaseElevationDecorator" id="MountainsBase"]
+elevation = 1.0
+
+[sub_resource type="WorldMountainsDecorator" id="MountainsProfile"]
+priority = -200
+elevation = 0.0
+amplitude = 12
+wavelength = 24.0
+seed = 102
+world_space_noise = true
+material_id = 3
+interior_elevation = 20.0
+interior_scale = 2.0
+interior_width = 18.0
+roughness = 0.6
+ridge_sharpness = 3.0
+
+[sub_resource type="WorldBaseElevationDecorator" id="SeaBase"]
+elevation = -4.0
+
+[sub_resource type="WorldSeaDecorator" id="SeaProfile"]
+priority = -200
+elevation = 0.0
+amplitude = 0.6
+wavelength = 24.0
+seed = 103
+world_space_noise = true
+
+[sub_resource type="WorldBaseElevationDecorator" id="DeepSeaBase"]
+elevation = -10.0
+
+[sub_resource type="WorldDeepSeaDecorator" id="DeepSeaProfile"]
+priority = -200
+elevation = 0.0
+amplitude = 1.5
+wavelength = 24.0
+seed = 104
+world_space_noise = true
+
+[sub_resource type="Environment" id="Environment"]
+background_mode = 1
+background_color = Color(0.055, 0.075, 0.105, 1)
+ambient_light_source = 3
+ambient_light_color = Color(0.78, 0.84, 1, 1)
+ambient_light_energy = 0.65
+reflected_light_source = 2
+
+[sub_resource type="WorldPlainsDecorator" id="GrassFlats"]
+priority = -200
+elevation = 0
+amplitude = 0.25
+wavelength = 32
+octaves = 3
+seed = 500
+material_id = 2
+world_space_noise = true
+
+
+[sub_resource type="WorldHillsDecorator" id="RollingMeadows"]
+priority = -200
+elevation = 0.3
+amplitude = 2.5
+wavelength = 22
+octaves = 3
+seed = 501
+material_id = 2
+world_space_noise = true
+
+
+[sub_resource type="WorldMountainsDecorator" id="RockyOutcrops"]
+priority = -200
+elevation = 0.5
+amplitude = 3
+wavelength = 12
+octaves = 4
+seed = 502
+material_id = 3
+world_space_noise = true
+blend_mode = 1
+
+
+[sub_resource type="WorldHillsDecorator" id="MeadowHills"]
+priority = -200
+elevation = 0
+amplitude = 4
+wavelength = 28
+octaves = 3
+seed = 531
+material_id = 2
+world_space_noise = true
+
+
+[sub_resource type="WorldMountainsDecorator" id="RockyRidges"]
+priority = -200
+elevation = 1
+amplitude = 5
+wavelength = 14
+octaves = 5
+seed = 532
+material_id = 3
+world_space_noise = true
+blend_mode = 1
+
+
+[sub_resource type="WorldPlainsDecorator" id="ShelteredValleys"]
+priority = -200
+elevation = -1
+amplitude = 0.7
+wavelength = 20
+octaves = 3
+seed = 533
+material_id = 2
+world_space_noise = true
+
+
+[sub_resource type="WorldMountainsDecorator" id="RockFlanks"]
+priority = -200
+elevation = -3
+amplitude = 5
+wavelength = 10
+octaves = 5
+seed = 562
+material_id = 3
+world_space_noise = true
+interior_elevation = 18
+interior_scale = 2
+interior_width = 18.0
+roughness = 0.6
+ridge_sharpness = 2
+
+
+[sub_resource type="WorldMountainsDecorator" id="SharpPeaks"]
+priority = -200
+elevation = 0
+amplitude = 8
+wavelength = 24
+octaves = 5
+seed = 563
+material_id = 3
+world_space_noise = true
+interior_elevation = 24
+interior_scale = 2
+interior_width = 18.0
+roughness = 0.6
+ridge_sharpness = 4
+
+
+[sub_resource type="WorldPlainsDecorator" id="HighPlateaus"]
+priority = -200
+elevation = -1
+amplitude = 1.5
+wavelength = 18
+octaves = 4
+seed = 564
+material_id = 3
+world_space_noise = true
+interior_elevation = 18
+interior_scale = 1.5
+interior_width = 18.0
+roughness = 0.6
+ridge_sharpness = 2
+
+
+[sub_resource type="WorldSeaDecorator" id="SandyShelves"]
+priority = -200
+elevation = 1
+amplitude = 0.5
+wavelength = 28
+octaves = 3
+seed = 593
+material_id = 4
+world_space_noise = true
+
+
+[sub_resource type="WorldMountainsDecorator" id="SeabedRidges"]
+priority = -200
+elevation = -1
+amplitude = 2.5
+wavelength = 16
+octaves = 4
+seed = 594
+material_id = 3
+world_space_noise = true
+
+
+[sub_resource type="WorldDeepSeaDecorator" id="SeabedBasins"]
+priority = -200
+elevation = -2
+amplitude = 1
+wavelength = 24
+octaves = 3
+seed = 595
+material_id = 4
+world_space_noise = true
+
+
+[sub_resource type="WorldDeepSeaDecorator" id="AbyssalPlains"]
+priority = -200
+elevation = 0
+amplitude = 0.5
+wavelength = 32
+octaves = 3
+seed = 624
+material_id = 5
+world_space_noise = true
+
+
+[sub_resource type="WorldMountainsDecorator" id="SubmarineRidges"]
+priority = -200
+elevation = 0
+amplitude = 3.5
+wavelength = 20
+octaves = 5
+seed = 625
+material_id = 3
+world_space_noise = true
+
+
+[sub_resource type="WorldDeepSeaDecorator" id="DeepBasins"]
+priority = -200
+elevation = -3
+amplitude = 2
+wavelength = 18
+octaves = 4
+seed = 626
+material_id = 5
+world_space_noise = true
+
+
+[node name="NestedRegionsAndRavines" type="Node3D"]
+script = ExtResource("1")
+
+[node name="World" type="WorldRegionLayout" parent="."]
+bounded = false
+layout_mode = 1
+region_size = 48.0
+transition_width = 8.0
+cells_per_region = 2
+biome_edges = true
+seed = 2026
+decorators = Array[WorldDecorator]([SubResource("Cave")])
+
+
+[node name="Plains" type="WorldRegionLayout" parent="World"]
+occurrence_weight = 3.0
+layout_mode = 1
+region_size = 18.0
+transition_width = 1.5
+cells_per_region = 1
+seed = 310
+decorators = Array[WorldDecorator]([SubResource("PlainsBase"), SubResource("PlainsProfile"), SubResource("Strata"), SubResource("Ravine1")])
+
+
+[node name="GrassFlats" type="RegionContainer" parent="World/Plains"]
+occurrence_weight = 5.0
+decorators = Array[WorldDecorator]([SubResource("GrassFlats"), SubResource("Strata")])
+
+[node name="RollingMeadows" type="RegionContainer" parent="World/Plains"]
+occurrence_weight = 3.0
+decorators = Array[WorldDecorator]([SubResource("RollingMeadows"), SubResource("Strata")])
+
+[node name="RockyOutcrops" type="RegionContainer" parent="World/Plains"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("RockyOutcrops"), SubResource("Strata")])
+
+[node name="Gullies" type="WorldRegionLayout" parent="World/Plains"]
+occurrence_weight = 3.0
+layout_mode = 1
+region_size = 9.0
+transition_width = 0.75
+cells_per_region = 1
+seed = 457
+decorators = Array[WorldDecorator]([SubResource("Ravine2")])
+
+
+[node name="Undisturbed" type="RegionContainer" parent="World/Plains/Gullies"]
+occurrence_weight = 4.0
+
+[node name="Fissures" type="WorldRegionLayout" parent="World/Plains/Gullies"]
+occurrence_weight = 3.0
+layout_mode = 1
+region_size = 4.5
+transition_width = 0.4
+cells_per_region = 1
+seed = 839
+decorators = Array[WorldDecorator]([SubResource("Ravine3")])
+
+
+[node name="Undisturbed" type="RegionContainer" parent="World/Plains/Gullies/Fissures"]
+occurrence_weight = 4.0
+
+[node name="Channels" type="RegionContainer" parent="World/Plains/Gullies/Fissures"]
+occurrence_weight = 3.0
+decorators = Array[WorldDecorator]([SubResource("Ravine4")])
+
+
+[node name="Hills" type="WorldRegionLayout" parent="World"]
+occurrence_weight = 3.0
+layout_mode = 1
+region_size = 18.0
+transition_width = 1.5
+cells_per_region = 1
+seed = 311
+decorators = Array[WorldDecorator]([SubResource("HillsBase"), SubResource("HillsProfile"), SubResource("Strata"), SubResource("Ravine1")])
+
+
+[node name="MeadowHills" type="RegionContainer" parent="World/Hills"]
+occurrence_weight = 5.0
+decorators = Array[WorldDecorator]([SubResource("MeadowHills"), SubResource("Strata")])
+
+[node name="RockyRidges" type="RegionContainer" parent="World/Hills"]
+occurrence_weight = 3.0
+decorators = Array[WorldDecorator]([SubResource("RockyRidges"), SubResource("Strata")])
+
+[node name="ShelteredValleys" type="RegionContainer" parent="World/Hills"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("ShelteredValleys"), SubResource("Strata")])
+
+[node name="Gullies" type="WorldRegionLayout" parent="World/Hills"]
+occurrence_weight = 3.0
+layout_mode = 1
+region_size = 9.0
+transition_width = 0.75
+cells_per_region = 1
+seed = 457
+decorators = Array[WorldDecorator]([SubResource("Ravine2")])
+
+
+[node name="Undisturbed" type="RegionContainer" parent="World/Hills/Gullies"]
+occurrence_weight = 4.0
+
+[node name="Fissures" type="WorldRegionLayout" parent="World/Hills/Gullies"]
+occurrence_weight = 3.0
+layout_mode = 1
+region_size = 4.5
+transition_width = 0.4
+cells_per_region = 1
+seed = 839
+decorators = Array[WorldDecorator]([SubResource("Ravine3")])
+
+
+[node name="Undisturbed" type="RegionContainer" parent="World/Hills/Gullies/Fissures"]
+occurrence_weight = 4.0
+
+[node name="Channels" type="RegionContainer" parent="World/Hills/Gullies/Fissures"]
+occurrence_weight = 3.0
+decorators = Array[WorldDecorator]([SubResource("Ravine4")])
+
+
+[node name="Mountains" type="WorldRegionLayout" parent="World"]
+occurrence_weight = 2.0
+layout_mode = 1
+region_size = 18.0
+transition_width = 1.5
+cells_per_region = 1
+seed = 312
+decorators = Array[WorldDecorator]([SubResource("MountainsBase"), SubResource("MountainsProfile"), SubResource("Strata"), SubResource("Ravine1")])
+
+
+[node name="RockFlanks" type="RegionContainer" parent="World/Mountains"]
+occurrence_weight = 5.0
+decorators = Array[WorldDecorator]([SubResource("RockFlanks"), SubResource("Strata")])
+
+[node name="SharpPeaks" type="RegionContainer" parent="World/Mountains"]
+occurrence_weight = 3.0
+decorators = Array[WorldDecorator]([SubResource("SharpPeaks"), SubResource("Strata")])
+
+[node name="HighPlateaus" type="RegionContainer" parent="World/Mountains"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("HighPlateaus"), SubResource("Strata")])
+
+[node name="Gullies" type="WorldRegionLayout" parent="World/Mountains"]
+occurrence_weight = 3.0
+layout_mode = 1
+region_size = 9.0
+transition_width = 0.75
+cells_per_region = 1
+seed = 457
+decorators = Array[WorldDecorator]([SubResource("Ravine2")])
+
+
+[node name="Undisturbed" type="RegionContainer" parent="World/Mountains/Gullies"]
+occurrence_weight = 4.0
+
+[node name="Fissures" type="WorldRegionLayout" parent="World/Mountains/Gullies"]
+occurrence_weight = 3.0
+layout_mode = 1
+region_size = 4.5
+transition_width = 0.4
+cells_per_region = 1
+seed = 839
+decorators = Array[WorldDecorator]([SubResource("Ravine3")])
+
+
+[node name="Undisturbed" type="RegionContainer" parent="World/Mountains/Gullies/Fissures"]
+occurrence_weight = 4.0
+
+[node name="Channels" type="RegionContainer" parent="World/Mountains/Gullies/Fissures"]
+occurrence_weight = 3.0
+decorators = Array[WorldDecorator]([SubResource("Ravine4")])
+
+
+[node name="Sea" type="WorldRegionLayout" parent="World"]
+occurrence_weight = 2.0
+layout_mode = 1
+region_size = 18.0
+transition_width = 1.5
+cells_per_region = 1
+seed = 313
+decorators = Array[WorldDecorator]([SubResource("SeaBase"), SubResource("SeaProfile"), SubResource("Strata"), SubResource("Ravine1")])
+
+
+[node name="SandyShelves" type="RegionContainer" parent="World/Sea"]
+occurrence_weight = 5.0
+decorators = Array[WorldDecorator]([SubResource("SandyShelves"), SubResource("Strata")])
+
+[node name="SeabedRidges" type="RegionContainer" parent="World/Sea"]
+occurrence_weight = 3.0
+decorators = Array[WorldDecorator]([SubResource("SeabedRidges"), SubResource("Strata")])
+
+[node name="SeabedBasins" type="RegionContainer" parent="World/Sea"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("SeabedBasins"), SubResource("Strata")])
+
+[node name="Gullies" type="WorldRegionLayout" parent="World/Sea"]
+occurrence_weight = 3.0
+layout_mode = 1
+region_size = 9.0
+transition_width = 0.75
+cells_per_region = 1
+seed = 457
+decorators = Array[WorldDecorator]([SubResource("Ravine2")])
+
+
+[node name="Undisturbed" type="RegionContainer" parent="World/Sea/Gullies"]
+occurrence_weight = 4.0
+
+[node name="Fissures" type="WorldRegionLayout" parent="World/Sea/Gullies"]
+occurrence_weight = 3.0
+layout_mode = 1
+region_size = 4.5
+transition_width = 0.4
+cells_per_region = 1
+seed = 839
+decorators = Array[WorldDecorator]([SubResource("Ravine3")])
+
+
+[node name="Undisturbed" type="RegionContainer" parent="World/Sea/Gullies/Fissures"]
+occurrence_weight = 4.0
+
+[node name="Channels" type="RegionContainer" parent="World/Sea/Gullies/Fissures"]
+occurrence_weight = 3.0
+decorators = Array[WorldDecorator]([SubResource("Ravine4")])
+
+
+[node name="DeepSea" type="WorldRegionLayout" parent="World"]
+occurrence_weight = 1.0
+layout_mode = 1
+region_size = 18.0
+transition_width = 1.5
+cells_per_region = 1
+seed = 314
+decorators = Array[WorldDecorator]([SubResource("DeepSeaBase"), SubResource("DeepSeaProfile"), SubResource("Strata"), SubResource("Ravine1")])
+
+
+[node name="AbyssalPlains" type="RegionContainer" parent="World/DeepSea"]
+occurrence_weight = 5.0
+decorators = Array[WorldDecorator]([SubResource("AbyssalPlains"), SubResource("Strata")])
+
+[node name="SubmarineRidges" type="RegionContainer" parent="World/DeepSea"]
+occurrence_weight = 3.0
+decorators = Array[WorldDecorator]([SubResource("SubmarineRidges"), SubResource("Strata")])
+
+[node name="DeepBasins" type="RegionContainer" parent="World/DeepSea"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("DeepBasins"), SubResource("Strata")])
+
+[node name="Gullies" type="WorldRegionLayout" parent="World/DeepSea"]
+occurrence_weight = 3.0
+layout_mode = 1
+region_size = 9.0
+transition_width = 0.75
+cells_per_region = 1
+seed = 457
+decorators = Array[WorldDecorator]([SubResource("Ravine2")])
+
+
+[node name="Undisturbed" type="RegionContainer" parent="World/DeepSea/Gullies"]
+occurrence_weight = 4.0
+
+[node name="Fissures" type="WorldRegionLayout" parent="World/DeepSea/Gullies"]
+occurrence_weight = 3.0
+layout_mode = 1
+region_size = 4.5
+transition_width = 0.4
+cells_per_region = 1
+seed = 839
+decorators = Array[WorldDecorator]([SubResource("Ravine3")])
+
+
+[node name="Undisturbed" type="RegionContainer" parent="World/DeepSea/Gullies/Fissures"]
+occurrence_weight = 4.0
+
+[node name="Channels" type="RegionContainer" parent="World/DeepSea/Gullies/Fissures"]
+occurrence_weight = 3.0
+decorators = Array[WorldDecorator]([SubResource("Ravine4")])
+
+
+[node name="TerrainView" type="TerrainView" parent="."]
+root_path = NodePath("../World")
+preview_area = AABB(-128, -64, -128, 256, 128, 256)
+sample_spacing = 1.0
+lod_enabled = true
+lod_distance = 32.0
+lod_error = 0.25
+triangle_budget = 4000000
+
+[node name="Camera3D" type="Camera3D" parent="."]
+current = true
+near = 0.1
+far = 800.0
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+rotation_degrees = Vector3(-52, -25, 0)
+light_color = Color(1, 0.94, 0.82, 1)
+light_energy = 1.3
+shadow_enabled = true
+
+[node name="Environment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment")

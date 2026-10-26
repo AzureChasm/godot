@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="WorldMesaDecorator" inherits="WorldTerrainDecorator" api_type="core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+	<brief_description>
+		Creates flatter rock tops with steeper margins.
+	</brief_description>
+	<description>
+		Uses a narrow smooth threshold on broad noise to form flat-topped mesas. This remains a surface profile; it does not generate overhangs. ADD_SOLID produces grounded outcrops. Shared elevation, seed, composition, material and interior controls are inherited from [WorldTerrainDecorator].
+	</description>
+	<tutorials>
+	</tutorials>
+</class>

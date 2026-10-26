@@ -31,6 +31,7 @@
 #include "world_region_layout.h"
 
 #include "core/object/class_db.h"
+#include "core/templates/hashfuncs.h"
 
 namespace {
 uint32_t cell_hash(int p_x, int p_z, uint32_t p_seed) {
@@ -56,9 +57,42 @@ struct LayoutGeometry {
 	real_t cell_size = 24;
 	real_t transition_width = 8;
 	real_t jitter = 1;
+	real_t boundary_noise = 0;
 	int cells_per_region = 4;
 	Vector2 scale = Vector2(1, 1);
 	uint32_t seed = 0;
+
+	// Smooth seeded domain warp bends ownership and blend boundaries together.
+	// Coordinates remain continuous across chunk boundaries; grid mode stays exact.
+	real_t noise(Vector2 p, uint32_t salt) const {
+		Vector2i cell(Math::floor(p.x), Math::floor(p.y));
+		Vector2 t = p - Vector2(cell);
+		t = t * t * (Vector2(3, 3) - 2 * t);
+		auto value = [&](int x, int z) { return real_t(double(cell_hash(x, z, seed ^ salt)) / 2147483648.0 - 1); };
+		return Math::lerp(Math::lerp(value(cell.x, cell.y), value(cell.x + 1, cell.y), t.x), Math::lerp(value(cell.x, cell.y + 1), value(cell.x + 1, cell.y + 1), t.x), t.y);
+	}
+	Vector2 query_point(const Vector2 &p_position) const {
+		Vector2 p = p_position / (cell_size * scale);
+		if (mode == WorldRegionLayout::VORONOI && boundary_noise > 0) {
+			struct WarpCache {
+				Vector2 input;
+				Vector2 output;
+				uint32_t seed = 0;
+				real_t amount = -1;
+			};
+			static thread_local WarpCache cache[4096];
+			const uint32_t hash = hash_murmur3_one_float(p.x, hash_murmur3_one_float(p.y, seed));
+			WarpCache &entry = cache[hash % 4096];
+			if (entry.input == p && entry.seed == seed && entry.amount == boundary_noise) {
+				return entry.output;
+			}
+			const Vector2 input = p;
+			const Vector2 q = p * 2;
+			p += boundary_noise * (Vector2(noise(q, 173), noise(q, 397)) + Vector2(noise(q * 2, 571), noise(q * 2, 839)) * 0.25);
+			entry = { input, p, seed, boundary_noise };
+		}
+		return p;
+	}
 
 	Vector2 site(const Vector2i &p_cell, uint32_t p_salt = 0) const {
 		const real_t x = double(cell_hash(p_cell.x, p_cell.y, seed ^ p_salt)) / 4294967296.0;
@@ -92,7 +126,7 @@ struct LayoutGeometry {
 		return center * cell_size * scale;
 	}
 	int influences(const Vector2 &p_position, CellInfluence *r_cells) const {
-		const Vector2 point = p_position / (cell_size * scale);
+		const Vector2 point = query_point(p_position);
 		if (mode == WorldRegionLayout::GRID) {
 			const Vector2 shifted = point - Vector2(0.5, 0.5);
 			const Vector2i base(int(Math::floor(shifted.x)), int(Math::floor(shifted.y)));
@@ -180,7 +214,105 @@ struct OperationLess {
 };
 
 class RegionLayoutModifier : public TerrainModifier {
+	static SafeNumeric<uint64_t> next_cache_id;
+	const uint64_t cache_id = next_cache_id.increment();
+	struct DepthCache {
+		uint64_t id = 0;
+		Vector2 point;
+		uint32_t seed = 0;
+		int definition = -1;
+		real_t depth = 0;
+	};
+	real_t boundary_depth(const Vector2 &p_position, int p_definition, uint32_t p_seed) const {
+		// Memoize only deterministic XZ-derived geometry, independently per worker.
+		// Unique compilation IDs prevent stale cache hits when modifiers are replaced.
+		static thread_local DepthCache cache[4096];
+		uint32_t hash = hash_murmur3_one_64(cache_id, hash_murmur3_one_float(p_position.x, hash_murmur3_one_float(p_position.y)));
+		hash = hash_murmur3_one_32(p_seed ^ uint32_t(p_definition), hash);
+		DepthCache &entry = cache[hash % 4096];
+		if (entry.id == cache_id && entry.point == p_position && entry.seed == p_seed && entry.definition == p_definition) {
+			return entry.depth;
+		}
+		const Vector2 point = geometry.query_point(p_position);
+		const Vector2i base(Math::floor(point.x), Math::floor(point.y));
+		Vector2 sites[25];
+		int kinds[25];
+		real_t closest = 1e30;
+		int nearest = -1;
+		for (int z = -2; z <= 2; ++z) {
+			for (int x = -2; x <= 2; ++x) {
+				const int i = (z + 2) * 5 + x + 2;
+				const Vector2i cell = base + Vector2i(x, z);
+				sites[i] = geometry.mode == WorldRegionLayout::GRID ? Vector2(cell) + Vector2(.5, .5) : geometry.site(cell);
+				const Vector2i owner = geometry.mode == WorldRegionLayout::GRID ? cell : geometry.owner(cell);
+				kinds[i] = select(owner.x, owner.y, p_seed);
+				const real_t distance = point.distance_squared_to(sites[i]);
+				if (kinds[i] == p_definition && distance < closest) {
+					closest = distance;
+					nearest = i;
+				}
+			}
+		}
+		const real_t scale = geometry.cell_size * MIN(geometry.scale.x, geometry.scale.y);
+		real_t foreign = 1e30;
+		for (int i = 0; i < 25; ++i) {
+			if (kinds[i] != p_definition) {
+				foreign = MIN(foreign, point.distance_squared_to(sites[i]));
+			}
+		}
+		// Continuous distance-gap estimate: changing the nearest matching cell does
+		// not introduce a height jump. Saturation keeps this a bounded local query.
+		const real_t depth = nearest >= 0 ? CLAMP((Math::sqrt(foreign) - Math::sqrt(closest)) * scale * .5, real_t(0), scale * .35) : 0;
+		entry = { cache_id, p_position, p_seed, p_definition, depth };
+		return depth;
+	}
+
+	struct PlanItem {
+		real_t weight = 0;
+		int definition = 0;
+		uint32_t seed = 0;
+		Vector3 instance_origin;
+		real_t depth = 0;
+	};
+	struct Plan {
+		uint64_t id = 0;
+		Vector2 point;
+		uint32_t seed = 0;
+		int count = 0;
+		PlanItem items[25];
+	};
+
+	Plan get_plan(const Vector3 &p_position, uint32_t p_instance_seed) const {
+		const Vector3 local = p_position - origin;
+
+		static thread_local Plan cache[1024];
+		const Vector2 point(local.x, local.z);
+		uint32_t hash = hash_murmur3_one_64(cache_id, hash_murmur3_one_float(point.x, hash_murmur3_one_float(point.y)));
+		hash = hash_murmur3_one_32(p_instance_seed, hash);
+		Plan &entry = cache[hash % 1024];
+		if (entry.id != cache_id || entry.point != point || entry.seed != p_instance_seed) {
+			CellInfluence cells[25];
+			entry.id = cache_id;
+			entry.point = point;
+			entry.seed = p_instance_seed;
+			entry.count = geometry.influences(point, cells);
+			for (int i = 0; i < entry.count; ++i) {
+				const CellInfluence &cell = cells[i];
+				PlanItem &item = entry.items[i];
+				item.weight = cell.weight;
+				item.definition = select(cell.region.x, cell.region.y, p_instance_seed);
+				item.seed = cell_hash(cell.region.x, cell.region.y, geometry.seed ^ p_instance_seed);
+				item.instance_origin = origin + Vector3(cell.center.x, 0, cell.center.y);
+				item.depth = biome_edges ? boundary_depth(point, item.definition, p_instance_seed) : 0;
+			}
+		}
+		// Recursive child layouts may collide with this slot. Copy the bounded
+		// plan before descending, so cache replacement cannot mutate our loop.
+		return entry;
+	}
+
 public:
+	bool biome_edges = false;
 	Vector3 origin;
 	LayoutGeometry geometry;
 	Vector<RegionDefinition> definitions;
@@ -188,10 +320,10 @@ public:
 
 	bool is_column_profile() const override { return column_profile; }
 
-	int select(int p_x, int p_z) const {
+	int select(int p_x, int p_z, uint32_t p_instance_seed) const {
 		// Explicit unsigned arithmetic: negative cells are stable too, with no
 		// mutable RNG stream or dependency on exploration/request order.
-		const uint32_t hash = cell_hash(p_x, p_z, geometry.seed);
+		const uint32_t hash = cell_hash(p_x, p_z, geometry.seed ^ p_instance_seed);
 		const double choice = double(hash) / 4294967296.0 * definitions[definitions.size() - 1].cumulative_weight;
 		for (int i = 0; i < definitions.size(); ++i) {
 			if (choice < definitions[i].cumulative_weight) {
@@ -202,17 +334,71 @@ public:
 	}
 
 	void apply(const Vector3 &p_position, float &r_field, uint16_t &r_material) const override {
-		const Vector3 local = p_position - origin;
-		CellInfluence cells[25];
-		const int count = geometry.influences(Vector2(local.x, local.z), cells);
+		TerrainEvaluationContext context;
+		context.world_position = p_position;
+		apply_context(p_position, r_field, r_material, context);
+	}
+	void apply_seeded(const Vector3 &p_position, float &r_field, uint16_t &r_material, uint32_t p_instance_seed) const override {
+		TerrainEvaluationContext context;
+		context.world_position = p_position;
+		context.instance_seed = p_instance_seed;
+		apply_context(p_position, r_field, r_material, context);
+	}
+	void apply_column(const Vector3 *p_positions, int p_count, float *r_fields, uint16_t *r_materials, const TerrainEvaluationContext &p_context) const override {
+		const Plan plan = get_plan(p_positions[0], p_context.instance_seed);
+		real_t output[MAX_COLUMN_SAMPLES] = {};
+		uint16_t materials[MAX_COLUMN_SAMPLES];
+		for (int j = 0; j < p_count; ++j) {
+			materials[j] = r_materials[j];
+		}
+		real_t strongest = -1;
+		for (int i = 0; i < plan.count; ++i) {
+			const PlanItem &item = plan.items[i];
+			const RegionDefinition &definition = definitions[item.definition];
+			Vector3 positions[MAX_COLUMN_SAMPLES];
+			float fields[MAX_COLUMN_SAMPLES];
+			uint16_t candidate_materials[MAX_COLUMN_SAMPLES];
+			for (int j = 0; j < p_count; ++j) {
+				positions[j] = p_positions[j] - item.instance_origin + definition.origin;
+				fields[j] = r_fields[j];
+				candidate_materials[j] = r_materials[j];
+			}
+			TerrainEvaluationContext context = p_context;
+			context.instance_seed = item.seed;
+			if (biome_edges) {
+				context.biome_depth = item.depth;
+			}
+			for (const TerrainOperation &operation : definition.operations) {
+				TerrainData::apply_operation_column(operation, positions, p_count, fields, candidate_materials, context);
+			}
+			for (int j = 0; j < p_count; ++j) {
+				output[j] += fields[j] * item.weight;
+				if (item.weight > strongest) {
+					materials[j] = candidate_materials[j];
+				}
+			}
+			strongest = MAX(strongest, item.weight);
+		}
+		for (int j = 0; j < p_count; ++j) {
+			r_fields[j] = output[j];
+			r_materials[j] = materials[j];
+		}
+	}
+
+	void apply_context(const Vector3 &p_position, float &r_field, uint16_t &r_material, const TerrainEvaluationContext &p_context) const override {
+		const Plan plan = get_plan(p_position, p_context.instance_seed);
 		real_t field = 0;
 		real_t strongest = -1;
 		uint16_t material = r_material;
-		for (int i = 0; i < count; ++i) {
-			const CellInfluence &cell = cells[i];
-			const RegionDefinition &definition = definitions[select(cell.region.x, cell.region.y)];
-			const Vector3 instance_origin = origin + Vector3(cell.center.x, 0, cell.center.y);
-			const Vector3 query = p_position - instance_origin + definition.origin;
+		for (int i = 0; i < plan.count; ++i) {
+			const PlanItem &item = plan.items[i];
+			const RegionDefinition &definition = definitions[item.definition];
+			const Vector3 query = p_position - item.instance_origin + definition.origin;
+			TerrainEvaluationContext context = p_context;
+			context.instance_seed = item.seed;
+			if (biome_edges) {
+				context.biome_depth = item.depth;
+			}
 			float candidate_field = r_field;
 			uint16_t candidate_material = r_material;
 			for (const TerrainOperation &operation : definition.operations) {
@@ -222,12 +408,12 @@ public:
 					inside &= query.x >= scope.position.x && query.y >= scope.position.y && query.z >= scope.position.z && query.x <= end.x && query.y <= end.y && query.z <= end.z;
 				}
 				if (inside) {
-					operation.modifier->apply(query, candidate_field, candidate_material);
+					operation.modifier->apply_context(query, candidate_field, candidate_material, context);
 				}
 			}
-			field += candidate_field * cell.weight;
-			if (cell.weight > strongest) {
-				strongest = cell.weight;
+			field += candidate_field * item.weight;
+			if (item.weight > strongest) {
+				strongest = item.weight;
 				material = candidate_material;
 			}
 		}
@@ -235,9 +421,16 @@ public:
 		r_material = material;
 	}
 };
+SafeNumeric<uint64_t> RegionLayoutModifier::next_cache_id;
 } // namespace
 
 void WorldRegionLayout::_bind_methods() {
+	ClassDB::bind_method(D_METHOD("set_boundary_noise", "value"), &WorldRegionLayout::set_boundary_noise);
+	ClassDB::bind_method(D_METHOD("get_boundary_noise"), &WorldRegionLayout::get_boundary_noise);
+	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "boundary_noise", PROPERTY_HINT_RANGE, "0,0.4,0.01"), "set_boundary_noise", "get_boundary_noise");
+	ClassDB::bind_method(D_METHOD("set_biome_edges", "enabled"), &WorldRegionLayout::set_biome_edges);
+	ClassDB::bind_method(D_METHOD("has_biome_edges"), &WorldRegionLayout::has_biome_edges);
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "biome_edges"), "set_biome_edges", "has_biome_edges");
 	ClassDB::bind_method(D_METHOD("set_layout_mode", "mode"), &WorldRegionLayout::set_layout_mode);
 	ClassDB::bind_method(D_METHOD("get_layout_mode"), &WorldRegionLayout::get_layout_mode);
 	ClassDB::bind_method(D_METHOD("set_cell_jitter", "jitter"), &WorldRegionLayout::set_cell_jitter);
@@ -252,7 +445,7 @@ void WorldRegionLayout::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::VECTOR2, "distribution_scale"), "set_distribution_scale", "get_distribution_scale");
 	BIND_ENUM_CONSTANT(GRID);
 	BIND_ENUM_CONSTANT(VORONOI);
-	ClassDB::bind_method(D_METHOD("get_region_at", "world_position"), &WorldRegionLayout::get_region_at);
+	ClassDB::bind_method(D_METHOD("get_region_at", "world_position", "instance_seed"), &WorldRegionLayout::get_region_at, DEFVAL(0));
 	ClassDB::bind_method(D_METHOD("set_region_size", "size"), &WorldRegionLayout::set_region_size);
 	ClassDB::bind_method(D_METHOD("get_region_size"), &WorldRegionLayout::get_region_size);
 	ClassDB::bind_method(D_METHOD("set_transition_width", "width"), &WorldRegionLayout::set_transition_width);
@@ -262,6 +455,10 @@ void WorldRegionLayout::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "region_size", PROPERTY_HINT_RANGE, "4,256,1,or_greater"), "set_region_size", "get_region_size");
 	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "transition_width", PROPERTY_HINT_RANGE, "0,64,0.5,or_greater"), "set_transition_width", "get_transition_width");
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "seed"), "set_seed", "get_seed");
+}
+void WorldRegionLayout::set_boundary_noise(real_t p_value) {
+	ERR_FAIL_COND(!Math::is_finite(p_value) || p_value < 0 || p_value > 0.4);
+	boundary_noise = p_value;
 }
 void WorldRegionLayout::set_layout_mode(LayoutMode p_mode) {
 	ERR_FAIL_COND(p_mode != GRID && p_mode != VORONOI);
@@ -325,11 +522,13 @@ bool WorldRegionLayout::collect_operations(Vector<TerrainOperation> &r_operation
 	Ref<RegionLayoutModifier> modifier;
 	modifier.instantiate();
 	modifier->origin = get_global_position();
+	modifier->biome_edges = biome_edges;
 	modifier->geometry.cell_size = region_size;
 	modifier->geometry.transition_width = transition_width;
 	modifier->geometry.seed = uint32_t(seed);
 	modifier->geometry.mode = layout_mode;
 	modifier->geometry.jitter = cell_jitter;
+	modifier->geometry.boundary_noise = boundary_noise;
 	modifier->geometry.cells_per_region = cells_per_region;
 	modifier->geometry.scale = distribution_scale;
 	real_t total_weight = 0;
@@ -370,7 +569,7 @@ bool WorldRegionLayout::collect_operations(Vector<TerrainOperation> &r_operation
 	return true;
 }
 
-Dictionary WorldRegionLayout::get_region_at(const Vector3 &p_world_position) const {
+Dictionary WorldRegionLayout::get_region_at(const Vector3 &p_world_position, int64_t p_instance_seed) const {
 	ERR_FAIL_COND_V(!p_world_position.is_finite() || p_world_position.abs().length() > 100000, Dictionary());
 	const Vector3 local = p_world_position - get_global_position();
 	LayoutGeometry geometry;
@@ -379,6 +578,7 @@ Dictionary WorldRegionLayout::get_region_at(const Vector3 &p_world_position) con
 	geometry.seed = uint32_t(seed);
 	geometry.mode = layout_mode;
 	geometry.jitter = cell_jitter;
+	geometry.boundary_noise = boundary_noise;
 	geometry.cells_per_region = cells_per_region;
 	geometry.scale = distribution_scale;
 	CellInfluence cell[25];
@@ -395,7 +595,7 @@ Dictionary WorldRegionLayout::get_region_at(const Vector3 &p_world_position) con
 	if (total <= 0) {
 		return Dictionary();
 	}
-	const double choice = double(cell_hash(x, z, uint32_t(seed))) / 4294967296.0 * total;
+	const double choice = double(cell_hash(x, z, uint32_t(seed) ^ uint32_t(p_instance_seed))) / 4294967296.0 * total;
 	real_t cumulative = 0;
 	for (int i = 0; i < get_child_count(); ++i) {
 		const RegionContainer *child = Object::cast_to<RegionContainer>(get_child(i));
@@ -405,6 +605,7 @@ Dictionary WorldRegionLayout::get_region_at(const Vector3 &p_world_position) con
 		cumulative += child->get_occurrence_weight();
 		if (choice < cumulative) {
 			Dictionary result;
+			result["instance_seed"] = int64_t(cell_hash(x, z, uint32_t(seed) ^ uint32_t(p_instance_seed)));
 			result["cell"] = Vector3i(cell[0].cell.x, 0, cell[0].cell.y);
 			result["region"] = Vector3i(x, 0, z);
 			result["biome"] = String(child->get_name());

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="WorldRavineDecorator" inherits="WorldDecorator" api_type="core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+	<brief_description>
+		Carves a meandering, upward-open ravine inside its container scope.
+	</brief_description>
+	<description>
+		Creates a finite-depth cut with an elliptical XZ footprint, aligned along local Z before optional seeded rotation. Uses inherited base elevation plus center.y as its reference. All enclosing container bounds restrict the operation; place it on a bounded descendant to keep it local. Cuts remain within the allocated biome influence, with field blending at layout transitions. Does not allocate underground biomes or simulate erosion. Default priority 0 follows terrain and strata. Parent layouters pass a stable instance identity so optional occurrence and shape variation differ across generated instances, including nested regions. Sizes are authored in metres; nesting does not automatically rescale them.
+	</description>
+	<tutorials>
+	</tutorials>
+	<members>
+		<member name="center" type="Vector3" setter="set_center" getter="get_center" default="Vector3(0, 0, 0)">
+			Local reference position, with inherited elevation added to Y.
+		</member>
+		<member name="width" type="float" setter="set_width" getter="get_width" default="5.0">
+			Full width of the elliptical footprint in metres.
+		</member>
+		<member name="length" type="float" setter="set_length" getter="get_length" default="24.0">
+			Full length along Z in metres.
+		</member>
+		<member name="depth" type="float" setter="set_depth" getter="get_depth" default="12.0">
+			Bottom distance below the reference level. The cut is open upward.
+		</member>
+		<member name="meander" type="float" setter="set_meander" getter="get_meander" default="1.0">
+			Sideways bend amplitude in metres; zero gives a straight ravine.
+		</member>
+		<member name="seed" type="int" setter="set_seed" getter="get_seed" default="42">
+			Deterministic bend phase seed.
+		</member>
+		<member name="probability" type="float" setter="set_probability" getter="get_probability" default="1.0">
+			Probability from 0 to 1 of applying this cut in each generated region instance. Uses a deterministic hash of decorator seed and instance identity, not discovery order. Defaults to always applying. Zero disables all cuts without disabling the resource.
+		</member>
+		<member name="variation" type="float" setter="set_variation" getter="get_variation" default="0.0">
+			Seeded variation amount from 0 to 1. Varies rotation, position, width, length, depth and bend shape per instance. Zero preserves the original authored shape. Width varies by up to 35 percent, length 25 percent and depth 30 percent; reference dimensions remain metre values. Rotated/offset cuts remain subject to their region scope.
+		</member>
+	</members>
+</class>

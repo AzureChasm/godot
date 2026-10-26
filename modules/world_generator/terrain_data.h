@@ -38,10 +38,35 @@
 #include "core/templates/vector.h"
 #include "core/variant/variant.h"
 
+struct TerrainEvaluationContext {
+	uint32_t instance_seed = 0;
+	Vector3 world_position;
+	real_t biome_depth = 0;
+	// Borrowed only during a synchronous column call; never retained by modifiers.
+	const Vector3 *world_column = nullptr;
+	int column_offset = 0;
+};
+
 // Compiled, immutable behavior. It never reads scene nodes or mutable resources.
 class TerrainModifier : public RefCounted {
 public:
+	static constexpr int MAX_COLUMN_SAMPLES = 67;
+	virtual void apply_column(const Vector3 *p_positions, int p_count, float *r_fields, uint16_t *r_materials, const TerrainEvaluationContext &p_context) const {
+		for (int i = 0; i < p_count; ++i) {
+			TerrainEvaluationContext context = p_context;
+			context.column_offset += i;
+			context.world_position = context.world_column ? context.world_column[context.column_offset] : p_positions[i];
+			apply_context(p_positions[i], r_fields[i], r_materials[i], context);
+		}
+	}
+	virtual void apply_context(const Vector3 &p_position, float &r_field, uint16_t &r_material, const TerrainEvaluationContext &p_context) const {
+		apply_seeded(p_position, r_field, r_material, p_context.instance_seed);
+	}
 	virtual bool is_column_profile() const { return false; }
+	// Instance identity is passed explicitly; workers never share mutable RNG state.
+	virtual void apply_seeded(const Vector3 &p_position, float &r_field, uint16_t &r_material, uint32_t p_instance_seed) const {
+		apply(p_position, r_field, r_material);
+	}
 	virtual void apply(const Vector3 &p_position, float &r_field, uint16_t &r_material) const = 0;
 };
 
@@ -91,6 +116,8 @@ public:
 	Vector<TerrainSection> sections;
 
 	TerrainSample sample(const Vector3 &p_position) const;
+	void sample_column(const Vector3 *p_positions, int p_count, float *r_fields, uint16_t *r_materials) const;
+	static void apply_operation_column(const TerrainOperation &p_operation, const Vector3 *p_positions, int p_count, float *r_fields, uint16_t *r_materials, const TerrainEvaluationContext &p_context);
 	Vector3 normal(const Vector3 &p_position) const;
 	Vector3 sampled_normal(const TerrainSection &p_section, const Vector3 &p_position, uint16_t &r_material) const;
 	bool prepare(String &r_error);

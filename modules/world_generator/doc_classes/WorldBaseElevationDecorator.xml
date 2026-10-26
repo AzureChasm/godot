@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="WorldBaseElevationDecorator" inherits="WorldDecorator" api_type="core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+	<brief_description>
+		Inherited reference elevation for descendant terrain profiles.
+	</brief_description>
+	<description>
+		Authoring metadata resolved root-to-leaf before immutable modifiers are compiled. Applies to terrain profiles and ravine reference levels, without moving container bounds, nodes, or explicitly positioned sphere decorators. Requires a terrain profile to create a surface; metadata alone does not replace the base Y=0 field. Disabled entries are ignored; multiple entries on the same container resolve in list order. Priority does not affect metadata. Shared Resources are never modified to implement inheritance.
+	</description>
+	<tutorials>
+	</tutorials>
+	<members>
+		<member name="elevation" type="float" setter="set_elevation" getter="get_elevation" default="0.0">
+			Reference elevation in metres. Terrain profile elevation remains an additional local offset. Node translation is additional.
+		</member>
+		<member name="relative" type="bool" setter="set_relative" getter="is_relative" default="false">
+			When true, adds elevation to the inherited value; otherwise replaces it for this container and descendants.
+		</member>
+	</members>
+</class>

@@ -1,0 +1,4649 @@
+[gd_scene load_steps=366 format=3]
+
+[ext_resource type="Script" path="res://009_lakes_plateaus_and_terrain_variety.gd" id="1"]
+
+[sub_resource type="WorldStrataDecorator" id="Strata"]
+priority = -150
+soil_depth = 2.0
+
+[sub_resource type="WorldRavineDecorator" id="Ravine1"]
+width = 9.0
+length = 40.0
+depth = 16.0
+meander = 2.6999999999999997
+seed = 71
+probability = 0.04
+variation = 0.8
+
+[sub_resource type="WorldRavineDecorator" id="Ravine2"]
+width = 5.0
+length = 21.0
+depth = 10.0
+meander = 1.5
+seed = 142
+probability = 0.08
+variation = 0.8
+
+[sub_resource type="WorldRavineDecorator" id="Ravine3"]
+width = 3.0
+length = 12.0
+depth = 7.0
+meander = 0.8999999999999999
+seed = 213
+probability = 0.08
+variation = 0.8
+
+[sub_resource type="WorldRavineDecorator" id="Ravine4"]
+width = 2.0
+length = 7.0
+depth = 4.0
+meander = 0.6
+seed = 284
+probability = 0.08
+variation = 0.8
+
+[sub_resource type="WorldSphereDecorator" id="Cave"]
+center = Vector3(0, -3, 0)
+radius = 7.0
+operation = 1
+priority = 10
+
+[sub_resource type="WorldBaseElevationDecorator" id="PlainsBase"]
+elevation = 12
+
+[sub_resource type="WorldPlainsDecorator" id="PlainsProfile"]
+priority = -200
+elevation = 0.0
+amplitude = 0.65
+wavelength = 38
+seed = 100
+world_space_noise = true
+
+[sub_resource type="WorldBaseElevationDecorator" id="HillsBase"]
+elevation = 20
+
+[sub_resource type="WorldFoothillsDecorator" id="HillsProfile"]
+priority = -200
+world_space_noise = true
+amplitude = 7
+wavelength = 54
+seed = 101
+
+[sub_resource type="WorldBaseElevationDecorator" id="MountainsBase"]
+elevation = 16
+
+[sub_resource type="WorldMountainRangeDecorator" id="MountainsProfile"]
+priority = -200
+world_space_noise = true
+amplitude = 140
+wavelength = 160
+seed = 901
+material_id = 3
+interior_elevation = 0.0
+interior_scale = 1.15
+interior_width = 28
+edge_strength = 0.25
+detail_strength = 0.035
+ridge_width = 0.3
+summit_count = 2
+summit_variation = 0.9
+summit_height_bias = 2.0
+hierarchical_summits = true
+summit_rounding = 0.25
+summit_breadth = 0.72
+range_irregularity = 0.7
+
+[sub_resource type="WorldBaseElevationDecorator" id="SeaBase"]
+elevation = -12
+
+[sub_resource type="WorldSeaDecorator" id="SeaProfile"]
+priority = -200
+elevation = 0.0
+amplitude = 1.4
+wavelength = 40
+seed = 103
+world_space_noise = true
+
+[sub_resource type="WorldBaseElevationDecorator" id="DeepSeaBase"]
+elevation = -36
+
+[sub_resource type="WorldDeepSeaDecorator" id="DeepSeaProfile"]
+priority = -200
+elevation = 0.0
+amplitude = 2.5
+wavelength = 64
+seed = 104
+world_space_noise = true
+
+[sub_resource type="Environment" id="Environment"]
+background_mode = 1
+background_color = Color(0.055, 0.075, 0.105, 1)
+ambient_light_source = 3
+ambient_light_color = Color(0.78, 0.84, 1, 1)
+ambient_light_energy = 0.35
+reflected_light_source = 2
+
+[sub_resource type="WorldPlainsDecorator" id="GrassFlats"]
+priority = -200
+elevation = 0
+amplitude = 0.55
+wavelength = 38
+octaves = 3
+seed = 500
+material_id = 2
+world_space_noise = true
+
+
+[sub_resource type="WorldFoothillsDecorator" id="RollingMeadows"]
+priority = -200
+world_space_noise = true
+amplitude = 3.8
+wavelength = 52
+seed = 501
+
+[sub_resource type="WorldMesaDecorator" id="RockyOutcrops"]
+priority = -200
+world_space_noise = true
+amplitude = 2.5
+wavelength = 36.0
+seed = 502
+material_id = 3
+blend_mode = 1
+
+[sub_resource type="WorldFoothillsDecorator" id="MeadowHills"]
+priority = -200
+world_space_noise = true
+amplitude = 7
+wavelength = 58
+seed = 531
+
+[sub_resource type="WorldEscarpmentDecorator" id="RockyRidges"]
+priority = -200
+world_space_noise = true
+amplitude = 6
+wavelength = 44
+elevation = 1.0
+material_id = 3
+seed = 532
+blend_mode = 1
+
+[sub_resource type="WorldValleyDecorator" id="ShelteredValleys"]
+priority = -200
+world_space_noise = true
+amplitude = 5
+wavelength = 52.0
+seed = 533
+
+[sub_resource type="WorldFoothillsDecorator" id="RockFlanks"]
+priority = -200
+world_space_noise = true
+amplitude = 2.6
+wavelength = 24
+seed = 901
+material_id = 3
+blend_mode = 3
+detail_strength = 0.08
+
+[sub_resource type="WorldValleyDecorator" id="SharpPeaks"]
+priority = -200
+world_space_noise = true
+amplitude = 3.5
+wavelength = 52
+seed = 901
+material_id = 3
+blend_mode = 3
+detail_strength = 0.05
+
+[sub_resource type="WorldTerracesDecorator" id="HighPlateaus"]
+priority = -200
+world_space_noise = true
+amplitude = 2.2
+wavelength = 40
+seed = 901
+material_id = 3
+blend_mode = 3
+detail_strength = 0.01
+
+[sub_resource type="WorldPlateauDecorator" id="SandyShelves"]
+priority = -200
+world_space_noise = true
+amplitude = 2
+wavelength = 52
+elevation = 0.0
+seed = 1401
+material_id = 4
+edge_strength = 1.0
+detail_strength = 0.02
+
+[sub_resource type="WorldMountainRangeDecorator" id="SeabedRidges"]
+priority = -200
+world_space_noise = true
+amplitude = 5
+wavelength = 96
+elevation = 0.0
+seed = 1401
+material_id = 3
+edge_strength = 1.0
+detail_strength = 0.02
+
+summit_rounding = 0.55
+
+[sub_resource type="WorldBasinDecorator" id="SeabedBasins"]
+priority = -200
+world_space_noise = true
+amplitude = 5
+wavelength = 72
+elevation = 0.0
+seed = 1401
+material_id = 3
+edge_strength = 1.0
+detail_strength = 0.02
+
+[sub_resource type="WorldBasinDecorator" id="AbyssalPlains"]
+priority = -200
+world_space_noise = true
+amplitude = 1.3
+wavelength = 96
+elevation = 0.0
+seed = 1401
+material_id = 5
+edge_strength = 1.0
+detail_strength = 0.02
+
+[sub_resource type="WorldMountainRangeDecorator" id="SubmarineRidges"]
+priority = -200
+world_space_noise = true
+amplitude = 8
+wavelength = 112
+elevation = 0.0
+seed = 1401
+material_id = 3
+edge_strength = 1.0
+detail_strength = 0.02
+
+summit_rounding = 0.55
+
+[sub_resource type="WorldBasinDecorator" id="DeepBasins"]
+priority = -200
+world_space_noise = true
+amplitude = 7
+wavelength = 88
+elevation = 0.0
+seed = 1401
+material_id = 5
+edge_strength = 1.0
+detail_strength = 0.02
+
+[sub_resource type="WorldTerracesDecorator" id="TerracedGrassland"]
+priority = -200
+world_space_noise = true
+amplitude = 2.8
+wavelength = 48
+elevation = 0
+material_id = 2
+seed = 1801
+
+[sub_resource type="WorldPlateauDecorator" id="UplandPlateau"]
+priority = -200
+world_space_noise = true
+amplitude = 4
+wavelength = 64
+elevation = 0
+material_id = 2
+seed = 1801
+
+[sub_resource type="WorldDunesDecorator" id="CoastalDunes"]
+priority = -200
+world_space_noise = true
+amplitude = 2.2
+wavelength = 24
+elevation = 3.5
+material_id = 4
+seed = 1801
+
+
+[sub_resource type="WorldRiverDecorator" id="MainRiver"]
+centerline = PackedVector3Array(-220, 32, -1024, -100, 14, -256, 30, 8, 128, 220, 4.3, 1024)
+slope = 0.002
+width = 7.0
+bank_width = 18.0
+depth = 3.5
+meander = 14.0
+seed = 2304
+
+[sub_resource type="WorldRiverDecorator" id="Tributary"]
+centerline = PackedVector3Array(-1024, 32, -500, -400, 22, -360, -100, 14, -256)
+slope = 0.002
+width = 4.0
+bank_width = 12.0
+depth = 2.5
+meander = 9.0
+seed = 5108
+
+[sub_resource type="WorldDunesDecorator" id="DuneSea"]
+priority = -200
+world_space_noise = true
+amplitude = 12
+wavelength = 64
+elevation = 9
+material_id = 4
+seed = 7001
+detail_strength = 0.04
+
+[sub_resource type="WorldPlateauDecorator" id="DesertPavement"]
+priority = -200
+world_space_noise = true
+amplitude = 5
+wavelength = 100
+elevation = 7
+material_id = 4
+seed = 7092
+detail_strength = 0.04
+
+[sub_resource type="WorldMesaDecorator" id="SandstoneMesas"]
+priority = -200
+world_space_noise = true
+amplitude = 36
+wavelength = 120
+elevation = 12
+material_id = 6
+seed = 7132
+detail_strength = 0.04
+
+[sub_resource type="WorldTerracesDecorator" id="CanyonBenches"]
+priority = -200
+world_space_noise = true
+amplitude = 22
+wavelength = 96
+elevation = 4
+material_id = 6
+seed = 7223
+detail_strength = 0.04
+
+[sub_resource type="WorldValleyDecorator" id="CanyonFloor"]
+priority = -200
+world_space_noise = true
+amplitude = 16
+wavelength = 100
+elevation = -2
+material_id = 6
+seed = 7314
+detail_strength = 0.04
+
+[sub_resource type="WorldRavineDecorator" id="CanyonCut"]
+width = 14.0
+length = 140.0
+depth = 18.0
+meander = 12.0
+variation = 0.35
+seed = 9153
+
+[sub_resource type="WorldEscarpmentDecorator" id="ErodedRidges"]
+priority = -200
+world_space_noise = true
+amplitude = 20
+wavelength = 76
+elevation = 6
+material_id = 6
+seed = 7263
+detail_strength = 0.04
+
+[sub_resource type="WorldTerracesDecorator" id="ClayTerraces"]
+priority = -200
+world_space_noise = true
+amplitude = 16
+wavelength = 80
+elevation = 4
+material_id = 6
+seed = 7354
+detail_strength = 0.04
+
+[sub_resource type="WorldPlainsDecorator" id="DryGrassland"]
+priority = -200
+world_space_noise = true
+amplitude = 2
+wavelength = 80
+elevation = 5
+material_id = 9
+seed = 7394
+detail_strength = 0.04
+
+[sub_resource type="WorldFoothillsDecorator" id="RollingSavanna"]
+priority = -200
+world_space_noise = true
+amplitude = 9
+wavelength = 96
+elevation = 6
+material_id = 9
+seed = 7485
+detail_strength = 0.04
+
+[sub_resource type="WorldBasinDecorator" id="MarshBasins"]
+priority = -200
+world_space_noise = true
+amplitude = 3
+wavelength = 80
+elevation = 1
+material_id = 10
+seed = 7525
+detail_strength = 0.04
+
+[sub_resource type="WorldPlainsDecorator" id="Mudflats"]
+priority = -200
+world_space_noise = true
+amplitude = 0.8
+wavelength = 48
+elevation = 0.4
+material_id = 10
+seed = 7616
+detail_strength = 0.04
+
+[sub_resource type="WorldFoothillsDecorator" id="TundraUplands"]
+priority = -200
+world_space_noise = true
+amplitude = 6
+wavelength = 100
+elevation = 6
+material_id = 7
+seed = 7656
+detail_strength = 0.04
+
+[sub_resource type="WorldBasinDecorator" id="GlacialHollows"]
+priority = -200
+world_space_noise = true
+amplitude = 5
+wavelength = 80
+elevation = 4
+material_id = 7
+seed = 7747
+detail_strength = 0.04
+
+[sub_resource type="WorldFoothillsDecorator" id="ForestHills"]
+priority = -200
+world_space_noise = true
+amplitude = 12
+wavelength = 100
+elevation = 7
+material_id = 8
+seed = 7787
+detail_strength = 0.04
+
+[sub_resource type="WorldValleyDecorator" id="WoodlandValleys"]
+priority = -200
+world_space_noise = true
+amplitude = 7
+wavelength = 96
+elevation = 5
+material_id = 8
+seed = 7878
+detail_strength = 0.04
+
+[sub_resource type="WorldFoothillsDecorator" id="BorealUplands"]
+priority = -200
+world_space_noise = true
+amplitude = 14
+wavelength = 112
+elevation = 8
+material_id = 8
+seed = 7918
+detail_strength = 0.04
+
+[sub_resource type="WorldBasinDecorator" id="LakeHollows"]
+priority = -200
+world_space_noise = true
+amplitude = 7
+wavelength = 96
+elevation = 4
+material_id = 8
+seed = 8009
+detail_strength = 0.04
+
+[sub_resource type="WorldFoothillsDecorator" id="JungleHills"]
+priority = -200
+world_space_noise = true
+amplitude = 20
+wavelength = 100
+elevation = 9
+material_id = 8
+seed = 8049
+detail_strength = 0.04
+
+[sub_resource type="WorldPlateauDecorator" id="TropicalPlateaus"]
+priority = -200
+world_space_noise = true
+amplitude = 18
+wavelength = 128
+elevation = 6
+material_id = 8
+seed = 8140
+detail_strength = 0.04
+
+
+[sub_resource type="WorldPlateauDecorator" id="RaisedTableland"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 14
+wavelength = 140
+elevation = 3
+material_id = 2
+seed = 8091
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="FloodplainSteps"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 3
+wavelength = 96
+elevation = 0
+material_id = 2
+seed = 8148
+detail_strength = 0.025
+
+[sub_resource type="WorldValleyDecorator" id="BroadValley"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 7
+wavelength = 120
+elevation = 0
+material_id = 2
+seed = 8205
+detail_strength = 0.025
+
+[sub_resource type="WorldPlateauDecorator" id="UplandTables"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 20
+wavelength = 150
+elevation = 5
+material_id = 2
+seed = 8264
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="HillsideBenches"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 10
+wavelength = 96
+elevation = 2
+material_id = 2
+seed = 8321
+detail_strength = 0.025
+
+[sub_resource type="WorldMesaDecorator" id="RockyButtes"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 18
+wavelength = 120
+elevation = 4
+material_id = 3
+seed = 8378
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="TalusFans"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 4
+wavelength = 64
+elevation = 0
+material_id = 3
+seed = 8437
+detail_strength = 0.025
+
+[sub_resource type="WorldEscarpmentDecorator" id="Headwalls"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 5
+wavelength = 90
+elevation = 0
+material_id = 3
+seed = 8494
+detail_strength = 0.025
+
+[sub_resource type="WorldPlateauDecorator" id="AlpineBenches"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 4
+wavelength = 120
+elevation = 0
+material_id = 3
+seed = 8551
+detail_strength = 0.025
+
+[sub_resource type="WorldDunesDecorator" id="SandRipples"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 1.2
+wavelength = 28
+elevation = 0
+material_id = 4
+seed = 8610
+detail_strength = 0.025
+
+[sub_resource type="WorldPlateauDecorator" id="ContinentalShelves"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 3
+wavelength = 160
+elevation = 0
+material_id = 4
+seed = 8667
+detail_strength = 0.025
+
+[sub_resource type="WorldBasinDecorator" id="SiltDepressions"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 5
+wavelength = 128
+elevation = 0
+material_id = 5
+seed = 8724
+detail_strength = 0.025
+
+[sub_resource type="WorldValleyDecorator" id="AbyssalTrenches"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 16
+wavelength = 192
+elevation = -4
+material_id = 5
+seed = 8783
+detail_strength = 0.025
+
+[sub_resource type="WorldMountainRangeDecorator" id="Seamounts"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 24
+wavelength = 220
+elevation = 0
+material_id = 3
+seed = 8840
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="OceanBenches"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 8
+wavelength = 160
+elevation = 0
+material_id = 5
+seed = 8897
+detail_strength = 0.025
+
+[sub_resource type="WorldMesaDecorator" id="DesertMesas"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 22
+wavelength = 140
+elevation = 6
+material_id = 4
+seed = 8956
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="DesertTerraces"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 10
+wavelength = 112
+elevation = 2
+material_id = 4
+seed = 9013
+detail_strength = 0.025
+
+[sub_resource type="WorldBasinDecorator" id="DryPans"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 9
+wavelength = 120
+elevation = 0
+material_id = 4
+seed = 9070
+detail_strength = 0.025
+
+[sub_resource type="WorldPlateauDecorator" id="TableTops"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 32
+wavelength = 160
+elevation = 12
+material_id = 6
+seed = 9129
+detail_strength = 0.025
+
+[sub_resource type="WorldValleyDecorator" id="SlotValleys"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 18
+wavelength = 120
+elevation = -4
+material_id = 6
+seed = 9186
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="ScreeAprons"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 9
+wavelength = 96
+elevation = 0
+material_id = 6
+seed = 9243
+detail_strength = 0.025
+
+[sub_resource type="WorldMesaDecorator" id="ClayButtes"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 24
+wavelength = 120
+elevation = 6
+material_id = 6
+seed = 9302
+detail_strength = 0.025
+
+[sub_resource type="WorldValleyDecorator" id="DryGullies"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 12
+wavelength = 96
+elevation = 0
+material_id = 6
+seed = 9359
+detail_strength = 0.025
+
+[sub_resource type="WorldPlateauDecorator" id="BadlandTables"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 20
+wavelength = 144
+elevation = 4
+material_id = 6
+seed = 9416
+detail_strength = 0.025
+
+[sub_resource type="WorldPlateauDecorator" id="SavannaTables"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 18
+wavelength = 160
+elevation = 6
+material_id = 9
+seed = 9475
+detail_strength = 0.025
+
+[sub_resource type="WorldBasinDecorator" id="SeasonalPans"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 7
+wavelength = 112
+elevation = 0
+material_id = 9
+seed = 9532
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="SavannaBenches"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 8
+wavelength = 128
+elevation = 2
+material_id = 9
+seed = 9589
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="PeatBanks"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 2
+wavelength = 96
+elevation = 0
+material_id = 10
+seed = 9648
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="RaisedHummocks"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 2
+wavelength = 72
+elevation = 1
+material_id = 10
+seed = 9705
+detail_strength = 0.025
+
+[sub_resource type="WorldValleyDecorator" id="MarshChannels"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 2
+wavelength = 96
+elevation = 0
+material_id = 10
+seed = 9762
+detail_strength = 0.025
+
+[sub_resource type="WorldPlateauDecorator" id="TundraTables"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 18
+wavelength = 176
+elevation = 6
+material_id = 7
+seed = 9821
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="GlacialSteps"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 9
+wavelength = 128
+elevation = 2
+material_id = 7
+seed = 9878
+detail_strength = 0.025
+
+[sub_resource type="WorldValleyDecorator" id="GlacialValleys"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 14
+wavelength = 160
+elevation = 0
+material_id = 7
+seed = 9935
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="ForestTerraces"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 10
+wavelength = 112
+elevation = 2
+material_id = 8
+seed = 9994
+detail_strength = 0.025
+
+[sub_resource type="WorldPlateauDecorator" id="ForestTables"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 20
+wavelength = 160
+elevation = 6
+material_id = 8
+seed = 10051
+detail_strength = 0.025
+
+[sub_resource type="WorldMesaDecorator" id="BoulderKnolls"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 10
+wavelength = 96
+elevation = 2
+material_id = 3
+seed = 10108
+detail_strength = 0.025
+
+[sub_resource type="WorldPlateauDecorator" id="BorealTables"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 22
+wavelength = 176
+elevation = 8
+material_id = 8
+seed = 10167
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="MoraineBenches"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 12
+wavelength = 128
+elevation = 2
+material_id = 8
+seed = 10224
+detail_strength = 0.025
+
+[sub_resource type="WorldValleyDecorator" id="BorealValleys"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 14
+wavelength = 160
+elevation = 0
+material_id = 8
+seed = 10281
+detail_strength = 0.025
+
+[sub_resource type="WorldEscarpmentDecorator" id="JungleScarps"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 20
+wavelength = 144
+elevation = 4
+material_id = 8
+seed = 10340
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="JungleBenches"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 12
+wavelength = 112
+elevation = 2
+material_id = 8
+seed = 10397
+detail_strength = 0.025
+
+[sub_resource type="WorldBasinDecorator" id="RainforestBasins"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 10
+wavelength = 128
+elevation = 0
+material_id = 8
+seed = 10454
+detail_strength = 0.025
+
+[sub_resource type="WorldPlateauDecorator" id="HighTables"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 28
+wavelength = 192
+elevation = 8
+material_id = 7
+seed = 10513
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="HighlandSteps"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 18
+wavelength = 144
+elevation = 4
+material_id = 7
+seed = 10570
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="HighlandHills"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 16
+wavelength = 160
+elevation = 6
+material_id = 7
+seed = 10627
+detail_strength = 0.025
+
+[sub_resource type="WorldValleyDecorator" id="HighlandGlens"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 18
+wavelength = 176
+elevation = 0
+material_id = 7
+seed = 10684
+detail_strength = 0.025
+
+[sub_resource type="WorldEscarpmentDecorator" id="HighlandScarps"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 24
+wavelength = 160
+elevation = 4
+material_id = 3
+seed = 10741
+detail_strength = 0.025
+
+[sub_resource type="WorldPlateauDecorator" id="AlpineTables"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 24
+wavelength = 192
+elevation = 6
+material_id = 2
+seed = 10686
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="AlpineRolls"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 14
+wavelength = 144
+elevation = 2
+material_id = 2
+seed = 10743
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="AlpineSteps"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 12
+wavelength = 128
+elevation = 4
+material_id = 2
+seed = 10800
+detail_strength = 0.025
+
+[sub_resource type="WorldValleyDecorator" id="HangingValleys"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 18
+wavelength = 176
+elevation = 0
+material_id = 2
+seed = 10857
+detail_strength = 0.025
+
+[sub_resource type="WorldEscarpmentDecorator" id="CirqueWalls"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 26
+wavelength = 192
+elevation = 4
+material_id = 3
+seed = 10914
+detail_strength = 0.025
+
+[sub_resource type="WorldPlainsDecorator" id="OpenSteppe"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 3
+wavelength = 128
+elevation = 2
+material_id = 9
+seed = 10859
+detail_strength = 0.025
+
+[sub_resource type="WorldPlateauDecorator" id="SteppeTables"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 24
+wavelength = 192
+elevation = 8
+material_id = 9
+seed = 10916
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="RollingSteppe"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 12
+wavelength = 144
+elevation = 4
+material_id = 9
+seed = 10973
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="SteppeBenches"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 10
+wavelength = 144
+elevation = 2
+material_id = 9
+seed = 11030
+detail_strength = 0.025
+
+[sub_resource type="WorldBasinDecorator" id="SteppePans"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 10
+wavelength = 160
+elevation = 0
+material_id = 9
+seed = 11087
+detail_strength = 0.025
+
+[sub_resource type="WorldBasinDecorator" id="TidalBasins"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 2
+wavelength = 96
+elevation = 0
+material_id = 10
+seed = 11032
+detail_strength = 0.025
+
+[sub_resource type="WorldPlainsDecorator" id="TidalFlats"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 0.6
+wavelength = 64
+elevation = 0
+material_id = 10
+seed = 11089
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="MudBanks"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 2
+wavelength = 96
+elevation = 0
+material_id = 10
+seed = 11146
+detail_strength = 0.025
+
+[sub_resource type="WorldValleyDecorator" id="TidalChannels"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 2.5
+wavelength = 112
+elevation = 0
+material_id = 10
+seed = 11203
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="MudIslets"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 2.5
+wavelength = 96
+elevation = 1
+material_id = 10
+seed = 11260
+detail_strength = 0.025
+
+[sub_resource type="WorldMountainRangeDecorator" id="VolcanicMassifs"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 48
+wavelength = 192
+elevation = 6
+material_id = 11
+seed = 11205
+detail_strength = 0.025
+
+[sub_resource type="WorldPlateauDecorator" id="LavaTables"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 28
+wavelength = 192
+elevation = 8
+material_id = 11
+seed = 11262
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="BasaltSteps"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 22
+wavelength = 128
+elevation = 4
+material_id = 11
+seed = 11319
+detail_strength = 0.025
+
+[sub_resource type="WorldBasinDecorator" id="CalderaBasins"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 20
+wavelength = 192
+elevation = 4
+material_id = 11
+seed = 11376
+detail_strength = 0.025
+
+[sub_resource type="WorldEscarpmentDecorator" id="LavaScarps"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 28
+wavelength = 160
+elevation = 6
+material_id = 11
+seed = 11433
+detail_strength = 0.025
+
+[sub_resource type="WorldMesaDecorator" id="LimestoneTowers"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 32
+wavelength = 160
+elevation = 6
+material_id = 12
+seed = 11378
+detail_strength = 0.025
+
+[sub_resource type="WorldPlateauDecorator" id="KarstTables"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 26
+wavelength = 192
+elevation = 8
+material_id = 12
+seed = 11435
+detail_strength = 0.025
+
+[sub_resource type="WorldBasinDecorator" id="KarstDolines"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 22
+wavelength = 128
+elevation = 2
+material_id = 12
+seed = 11492
+detail_strength = 0.025
+
+[sub_resource type="WorldValleyDecorator" id="KarstValleys"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 18
+wavelength = 144
+elevation = 0
+material_id = 12
+seed = 11549
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="LimestoneBenches"]
+priority = -200
+world_space_noise = true
+blend_mode = 0
+amplitude = 16
+wavelength = 144
+elevation = 4
+material_id = 12
+seed = 11606
+detail_strength = 0.025
+
+[sub_resource type="WorldBaseElevationDecorator" id="DesertDatum"]
+elevation = 12
+
+[sub_resource type="WorldBaseElevationDecorator" id="CanyonsDatum"]
+elevation = 24
+
+[sub_resource type="WorldBaseElevationDecorator" id="BadlandsDatum"]
+elevation = 18
+
+[sub_resource type="WorldBaseElevationDecorator" id="SavannaDatum"]
+elevation = 16
+
+[sub_resource type="WorldBaseElevationDecorator" id="WetlandsDatum"]
+elevation = 1.5
+
+[sub_resource type="WorldBaseElevationDecorator" id="TundraDatum"]
+elevation = 32
+
+[sub_resource type="WorldBaseElevationDecorator" id="ForestDatum"]
+elevation = 20
+
+[sub_resource type="WorldBaseElevationDecorator" id="TaigaDatum"]
+elevation = 28
+
+[sub_resource type="WorldBaseElevationDecorator" id="RainforestDatum"]
+elevation = 24
+
+[sub_resource type="WorldBaseElevationDecorator" id="HighlandsDatum"]
+elevation = 54
+
+[sub_resource type="WorldBaseElevationDecorator" id="AlpineMeadowsDatum"]
+elevation = 78
+
+[sub_resource type="WorldBaseElevationDecorator" id="SteppeDatum"]
+elevation = 28
+
+[sub_resource type="WorldBaseElevationDecorator" id="MangrovesDatum"]
+elevation = 0.5
+
+[sub_resource type="WorldBaseElevationDecorator" id="VolcanicDatum"]
+elevation = 38
+
+[sub_resource type="WorldBaseElevationDecorator" id="KarstDatum"]
+elevation = 44
+
+[sub_resource type="WorldFoothillsDecorator" id="PlainsDetail1"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.35
+wavelength = 40
+elevation = 0
+material_id = 2
+seed = 18132
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="PlainsContour1"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.22749999999999998
+wavelength = 80
+elevation = 0
+material_id = 2
+seed = 22080
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="PlainsDetail2"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.35
+wavelength = 48
+elevation = 0
+material_id = 2
+seed = 18263
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="PlainsContour2"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.22749999999999998
+wavelength = 96
+elevation = 0
+material_id = 2
+seed = 22159
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="PlainsDetail3"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.35
+wavelength = 56
+elevation = 0
+material_id = 2
+seed = 18394
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="PlainsContour3"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.22749999999999998
+wavelength = 64
+elevation = 0
+material_id = 2
+seed = 22238
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="PlainsDetail4"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.35
+wavelength = 32
+elevation = 0
+material_id = 2
+seed = 18525
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="PlainsContour4"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.22749999999999998
+wavelength = 80
+elevation = 0
+material_id = 2
+seed = 22317
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="HillsDetail5"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 40
+elevation = 0
+material_id = 2
+seed = 18656
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="HillsContour5"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 96
+elevation = 0
+material_id = 2
+seed = 22396
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="HillsDetail6"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 48
+elevation = 0
+material_id = 2
+seed = 18787
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="HillsContour6"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 64
+elevation = 0
+material_id = 2
+seed = 22475
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="HillsDetail7"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 56
+elevation = 0
+material_id = 2
+seed = 18918
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="HillsContour7"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 80
+elevation = 0
+material_id = 2
+seed = 22554
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="HillsDetail8"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 32
+elevation = 0
+material_id = 2
+seed = 19049
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="HillsContour8"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 96
+elevation = 0
+material_id = 2
+seed = 22633
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="MountainsDetail9"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 40
+elevation = 0
+material_id = 2
+seed = 19180
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="MountainsContour9"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 64
+elevation = 0
+material_id = 2
+seed = 22712
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="MountainsDetail10"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 48
+elevation = 0
+material_id = 2
+seed = 19311
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="MountainsContour10"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 80
+elevation = 0
+material_id = 2
+seed = 22791
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="MountainsDetail11"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 56
+elevation = 0
+material_id = 2
+seed = 19442
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="MountainsContour11"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 96
+elevation = 0
+material_id = 2
+seed = 22870
+detail_strength = 0.025
+
+[sub_resource type="WorldDunesDecorator" id="SeaDetail12"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.8
+wavelength = 32
+elevation = 0
+material_id = 2
+seed = 19573
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="SeaContour12"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.52
+wavelength = 64
+elevation = 0
+material_id = 2
+seed = 22949
+detail_strength = 0.025
+
+[sub_resource type="WorldDunesDecorator" id="SeaDetail13"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.8
+wavelength = 40
+elevation = 0
+material_id = 2
+seed = 19704
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="SeaContour13"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.52
+wavelength = 80
+elevation = 0
+material_id = 2
+seed = 23028
+detail_strength = 0.025
+
+[sub_resource type="WorldDunesDecorator" id="SeaDetail14"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.8
+wavelength = 48
+elevation = 0
+material_id = 2
+seed = 19835
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="SeaContour14"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.52
+wavelength = 96
+elevation = 0
+material_id = 2
+seed = 23107
+detail_strength = 0.025
+
+[sub_resource type="WorldDunesDecorator" id="SeaDetail15"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.8
+wavelength = 56
+elevation = 0
+material_id = 2
+seed = 19966
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="SeaContour15"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.52
+wavelength = 64
+elevation = 0
+material_id = 2
+seed = 23186
+detail_strength = 0.025
+
+[sub_resource type="WorldDunesDecorator" id="DeepSeaDetail16"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.8
+wavelength = 32
+elevation = 0
+material_id = 2
+seed = 20097
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="DeepSeaContour16"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.52
+wavelength = 80
+elevation = 0
+material_id = 2
+seed = 23265
+detail_strength = 0.025
+
+[sub_resource type="WorldDunesDecorator" id="DeepSeaDetail17"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.8
+wavelength = 40
+elevation = 0
+material_id = 2
+seed = 20228
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="DeepSeaContour17"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.52
+wavelength = 96
+elevation = 0
+material_id = 2
+seed = 23344
+detail_strength = 0.025
+
+[sub_resource type="WorldDunesDecorator" id="DeepSeaDetail18"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.8
+wavelength = 48
+elevation = 0
+material_id = 2
+seed = 20359
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="DeepSeaContour18"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.52
+wavelength = 64
+elevation = 0
+material_id = 2
+seed = 23423
+detail_strength = 0.025
+
+[sub_resource type="WorldDunesDecorator" id="DesertDetail19"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.8
+wavelength = 56
+elevation = 0
+material_id = 2
+seed = 20490
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="DesertContour19"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.52
+wavelength = 80
+elevation = 0
+material_id = 2
+seed = 23502
+detail_strength = 0.025
+
+[sub_resource type="WorldDunesDecorator" id="DesertDetail20"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.8
+wavelength = 32
+elevation = 0
+material_id = 2
+seed = 20621
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="DesertContour20"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.52
+wavelength = 96
+elevation = 0
+material_id = 2
+seed = 23581
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="CanyonsDetail21"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 40
+elevation = 0
+material_id = 2
+seed = 20752
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="CanyonsContour21"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 64
+elevation = 0
+material_id = 2
+seed = 23660
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="CanyonsDetail22"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 48
+elevation = 0
+material_id = 2
+seed = 20883
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="CanyonsContour22"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 80
+elevation = 0
+material_id = 2
+seed = 23739
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="CanyonsDetail23"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 56
+elevation = 0
+material_id = 2
+seed = 21014
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="CanyonsContour23"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 96
+elevation = 0
+material_id = 2
+seed = 23818
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="BadlandsDetail24"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 32
+elevation = 0
+material_id = 2
+seed = 21145
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="BadlandsContour24"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 64
+elevation = 0
+material_id = 2
+seed = 23897
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="BadlandsDetail25"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 40
+elevation = 0
+material_id = 2
+seed = 21276
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="BadlandsContour25"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 80
+elevation = 0
+material_id = 2
+seed = 23976
+detail_strength = 0.025
+
+[sub_resource type="WorldDunesDecorator" id="SavannaDetail26"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 48
+elevation = 0
+material_id = 2
+seed = 21407
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="SavannaContour26"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 96
+elevation = 0
+material_id = 2
+seed = 24055
+detail_strength = 0.025
+
+[sub_resource type="WorldDunesDecorator" id="SavannaDetail27"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 56
+elevation = 0
+material_id = 2
+seed = 21538
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="SavannaContour27"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 64
+elevation = 0
+material_id = 2
+seed = 24134
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="WetlandsDetail28"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.35
+wavelength = 32
+elevation = 0
+material_id = 2
+seed = 21669
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="WetlandsContour28"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.22749999999999998
+wavelength = 80
+elevation = 0
+material_id = 2
+seed = 24213
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="WetlandsDetail29"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.35
+wavelength = 40
+elevation = 0
+material_id = 2
+seed = 21800
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="WetlandsContour29"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.22749999999999998
+wavelength = 96
+elevation = 0
+material_id = 2
+seed = 24292
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="TundraDetail30"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 48
+elevation = 0
+material_id = 2
+seed = 21931
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="TundraContour30"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 64
+elevation = 0
+material_id = 2
+seed = 24371
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="TundraDetail31"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 56
+elevation = 0
+material_id = 2
+seed = 22062
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="TundraContour31"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 80
+elevation = 0
+material_id = 2
+seed = 24450
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="ForestDetail32"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 32
+elevation = 0
+material_id = 2
+seed = 22193
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="ForestContour32"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 96
+elevation = 0
+material_id = 2
+seed = 24529
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="ForestDetail33"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 40
+elevation = 0
+material_id = 2
+seed = 22324
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="ForestContour33"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 64
+elevation = 0
+material_id = 2
+seed = 24608
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="TaigaDetail34"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 48
+elevation = 0
+material_id = 2
+seed = 22455
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="TaigaContour34"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 80
+elevation = 0
+material_id = 2
+seed = 24687
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="TaigaDetail35"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 56
+elevation = 0
+material_id = 2
+seed = 22586
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="TaigaContour35"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 96
+elevation = 0
+material_id = 2
+seed = 24766
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="RainforestDetail36"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 32
+elevation = 0
+material_id = 2
+seed = 22717
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="RainforestContour36"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 64
+elevation = 0
+material_id = 2
+seed = 24845
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="RainforestDetail37"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 40
+elevation = 0
+material_id = 2
+seed = 22848
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="RainforestContour37"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 80
+elevation = 0
+material_id = 2
+seed = 24924
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="PlainsDetail38"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.35
+wavelength = 48
+elevation = 0
+material_id = 2
+seed = 22979
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="PlainsContour38"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.22749999999999998
+wavelength = 96
+elevation = 0
+material_id = 2
+seed = 25003
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="PlainsDetail39"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.35
+wavelength = 56
+elevation = 0
+material_id = 2
+seed = 23110
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="PlainsContour39"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.22749999999999998
+wavelength = 64
+elevation = 0
+material_id = 2
+seed = 25082
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="PlainsDetail40"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.35
+wavelength = 32
+elevation = 0
+material_id = 2
+seed = 23241
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="PlainsContour40"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.22749999999999998
+wavelength = 80
+elevation = 0
+material_id = 2
+seed = 25161
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="HillsDetail41"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 40
+elevation = 0
+material_id = 2
+seed = 23372
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="HillsContour41"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 96
+elevation = 0
+material_id = 2
+seed = 25240
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="HillsDetail42"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 48
+elevation = 0
+material_id = 2
+seed = 23503
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="HillsContour42"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 64
+elevation = 0
+material_id = 2
+seed = 25319
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="HillsDetail43"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 56
+elevation = 0
+material_id = 2
+seed = 23634
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="HillsContour43"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 80
+elevation = 0
+material_id = 2
+seed = 25398
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="MountainsDetail44"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 32
+elevation = 0
+material_id = 2
+seed = 23765
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="MountainsContour44"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 96
+elevation = 0
+material_id = 2
+seed = 25477
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="MountainsDetail45"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 40
+elevation = 0
+material_id = 2
+seed = 23896
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="MountainsContour45"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 64
+elevation = 0
+material_id = 2
+seed = 25556
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="MountainsDetail46"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 48
+elevation = 0
+material_id = 2
+seed = 24027
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="MountainsContour46"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 80
+elevation = 0
+material_id = 2
+seed = 25635
+detail_strength = 0.025
+
+[sub_resource type="WorldDunesDecorator" id="SeaDetail47"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.8
+wavelength = 56
+elevation = 0
+material_id = 2
+seed = 24158
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="SeaContour47"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.52
+wavelength = 96
+elevation = 0
+material_id = 2
+seed = 25714
+detail_strength = 0.025
+
+[sub_resource type="WorldDunesDecorator" id="SeaDetail48"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.8
+wavelength = 32
+elevation = 0
+material_id = 2
+seed = 24289
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="SeaContour48"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.52
+wavelength = 64
+elevation = 0
+material_id = 2
+seed = 25793
+detail_strength = 0.025
+
+[sub_resource type="WorldDunesDecorator" id="SeaDetail49"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.8
+wavelength = 40
+elevation = 0
+material_id = 2
+seed = 24420
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="SeaContour49"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.52
+wavelength = 80
+elevation = 0
+material_id = 2
+seed = 25872
+detail_strength = 0.025
+
+[sub_resource type="WorldDunesDecorator" id="DeepSeaDetail50"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.8
+wavelength = 48
+elevation = 0
+material_id = 2
+seed = 24551
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="DeepSeaContour50"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.52
+wavelength = 96
+elevation = 0
+material_id = 2
+seed = 25951
+detail_strength = 0.025
+
+[sub_resource type="WorldDunesDecorator" id="DeepSeaDetail51"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.8
+wavelength = 56
+elevation = 0
+material_id = 2
+seed = 24682
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="DeepSeaContour51"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.52
+wavelength = 64
+elevation = 0
+material_id = 2
+seed = 26030
+detail_strength = 0.025
+
+[sub_resource type="WorldDunesDecorator" id="DeepSeaDetail52"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.8
+wavelength = 32
+elevation = 0
+material_id = 2
+seed = 24813
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="DeepSeaContour52"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.52
+wavelength = 80
+elevation = 0
+material_id = 2
+seed = 26109
+detail_strength = 0.025
+
+[sub_resource type="WorldDunesDecorator" id="DesertDetail53"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.8
+wavelength = 40
+elevation = 0
+material_id = 2
+seed = 24944
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="DesertContour53"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.52
+wavelength = 96
+elevation = 0
+material_id = 2
+seed = 26188
+detail_strength = 0.025
+
+[sub_resource type="WorldDunesDecorator" id="DesertDetail54"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.8
+wavelength = 48
+elevation = 0
+material_id = 2
+seed = 25075
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="DesertContour54"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.52
+wavelength = 64
+elevation = 0
+material_id = 2
+seed = 26267
+detail_strength = 0.025
+
+[sub_resource type="WorldDunesDecorator" id="DesertDetail55"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.8
+wavelength = 56
+elevation = 0
+material_id = 2
+seed = 25206
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="DesertContour55"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.52
+wavelength = 80
+elevation = 0
+material_id = 2
+seed = 26346
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="CanyonsDetail56"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 32
+elevation = 0
+material_id = 2
+seed = 25337
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="CanyonsContour56"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 96
+elevation = 0
+material_id = 2
+seed = 26425
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="CanyonsDetail57"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 40
+elevation = 0
+material_id = 2
+seed = 25468
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="CanyonsContour57"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 64
+elevation = 0
+material_id = 2
+seed = 26504
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="CanyonsDetail58"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 48
+elevation = 0
+material_id = 2
+seed = 25599
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="CanyonsContour58"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 80
+elevation = 0
+material_id = 2
+seed = 26583
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="BadlandsDetail59"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 56
+elevation = 0
+material_id = 2
+seed = 25730
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="BadlandsContour59"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 96
+elevation = 0
+material_id = 2
+seed = 26662
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="BadlandsDetail60"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 32
+elevation = 0
+material_id = 2
+seed = 25861
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="BadlandsContour60"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 64
+elevation = 0
+material_id = 2
+seed = 26741
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="BadlandsDetail61"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 40
+elevation = 0
+material_id = 2
+seed = 25992
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="BadlandsContour61"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 80
+elevation = 0
+material_id = 2
+seed = 26820
+detail_strength = 0.025
+
+[sub_resource type="WorldDunesDecorator" id="SavannaDetail62"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 48
+elevation = 0
+material_id = 2
+seed = 26123
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="SavannaContour62"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 96
+elevation = 0
+material_id = 2
+seed = 26899
+detail_strength = 0.025
+
+[sub_resource type="WorldDunesDecorator" id="SavannaDetail63"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 56
+elevation = 0
+material_id = 2
+seed = 26254
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="SavannaContour63"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 64
+elevation = 0
+material_id = 2
+seed = 26978
+detail_strength = 0.025
+
+[sub_resource type="WorldDunesDecorator" id="SavannaDetail64"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 32
+elevation = 0
+material_id = 2
+seed = 26385
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="SavannaContour64"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 80
+elevation = 0
+material_id = 2
+seed = 27057
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="WetlandsDetail65"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.35
+wavelength = 40
+elevation = 0
+material_id = 2
+seed = 26516
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="WetlandsContour65"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.22749999999999998
+wavelength = 96
+elevation = 0
+material_id = 2
+seed = 27136
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="WetlandsDetail66"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.35
+wavelength = 48
+elevation = 0
+material_id = 2
+seed = 26647
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="WetlandsContour66"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.22749999999999998
+wavelength = 64
+elevation = 0
+material_id = 2
+seed = 27215
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="WetlandsDetail67"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.35
+wavelength = 56
+elevation = 0
+material_id = 2
+seed = 26778
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="WetlandsContour67"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.22749999999999998
+wavelength = 80
+elevation = 0
+material_id = 2
+seed = 27294
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="TundraDetail68"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 32
+elevation = 0
+material_id = 2
+seed = 26909
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="TundraContour68"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 96
+elevation = 0
+material_id = 2
+seed = 27373
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="TundraDetail69"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 40
+elevation = 0
+material_id = 2
+seed = 27040
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="TundraContour69"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 64
+elevation = 0
+material_id = 2
+seed = 27452
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="TundraDetail70"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 48
+elevation = 0
+material_id = 2
+seed = 27171
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="TundraContour70"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 80
+elevation = 0
+material_id = 2
+seed = 27531
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="ForestDetail71"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 56
+elevation = 0
+material_id = 2
+seed = 27302
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="ForestContour71"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 96
+elevation = 0
+material_id = 2
+seed = 27610
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="ForestDetail72"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 32
+elevation = 0
+material_id = 2
+seed = 27433
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="ForestContour72"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 64
+elevation = 0
+material_id = 2
+seed = 27689
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="ForestDetail73"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 40
+elevation = 0
+material_id = 2
+seed = 27564
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="ForestContour73"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 80
+elevation = 0
+material_id = 2
+seed = 27768
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="TaigaDetail74"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 48
+elevation = 0
+material_id = 2
+seed = 27695
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="TaigaContour74"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 96
+elevation = 0
+material_id = 2
+seed = 27847
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="TaigaDetail75"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 56
+elevation = 0
+material_id = 2
+seed = 27826
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="TaigaContour75"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 64
+elevation = 0
+material_id = 2
+seed = 27926
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="TaigaDetail76"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 32
+elevation = 0
+material_id = 2
+seed = 27957
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="TaigaContour76"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 80
+elevation = 0
+material_id = 2
+seed = 28005
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="RainforestDetail77"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 40
+elevation = 0
+material_id = 2
+seed = 28088
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="RainforestContour77"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 96
+elevation = 0
+material_id = 2
+seed = 28084
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="RainforestDetail78"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 48
+elevation = 0
+material_id = 2
+seed = 28219
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="RainforestContour78"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 64
+elevation = 0
+material_id = 2
+seed = 28163
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="RainforestDetail79"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 56
+elevation = 0
+material_id = 2
+seed = 28350
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="RainforestContour79"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 80
+elevation = 0
+material_id = 2
+seed = 28242
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="HighlandsDetail80"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 32
+elevation = 0
+material_id = 2
+seed = 28481
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="HighlandsContour80"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 96
+elevation = 0
+material_id = 2
+seed = 28321
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="HighlandsDetail81"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 40
+elevation = 0
+material_id = 2
+seed = 28612
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="HighlandsContour81"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 64
+elevation = 0
+material_id = 2
+seed = 28400
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="HighlandsDetail82"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 48
+elevation = 0
+material_id = 2
+seed = 28743
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="HighlandsContour82"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 80
+elevation = 0
+material_id = 2
+seed = 28479
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="HighlandsDetail83"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 56
+elevation = 0
+material_id = 2
+seed = 28874
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="HighlandsContour83"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 96
+elevation = 0
+material_id = 2
+seed = 28558
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="HighlandsDetail84"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 32
+elevation = 0
+material_id = 2
+seed = 29005
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="HighlandsContour84"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 64
+elevation = 0
+material_id = 2
+seed = 28637
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="AlpineMeadowsDetail85"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 40
+elevation = 0
+material_id = 2
+seed = 29136
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="AlpineMeadowsContour85"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 80
+elevation = 0
+material_id = 2
+seed = 28716
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="AlpineMeadowsDetail86"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 48
+elevation = 0
+material_id = 2
+seed = 29267
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="AlpineMeadowsContour86"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 96
+elevation = 0
+material_id = 2
+seed = 28795
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="AlpineMeadowsDetail87"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 56
+elevation = 0
+material_id = 2
+seed = 29398
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="AlpineMeadowsContour87"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 64
+elevation = 0
+material_id = 2
+seed = 28874
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="AlpineMeadowsDetail88"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 32
+elevation = 0
+material_id = 2
+seed = 29529
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="AlpineMeadowsContour88"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 80
+elevation = 0
+material_id = 2
+seed = 28953
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="AlpineMeadowsDetail89"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 40
+elevation = 0
+material_id = 2
+seed = 29660
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="AlpineMeadowsContour89"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 96
+elevation = 0
+material_id = 2
+seed = 29032
+detail_strength = 0.025
+
+[sub_resource type="WorldDunesDecorator" id="SteppeDetail90"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 48
+elevation = 0
+material_id = 2
+seed = 29791
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="SteppeContour90"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 64
+elevation = 0
+material_id = 2
+seed = 29111
+detail_strength = 0.025
+
+[sub_resource type="WorldDunesDecorator" id="SteppeDetail91"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 56
+elevation = 0
+material_id = 2
+seed = 29922
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="SteppeContour91"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 80
+elevation = 0
+material_id = 2
+seed = 29190
+detail_strength = 0.025
+
+[sub_resource type="WorldDunesDecorator" id="SteppeDetail92"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 32
+elevation = 0
+material_id = 2
+seed = 30053
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="SteppeContour92"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 96
+elevation = 0
+material_id = 2
+seed = 29269
+detail_strength = 0.025
+
+[sub_resource type="WorldDunesDecorator" id="SteppeDetail93"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 40
+elevation = 0
+material_id = 2
+seed = 30184
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="SteppeContour93"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 64
+elevation = 0
+material_id = 2
+seed = 29348
+detail_strength = 0.025
+
+[sub_resource type="WorldDunesDecorator" id="SteppeDetail94"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 48
+elevation = 0
+material_id = 2
+seed = 30315
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="SteppeContour94"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 80
+elevation = 0
+material_id = 2
+seed = 29427
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="MangrovesDetail95"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.35
+wavelength = 56
+elevation = 0
+material_id = 2
+seed = 30446
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="MangrovesContour95"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.22749999999999998
+wavelength = 96
+elevation = 0
+material_id = 2
+seed = 29506
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="MangrovesDetail96"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.35
+wavelength = 32
+elevation = 0
+material_id = 2
+seed = 30577
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="MangrovesContour96"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.22749999999999998
+wavelength = 64
+elevation = 0
+material_id = 2
+seed = 29585
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="MangrovesDetail97"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.35
+wavelength = 40
+elevation = 0
+material_id = 2
+seed = 30708
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="MangrovesContour97"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.22749999999999998
+wavelength = 80
+elevation = 0
+material_id = 2
+seed = 29664
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="MangrovesDetail98"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.35
+wavelength = 48
+elevation = 0
+material_id = 2
+seed = 30839
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="MangrovesContour98"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.22749999999999998
+wavelength = 96
+elevation = 0
+material_id = 2
+seed = 29743
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="MangrovesDetail99"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.35
+wavelength = 56
+elevation = 0
+material_id = 2
+seed = 30970
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="MangrovesContour99"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.22749999999999998
+wavelength = 64
+elevation = 0
+material_id = 2
+seed = 29822
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="VolcanicDetail100"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 32
+elevation = 0
+material_id = 2
+seed = 31101
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="VolcanicContour100"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 80
+elevation = 0
+material_id = 2
+seed = 29901
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="VolcanicDetail101"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 40
+elevation = 0
+material_id = 2
+seed = 31232
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="VolcanicContour101"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 96
+elevation = 0
+material_id = 2
+seed = 29980
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="VolcanicDetail102"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 48
+elevation = 0
+material_id = 2
+seed = 31363
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="VolcanicContour102"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 64
+elevation = 0
+material_id = 2
+seed = 30059
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="VolcanicDetail103"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 56
+elevation = 0
+material_id = 2
+seed = 31494
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="VolcanicContour103"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 80
+elevation = 0
+material_id = 2
+seed = 30138
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="VolcanicDetail104"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 32
+elevation = 0
+material_id = 2
+seed = 31625
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="VolcanicContour104"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 96
+elevation = 0
+material_id = 2
+seed = 30217
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="KarstDetail105"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 40
+elevation = 0
+material_id = 2
+seed = 31756
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="KarstContour105"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 64
+elevation = 0
+material_id = 2
+seed = 30296
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="KarstDetail106"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 48
+elevation = 0
+material_id = 2
+seed = 31887
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="KarstContour106"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 80
+elevation = 0
+material_id = 2
+seed = 30375
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="KarstDetail107"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 56
+elevation = 0
+material_id = 2
+seed = 32018
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="KarstContour107"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 96
+elevation = 0
+material_id = 2
+seed = 30454
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="KarstDetail108"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 32
+elevation = 0
+material_id = 2
+seed = 32149
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="KarstContour108"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 64
+elevation = 0
+material_id = 2
+seed = 30533
+detail_strength = 0.025
+
+[sub_resource type="WorldFoothillsDecorator" id="KarstDetail109"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 1.5
+wavelength = 40
+elevation = 0
+material_id = 2
+seed = 32280
+detail_strength = 0.025
+
+[sub_resource type="WorldTerracesDecorator" id="KarstContour109"]
+priority = -180
+world_space_noise = true
+blend_mode = 3
+amplitude = 0.9750000000000001
+wavelength = 80
+elevation = 0
+material_id = 2
+seed = 30612
+detail_strength = 0.025
+
+[sub_resource type="WorldLakeDecorator" id="RiverLake"]
+center = Vector3(30, 5.6, 128)
+radius = Vector2(42, 30)
+depth = 9.0
+bank_width = 30.0
+shore_noise = 0.18
+seed = 4501
+
+[sub_resource type="WorldLakeDecorator" id="UplandLake"]
+center = Vector3(-148, 72, 96)
+radius = Vector2(38, 28)
+depth = 12.0
+bank_width = 38.0
+shore_height = 3.0
+shore_noise = 0.2
+seed = 7051
+
+[node name="LakesPlateausAndTerrainVariety" type="Node3D"]
+script = ExtResource("1")
+
+[node name="World" type="WorldRegionLayout" parent="."]
+bounded = false
+layout_mode = 1
+region_size = 96.0
+transition_width = 18.0
+cells_per_region = 3
+biome_edges = true
+boundary_noise = 0.22
+seed = 2026
+decorators = Array[WorldDecorator]([SubResource("Cave"), SubResource("MainRiver"), SubResource("Tributary"), SubResource("RiverLake"), SubResource("UplandLake")])
+
+
+[node name="Plains" type="WorldRegionLayout" parent="World"]
+boundary_noise = 0.14
+occurrence_weight = 3.0
+layout_mode = 1
+region_size = 18.0
+transition_width = 1.5
+cells_per_region = 1
+seed = 310
+decorators = Array[WorldDecorator]([SubResource("PlainsBase"), SubResource("PlainsProfile"), SubResource("Strata"), SubResource("Ravine1")])
+
+
+[node name="GrassFlats" type="RegionContainer" parent="World/Plains"]
+occurrence_weight = 5.0
+decorators = Array[WorldDecorator]([SubResource("GrassFlats"), SubResource("PlainsDetail1"), SubResource("PlainsContour1"), SubResource("Strata")])
+
+[node name="RollingMeadows" type="RegionContainer" parent="World/Plains"]
+occurrence_weight = 3.0
+decorators = Array[WorldDecorator]([SubResource("RollingMeadows"), SubResource("PlainsDetail2"), SubResource("PlainsContour2"), SubResource("Strata")])
+
+[node name="RockyOutcrops" type="RegionContainer" parent="World/Plains"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("RockyOutcrops"), SubResource("PlainsDetail3"), SubResource("PlainsContour3"), SubResource("Strata")])
+
+[node name="TerracedGrassland" type="RegionContainer" parent="World/Plains"]
+occurrence_weight = 1.0
+decorators = Array[WorldDecorator]([SubResource("TerracedGrassland"), SubResource("PlainsDetail4"), SubResource("PlainsContour4"), SubResource("Strata")])
+
+[node name="Gullies" type="WorldRegionLayout" parent="World/Plains"]
+boundary_noise = 0.14
+occurrence_weight = 3.0
+layout_mode = 1
+region_size = 9.0
+transition_width = 0.75
+cells_per_region = 1
+seed = 457
+decorators = Array[WorldDecorator]([SubResource("Ravine2")])
+
+
+[node name="Undisturbed" type="RegionContainer" parent="World/Plains/Gullies"]
+occurrence_weight = 4.0
+
+[node name="Fissures" type="WorldRegionLayout" parent="World/Plains/Gullies"]
+boundary_noise = 0.14
+occurrence_weight = 3.0
+layout_mode = 1
+region_size = 4.5
+transition_width = 0.4
+cells_per_region = 1
+seed = 839
+decorators = Array[WorldDecorator]([SubResource("Ravine3")])
+
+
+[node name="Undisturbed" type="RegionContainer" parent="World/Plains/Gullies/Fissures"]
+occurrence_weight = 4.0
+
+[node name="Channels" type="RegionContainer" parent="World/Plains/Gullies/Fissures"]
+occurrence_weight = 3.0
+decorators = Array[WorldDecorator]([SubResource("Ravine4")])
+
+
+[node name="Hills" type="WorldRegionLayout" parent="World"]
+boundary_noise = 0.14
+occurrence_weight = 3.0
+layout_mode = 1
+region_size = 18.0
+transition_width = 1.5
+cells_per_region = 1
+seed = 311
+decorators = Array[WorldDecorator]([SubResource("HillsBase"), SubResource("HillsProfile"), SubResource("Strata"), SubResource("Ravine1")])
+
+
+[node name="MeadowHills" type="RegionContainer" parent="World/Hills"]
+occurrence_weight = 5.0
+decorators = Array[WorldDecorator]([SubResource("MeadowHills"), SubResource("HillsDetail5"), SubResource("HillsContour5"), SubResource("Strata")])
+
+[node name="RockyRidges" type="RegionContainer" parent="World/Hills"]
+occurrence_weight = 3.0
+decorators = Array[WorldDecorator]([SubResource("RockyRidges"), SubResource("HillsDetail6"), SubResource("HillsContour6"), SubResource("Strata")])
+
+[node name="ShelteredValleys" type="RegionContainer" parent="World/Hills"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("ShelteredValleys"), SubResource("HillsDetail7"), SubResource("HillsContour7"), SubResource("Strata")])
+
+[node name="UplandPlateau" type="RegionContainer" parent="World/Hills"]
+occurrence_weight = 1.0
+decorators = Array[WorldDecorator]([SubResource("UplandPlateau"), SubResource("HillsDetail8"), SubResource("HillsContour8"), SubResource("Strata")])
+
+[node name="Gullies" type="WorldRegionLayout" parent="World/Hills"]
+boundary_noise = 0.14
+occurrence_weight = 3.0
+layout_mode = 1
+region_size = 9.0
+transition_width = 0.75
+cells_per_region = 1
+seed = 457
+decorators = Array[WorldDecorator]([SubResource("Ravine2")])
+
+
+[node name="Undisturbed" type="RegionContainer" parent="World/Hills/Gullies"]
+occurrence_weight = 4.0
+
+[node name="Fissures" type="WorldRegionLayout" parent="World/Hills/Gullies"]
+boundary_noise = 0.14
+occurrence_weight = 3.0
+layout_mode = 1
+region_size = 4.5
+transition_width = 0.4
+cells_per_region = 1
+seed = 839
+decorators = Array[WorldDecorator]([SubResource("Ravine3")])
+
+
+[node name="Undisturbed" type="RegionContainer" parent="World/Hills/Gullies/Fissures"]
+occurrence_weight = 4.0
+
+[node name="Channels" type="RegionContainer" parent="World/Hills/Gullies/Fissures"]
+occurrence_weight = 3.0
+decorators = Array[WorldDecorator]([SubResource("Ravine4")])
+
+
+[node name="Mountains" type="WorldRegionLayout" parent="World"]
+boundary_noise = 0.14
+occurrence_weight = 2.0
+layout_mode = 1
+region_size = 18.0
+transition_width = 1.5
+cells_per_region = 1
+seed = 312
+decorators = Array[WorldDecorator]([SubResource("MountainsBase"), SubResource("MountainsProfile"), SubResource("Strata"), SubResource("Ravine1")])
+
+
+[node name="ScreeSlopes" type="RegionContainer" parent="World/Mountains"]
+occurrence_weight = 5.0
+decorators = Array[WorldDecorator]([SubResource("RockFlanks"), SubResource("MountainsDetail9"), SubResource("MountainsContour9"), SubResource("Strata")])
+
+[node name="SaddleValleys" type="RegionContainer" parent="World/Mountains"]
+occurrence_weight = 3.0
+decorators = Array[WorldDecorator]([SubResource("SharpPeaks"), SubResource("MountainsDetail10"), SubResource("MountainsContour10"), SubResource("Strata")])
+
+[node name="BenchTerraces" type="RegionContainer" parent="World/Mountains"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("HighPlateaus"), SubResource("MountainsDetail11"), SubResource("MountainsContour11"), SubResource("Strata")])
+
+[node name="Gullies" type="WorldRegionLayout" parent="World/Mountains"]
+boundary_noise = 0.14
+occurrence_weight = 3.0
+layout_mode = 1
+region_size = 9.0
+transition_width = 0.75
+cells_per_region = 1
+seed = 457
+decorators = Array[WorldDecorator]([SubResource("Ravine2")])
+
+
+[node name="Undisturbed" type="RegionContainer" parent="World/Mountains/Gullies"]
+occurrence_weight = 4.0
+
+[node name="Fissures" type="WorldRegionLayout" parent="World/Mountains/Gullies"]
+boundary_noise = 0.14
+occurrence_weight = 3.0
+layout_mode = 1
+region_size = 4.5
+transition_width = 0.4
+cells_per_region = 1
+seed = 839
+decorators = Array[WorldDecorator]([SubResource("Ravine3")])
+
+
+[node name="Undisturbed" type="RegionContainer" parent="World/Mountains/Gullies/Fissures"]
+occurrence_weight = 4.0
+
+[node name="Channels" type="RegionContainer" parent="World/Mountains/Gullies/Fissures"]
+occurrence_weight = 3.0
+decorators = Array[WorldDecorator]([SubResource("Ravine4")])
+
+
+[node name="Sea" type="WorldRegionLayout" parent="World"]
+boundary_noise = 0.14
+occurrence_weight = 2.0
+layout_mode = 1
+region_size = 18.0
+transition_width = 1.5
+cells_per_region = 1
+seed = 313
+decorators = Array[WorldDecorator]([SubResource("SeaBase"), SubResource("SeaProfile"), SubResource("Strata"), SubResource("Ravine1")])
+
+
+[node name="SandyShelves" type="RegionContainer" parent="World/Sea"]
+occurrence_weight = 5.0
+decorators = Array[WorldDecorator]([SubResource("SandyShelves"), SubResource("SeaDetail12"), SubResource("SeaContour12"), SubResource("Strata")])
+
+[node name="SeabedRidges" type="RegionContainer" parent="World/Sea"]
+occurrence_weight = 3.0
+decorators = Array[WorldDecorator]([SubResource("SeabedRidges"), SubResource("SeaDetail13"), SubResource("SeaContour13"), SubResource("Strata")])
+
+[node name="SeabedBasins" type="RegionContainer" parent="World/Sea"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("SeabedBasins"), SubResource("SeaDetail14"), SubResource("SeaContour14"), SubResource("Strata")])
+
+[node name="CoastalDunes" type="RegionContainer" parent="World/Sea"]
+occurrence_weight = 1.0
+decorators = Array[WorldDecorator]([SubResource("CoastalDunes"), SubResource("SeaDetail15"), SubResource("SeaContour15"), SubResource("Strata")])
+
+[node name="Gullies" type="WorldRegionLayout" parent="World/Sea"]
+boundary_noise = 0.14
+occurrence_weight = 3.0
+layout_mode = 1
+region_size = 9.0
+transition_width = 0.75
+cells_per_region = 1
+seed = 457
+decorators = Array[WorldDecorator]([SubResource("Ravine2")])
+
+
+[node name="Undisturbed" type="RegionContainer" parent="World/Sea/Gullies"]
+occurrence_weight = 4.0
+
+[node name="Fissures" type="WorldRegionLayout" parent="World/Sea/Gullies"]
+boundary_noise = 0.14
+occurrence_weight = 3.0
+layout_mode = 1
+region_size = 4.5
+transition_width = 0.4
+cells_per_region = 1
+seed = 839
+decorators = Array[WorldDecorator]([SubResource("Ravine3")])
+
+
+[node name="Undisturbed" type="RegionContainer" parent="World/Sea/Gullies/Fissures"]
+occurrence_weight = 4.0
+
+[node name="Channels" type="RegionContainer" parent="World/Sea/Gullies/Fissures"]
+occurrence_weight = 3.0
+decorators = Array[WorldDecorator]([SubResource("Ravine4")])
+
+
+[node name="DeepSea" type="WorldRegionLayout" parent="World"]
+boundary_noise = 0.14
+occurrence_weight = 1.0
+layout_mode = 1
+region_size = 18.0
+transition_width = 1.5
+cells_per_region = 1
+seed = 314
+decorators = Array[WorldDecorator]([SubResource("DeepSeaBase"), SubResource("DeepSeaProfile"), SubResource("Strata"), SubResource("Ravine1")])
+
+
+[node name="AbyssalPlains" type="RegionContainer" parent="World/DeepSea"]
+occurrence_weight = 5.0
+decorators = Array[WorldDecorator]([SubResource("AbyssalPlains"), SubResource("DeepSeaDetail16"), SubResource("DeepSeaContour16"), SubResource("Strata")])
+
+[node name="SubmarineRidges" type="RegionContainer" parent="World/DeepSea"]
+occurrence_weight = 3.0
+decorators = Array[WorldDecorator]([SubResource("SubmarineRidges"), SubResource("DeepSeaDetail17"), SubResource("DeepSeaContour17"), SubResource("Strata")])
+
+[node name="DeepBasins" type="RegionContainer" parent="World/DeepSea"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("DeepBasins"), SubResource("DeepSeaDetail18"), SubResource("DeepSeaContour18"), SubResource("Strata")])
+
+[node name="Gullies" type="WorldRegionLayout" parent="World/DeepSea"]
+boundary_noise = 0.14
+occurrence_weight = 3.0
+layout_mode = 1
+region_size = 9.0
+transition_width = 0.75
+cells_per_region = 1
+seed = 457
+decorators = Array[WorldDecorator]([SubResource("Ravine2")])
+
+
+[node name="Undisturbed" type="RegionContainer" parent="World/DeepSea/Gullies"]
+occurrence_weight = 4.0
+
+[node name="Fissures" type="WorldRegionLayout" parent="World/DeepSea/Gullies"]
+boundary_noise = 0.14
+occurrence_weight = 3.0
+layout_mode = 1
+region_size = 4.5
+transition_width = 0.4
+cells_per_region = 1
+seed = 839
+decorators = Array[WorldDecorator]([SubResource("Ravine3")])
+
+
+[node name="Undisturbed" type="RegionContainer" parent="World/DeepSea/Gullies/Fissures"]
+occurrence_weight = 4.0
+
+[node name="Channels" type="RegionContainer" parent="World/DeepSea/Gullies/Fissures"]
+occurrence_weight = 3.0
+decorators = Array[WorldDecorator]([SubResource("Ravine4")])
+
+
+
+[node name="Desert" type="WorldRegionLayout" parent="World"]
+bounded = false
+layout_mode = 1
+region_size = 32.0
+transition_width = 6.0
+boundary_noise = 0.16
+cells_per_region = 2
+seed = 5000
+occurrence_weight = 1.0
+
+decorators = Array[WorldDecorator]([SubResource("DesertDatum")])
+
+[node name="DuneSea" type="RegionContainer" parent="World/Desert"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("DuneSea"), SubResource("DesertDetail19"), SubResource("DesertContour19"), SubResource("Strata")])
+
+[node name="DesertPavement" type="RegionContainer" parent="World/Desert"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("DesertPavement"), SubResource("DesertDetail20"), SubResource("DesertContour20"), SubResource("Strata")])
+
+[node name="Canyons" type="WorldRegionLayout" parent="World"]
+bounded = false
+layout_mode = 1
+region_size = 32.0
+transition_width = 6.0
+boundary_noise = 0.16
+cells_per_region = 2
+seed = 5113
+occurrence_weight = 1.0
+decorators = Array[WorldDecorator]([SubResource("CanyonsDatum"), SubResource("CanyonCut")])
+
+[node name="SandstoneMesas" type="RegionContainer" parent="World/Canyons"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("SandstoneMesas"), SubResource("CanyonsDetail21"), SubResource("CanyonsContour21"), SubResource("Strata")])
+
+[node name="CanyonBenches" type="RegionContainer" parent="World/Canyons"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("CanyonBenches"), SubResource("CanyonsDetail22"), SubResource("CanyonsContour22"), SubResource("Strata")])
+
+[node name="CanyonFloor" type="RegionContainer" parent="World/Canyons"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("CanyonFloor"), SubResource("CanyonsDetail23"), SubResource("CanyonsContour23"), SubResource("Strata")])
+
+[node name="Badlands" type="WorldRegionLayout" parent="World"]
+bounded = false
+layout_mode = 1
+region_size = 32.0
+transition_width = 6.0
+boundary_noise = 0.16
+cells_per_region = 2
+seed = 5226
+occurrence_weight = 1.0
+
+decorators = Array[WorldDecorator]([SubResource("BadlandsDatum")])
+
+[node name="ErodedRidges" type="RegionContainer" parent="World/Badlands"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("ErodedRidges"), SubResource("BadlandsDetail24"), SubResource("BadlandsContour24"), SubResource("Strata")])
+
+[node name="ClayTerraces" type="RegionContainer" parent="World/Badlands"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("ClayTerraces"), SubResource("BadlandsDetail25"), SubResource("BadlandsContour25"), SubResource("Strata")])
+
+[node name="Savanna" type="WorldRegionLayout" parent="World"]
+bounded = false
+layout_mode = 1
+region_size = 32.0
+transition_width = 6.0
+boundary_noise = 0.16
+cells_per_region = 2
+seed = 5339
+occurrence_weight = 1.0
+
+decorators = Array[WorldDecorator]([SubResource("SavannaDatum")])
+
+[node name="DryGrassland" type="RegionContainer" parent="World/Savanna"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("DryGrassland"), SubResource("SavannaDetail26"), SubResource("SavannaContour26"), SubResource("Strata")])
+
+[node name="RollingSavanna" type="RegionContainer" parent="World/Savanna"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("RollingSavanna"), SubResource("SavannaDetail27"), SubResource("SavannaContour27"), SubResource("Strata")])
+
+[node name="Wetlands" type="WorldRegionLayout" parent="World"]
+bounded = false
+layout_mode = 1
+region_size = 32.0
+transition_width = 6.0
+boundary_noise = 0.16
+cells_per_region = 2
+seed = 5452
+occurrence_weight = 1.0
+
+decorators = Array[WorldDecorator]([SubResource("WetlandsDatum")])
+
+[node name="MarshBasins" type="RegionContainer" parent="World/Wetlands"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("MarshBasins"), SubResource("WetlandsDetail28"), SubResource("WetlandsContour28"), SubResource("Strata")])
+
+[node name="Mudflats" type="RegionContainer" parent="World/Wetlands"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("Mudflats"), SubResource("WetlandsDetail29"), SubResource("WetlandsContour29"), SubResource("Strata")])
+
+[node name="Tundra" type="WorldRegionLayout" parent="World"]
+bounded = false
+layout_mode = 1
+region_size = 32.0
+transition_width = 6.0
+boundary_noise = 0.16
+cells_per_region = 2
+seed = 5565
+occurrence_weight = 1.0
+
+decorators = Array[WorldDecorator]([SubResource("TundraDatum")])
+
+[node name="TundraUplands" type="RegionContainer" parent="World/Tundra"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("TundraUplands"), SubResource("TundraDetail30"), SubResource("TundraContour30"), SubResource("Strata")])
+
+[node name="GlacialHollows" type="RegionContainer" parent="World/Tundra"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("GlacialHollows"), SubResource("TundraDetail31"), SubResource("TundraContour31"), SubResource("Strata")])
+
+[node name="Forest" type="WorldRegionLayout" parent="World"]
+bounded = false
+layout_mode = 1
+region_size = 32.0
+transition_width = 6.0
+boundary_noise = 0.16
+cells_per_region = 2
+seed = 5678
+occurrence_weight = 1.0
+
+decorators = Array[WorldDecorator]([SubResource("ForestDatum")])
+
+[node name="ForestHills" type="RegionContainer" parent="World/Forest"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("ForestHills"), SubResource("ForestDetail32"), SubResource("ForestContour32"), SubResource("Strata")])
+
+[node name="WoodlandValleys" type="RegionContainer" parent="World/Forest"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("WoodlandValleys"), SubResource("ForestDetail33"), SubResource("ForestContour33"), SubResource("Strata")])
+
+[node name="Taiga" type="WorldRegionLayout" parent="World"]
+bounded = false
+layout_mode = 1
+region_size = 32.0
+transition_width = 6.0
+boundary_noise = 0.16
+cells_per_region = 2
+seed = 5791
+occurrence_weight = 1.0
+
+decorators = Array[WorldDecorator]([SubResource("TaigaDatum")])
+
+[node name="BorealUplands" type="RegionContainer" parent="World/Taiga"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("BorealUplands"), SubResource("TaigaDetail34"), SubResource("TaigaContour34"), SubResource("Strata")])
+
+[node name="LakeHollows" type="RegionContainer" parent="World/Taiga"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("LakeHollows"), SubResource("TaigaDetail35"), SubResource("TaigaContour35"), SubResource("Strata")])
+
+[node name="Rainforest" type="WorldRegionLayout" parent="World"]
+bounded = false
+layout_mode = 1
+region_size = 32.0
+transition_width = 6.0
+boundary_noise = 0.16
+cells_per_region = 2
+seed = 5904
+occurrence_weight = 1.0
+
+decorators = Array[WorldDecorator]([SubResource("RainforestDatum")])
+
+[node name="JungleHills" type="RegionContainer" parent="World/Rainforest"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("JungleHills"), SubResource("RainforestDetail36"), SubResource("RainforestContour36"), SubResource("Strata")])
+
+[node name="TropicalPlateaus" type="RegionContainer" parent="World/Rainforest"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("TropicalPlateaus"), SubResource("RainforestDetail37"), SubResource("RainforestContour37"), SubResource("Strata")])
+
+
+[node name="RaisedTableland" type="RegionContainer" parent="World/Plains"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("RaisedTableland"), SubResource("PlainsDetail38"), SubResource("PlainsContour38"), SubResource("Strata")])
+
+[node name="FloodplainSteps" type="RegionContainer" parent="World/Plains"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("FloodplainSteps"), SubResource("PlainsDetail39"), SubResource("PlainsContour39"), SubResource("Strata")])
+
+[node name="BroadValley" type="RegionContainer" parent="World/Plains"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("BroadValley"), SubResource("PlainsDetail40"), SubResource("PlainsContour40"), SubResource("Strata")])
+
+[node name="UplandTables" type="RegionContainer" parent="World/Hills"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("UplandTables"), SubResource("HillsDetail41"), SubResource("HillsContour41"), SubResource("Strata")])
+
+[node name="HillsideBenches" type="RegionContainer" parent="World/Hills"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("HillsideBenches"), SubResource("HillsDetail42"), SubResource("HillsContour42"), SubResource("Strata")])
+
+[node name="RockyButtes" type="RegionContainer" parent="World/Hills"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("RockyButtes"), SubResource("HillsDetail43"), SubResource("HillsContour43"), SubResource("Strata")])
+
+[node name="TalusFans" type="RegionContainer" parent="World/Mountains"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("TalusFans"), SubResource("MountainsDetail44"), SubResource("MountainsContour44"), SubResource("Strata")])
+
+[node name="Headwalls" type="RegionContainer" parent="World/Mountains"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("Headwalls"), SubResource("MountainsDetail45"), SubResource("MountainsContour45"), SubResource("Strata")])
+
+[node name="AlpineBenches" type="RegionContainer" parent="World/Mountains"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("AlpineBenches"), SubResource("MountainsDetail46"), SubResource("MountainsContour46"), SubResource("Strata")])
+
+[node name="SandRipples" type="RegionContainer" parent="World/Sea"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("SandRipples"), SubResource("SeaDetail47"), SubResource("SeaContour47"), SubResource("Strata")])
+
+[node name="ContinentalShelves" type="RegionContainer" parent="World/Sea"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("ContinentalShelves"), SubResource("SeaDetail48"), SubResource("SeaContour48"), SubResource("Strata")])
+
+[node name="SiltDepressions" type="RegionContainer" parent="World/Sea"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("SiltDepressions"), SubResource("SeaDetail49"), SubResource("SeaContour49"), SubResource("Strata")])
+
+[node name="AbyssalTrenches" type="RegionContainer" parent="World/DeepSea"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("AbyssalTrenches"), SubResource("DeepSeaDetail50"), SubResource("DeepSeaContour50"), SubResource("Strata")])
+
+[node name="Seamounts" type="RegionContainer" parent="World/DeepSea"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("Seamounts"), SubResource("DeepSeaDetail51"), SubResource("DeepSeaContour51"), SubResource("Strata")])
+
+[node name="OceanBenches" type="RegionContainer" parent="World/DeepSea"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("OceanBenches"), SubResource("DeepSeaDetail52"), SubResource("DeepSeaContour52"), SubResource("Strata")])
+
+[node name="DesertMesas" type="RegionContainer" parent="World/Desert"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("DesertMesas"), SubResource("DesertDetail53"), SubResource("DesertContour53"), SubResource("Strata")])
+
+[node name="DesertTerraces" type="RegionContainer" parent="World/Desert"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("DesertTerraces"), SubResource("DesertDetail54"), SubResource("DesertContour54"), SubResource("Strata")])
+
+[node name="DryPans" type="RegionContainer" parent="World/Desert"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("DryPans"), SubResource("DesertDetail55"), SubResource("DesertContour55"), SubResource("Strata")])
+
+[node name="TableTops" type="RegionContainer" parent="World/Canyons"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("TableTops"), SubResource("CanyonsDetail56"), SubResource("CanyonsContour56"), SubResource("Strata")])
+
+[node name="SlotValleys" type="RegionContainer" parent="World/Canyons"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("SlotValleys"), SubResource("CanyonsDetail57"), SubResource("CanyonsContour57"), SubResource("Strata")])
+
+[node name="ScreeAprons" type="RegionContainer" parent="World/Canyons"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("ScreeAprons"), SubResource("CanyonsDetail58"), SubResource("CanyonsContour58"), SubResource("Strata")])
+
+[node name="ClayButtes" type="RegionContainer" parent="World/Badlands"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("ClayButtes"), SubResource("BadlandsDetail59"), SubResource("BadlandsContour59"), SubResource("Strata")])
+
+[node name="DryGullies" type="RegionContainer" parent="World/Badlands"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("DryGullies"), SubResource("BadlandsDetail60"), SubResource("BadlandsContour60"), SubResource("Strata")])
+
+[node name="BadlandTables" type="RegionContainer" parent="World/Badlands"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("BadlandTables"), SubResource("BadlandsDetail61"), SubResource("BadlandsContour61"), SubResource("Strata")])
+
+[node name="SavannaTables" type="RegionContainer" parent="World/Savanna"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("SavannaTables"), SubResource("SavannaDetail62"), SubResource("SavannaContour62"), SubResource("Strata")])
+
+[node name="SeasonalPans" type="RegionContainer" parent="World/Savanna"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("SeasonalPans"), SubResource("SavannaDetail63"), SubResource("SavannaContour63"), SubResource("Strata")])
+
+[node name="SavannaBenches" type="RegionContainer" parent="World/Savanna"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("SavannaBenches"), SubResource("SavannaDetail64"), SubResource("SavannaContour64"), SubResource("Strata")])
+
+[node name="PeatBanks" type="RegionContainer" parent="World/Wetlands"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("PeatBanks"), SubResource("WetlandsDetail65"), SubResource("WetlandsContour65"), SubResource("Strata")])
+
+[node name="RaisedHummocks" type="RegionContainer" parent="World/Wetlands"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("RaisedHummocks"), SubResource("WetlandsDetail66"), SubResource("WetlandsContour66"), SubResource("Strata")])
+
+[node name="MarshChannels" type="RegionContainer" parent="World/Wetlands"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("MarshChannels"), SubResource("WetlandsDetail67"), SubResource("WetlandsContour67"), SubResource("Strata")])
+
+[node name="TundraTables" type="RegionContainer" parent="World/Tundra"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("TundraTables"), SubResource("TundraDetail68"), SubResource("TundraContour68"), SubResource("Strata")])
+
+[node name="GlacialSteps" type="RegionContainer" parent="World/Tundra"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("GlacialSteps"), SubResource("TundraDetail69"), SubResource("TundraContour69"), SubResource("Strata")])
+
+[node name="GlacialValleys" type="RegionContainer" parent="World/Tundra"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("GlacialValleys"), SubResource("TundraDetail70"), SubResource("TundraContour70"), SubResource("Strata")])
+
+[node name="ForestTerraces" type="RegionContainer" parent="World/Forest"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("ForestTerraces"), SubResource("ForestDetail71"), SubResource("ForestContour71"), SubResource("Strata")])
+
+[node name="ForestTables" type="RegionContainer" parent="World/Forest"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("ForestTables"), SubResource("ForestDetail72"), SubResource("ForestContour72"), SubResource("Strata")])
+
+[node name="BoulderKnolls" type="RegionContainer" parent="World/Forest"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("BoulderKnolls"), SubResource("ForestDetail73"), SubResource("ForestContour73"), SubResource("Strata")])
+
+[node name="BorealTables" type="RegionContainer" parent="World/Taiga"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("BorealTables"), SubResource("TaigaDetail74"), SubResource("TaigaContour74"), SubResource("Strata")])
+
+[node name="MoraineBenches" type="RegionContainer" parent="World/Taiga"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("MoraineBenches"), SubResource("TaigaDetail75"), SubResource("TaigaContour75"), SubResource("Strata")])
+
+[node name="BorealValleys" type="RegionContainer" parent="World/Taiga"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("BorealValleys"), SubResource("TaigaDetail76"), SubResource("TaigaContour76"), SubResource("Strata")])
+
+[node name="JungleScarps" type="RegionContainer" parent="World/Rainforest"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("JungleScarps"), SubResource("RainforestDetail77"), SubResource("RainforestContour77"), SubResource("Strata")])
+
+[node name="JungleBenches" type="RegionContainer" parent="World/Rainforest"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("JungleBenches"), SubResource("RainforestDetail78"), SubResource("RainforestContour78"), SubResource("Strata")])
+
+[node name="RainforestBasins" type="RegionContainer" parent="World/Rainforest"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("RainforestBasins"), SubResource("RainforestDetail79"), SubResource("RainforestContour79"), SubResource("Strata")])
+
+[node name="Highlands" type="WorldRegionLayout" parent="World"]
+layout_mode = 1
+region_size = 40.0
+transition_width = 8.0
+boundary_noise = 0.18
+cells_per_region = 2
+seed = 7094
+occurrence_weight = 1.0
+
+decorators = Array[WorldDecorator]([SubResource("HighlandsDatum")])
+
+[node name="HighTables" type="RegionContainer" parent="World/Highlands"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("HighTables"), SubResource("HighlandsDetail80"), SubResource("HighlandsContour80"), SubResource("Strata")])
+
+[node name="HighlandSteps" type="RegionContainer" parent="World/Highlands"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("HighlandSteps"), SubResource("HighlandsDetail81"), SubResource("HighlandsContour81"), SubResource("Strata")])
+
+[node name="HighlandHills" type="RegionContainer" parent="World/Highlands"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("HighlandHills"), SubResource("HighlandsDetail82"), SubResource("HighlandsContour82"), SubResource("Strata")])
+
+[node name="HighlandGlens" type="RegionContainer" parent="World/Highlands"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("HighlandGlens"), SubResource("HighlandsDetail83"), SubResource("HighlandsContour83"), SubResource("Strata")])
+
+[node name="HighlandScarps" type="RegionContainer" parent="World/Highlands"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("HighlandScarps"), SubResource("HighlandsDetail84"), SubResource("HighlandsContour84"), SubResource("Strata")])
+
+[node name="AlpineMeadows" type="WorldRegionLayout" parent="World"]
+layout_mode = 1
+region_size = 40.0
+transition_width = 8.0
+boundary_noise = 0.18
+cells_per_region = 2
+seed = 7165
+occurrence_weight = 1.0
+
+decorators = Array[WorldDecorator]([SubResource("AlpineMeadowsDatum")])
+
+[node name="AlpineTables" type="RegionContainer" parent="World/AlpineMeadows"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("AlpineTables"), SubResource("AlpineMeadowsDetail85"), SubResource("AlpineMeadowsContour85"), SubResource("Strata")])
+
+[node name="AlpineRolls" type="RegionContainer" parent="World/AlpineMeadows"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("AlpineRolls"), SubResource("AlpineMeadowsDetail86"), SubResource("AlpineMeadowsContour86"), SubResource("Strata")])
+
+[node name="AlpineSteps" type="RegionContainer" parent="World/AlpineMeadows"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("AlpineSteps"), SubResource("AlpineMeadowsDetail87"), SubResource("AlpineMeadowsContour87"), SubResource("Strata")])
+
+[node name="HangingValleys" type="RegionContainer" parent="World/AlpineMeadows"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("HangingValleys"), SubResource("AlpineMeadowsDetail88"), SubResource("AlpineMeadowsContour88"), SubResource("Strata")])
+
+[node name="CirqueWalls" type="RegionContainer" parent="World/AlpineMeadows"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("CirqueWalls"), SubResource("AlpineMeadowsDetail89"), SubResource("AlpineMeadowsContour89"), SubResource("Strata")])
+
+[node name="Steppe" type="WorldRegionLayout" parent="World"]
+layout_mode = 1
+region_size = 40.0
+transition_width = 8.0
+boundary_noise = 0.18
+cells_per_region = 2
+seed = 7236
+occurrence_weight = 1.0
+
+decorators = Array[WorldDecorator]([SubResource("SteppeDatum")])
+
+[node name="OpenSteppe" type="RegionContainer" parent="World/Steppe"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("OpenSteppe"), SubResource("SteppeDetail90"), SubResource("SteppeContour90"), SubResource("Strata")])
+
+[node name="SteppeTables" type="RegionContainer" parent="World/Steppe"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("SteppeTables"), SubResource("SteppeDetail91"), SubResource("SteppeContour91"), SubResource("Strata")])
+
+[node name="RollingSteppe" type="RegionContainer" parent="World/Steppe"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("RollingSteppe"), SubResource("SteppeDetail92"), SubResource("SteppeContour92"), SubResource("Strata")])
+
+[node name="SteppeBenches" type="RegionContainer" parent="World/Steppe"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("SteppeBenches"), SubResource("SteppeDetail93"), SubResource("SteppeContour93"), SubResource("Strata")])
+
+[node name="SteppePans" type="RegionContainer" parent="World/Steppe"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("SteppePans"), SubResource("SteppeDetail94"), SubResource("SteppeContour94"), SubResource("Strata")])
+
+[node name="Mangroves" type="WorldRegionLayout" parent="World"]
+layout_mode = 1
+region_size = 40.0
+transition_width = 8.0
+boundary_noise = 0.18
+cells_per_region = 2
+seed = 7307
+occurrence_weight = 1.0
+
+decorators = Array[WorldDecorator]([SubResource("MangrovesDatum")])
+
+[node name="TidalBasins" type="RegionContainer" parent="World/Mangroves"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("TidalBasins"), SubResource("MangrovesDetail95"), SubResource("MangrovesContour95"), SubResource("Strata")])
+
+[node name="TidalFlats" type="RegionContainer" parent="World/Mangroves"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("TidalFlats"), SubResource("MangrovesDetail96"), SubResource("MangrovesContour96"), SubResource("Strata")])
+
+[node name="MudBanks" type="RegionContainer" parent="World/Mangroves"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("MudBanks"), SubResource("MangrovesDetail97"), SubResource("MangrovesContour97"), SubResource("Strata")])
+
+[node name="TidalChannels" type="RegionContainer" parent="World/Mangroves"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("TidalChannels"), SubResource("MangrovesDetail98"), SubResource("MangrovesContour98"), SubResource("Strata")])
+
+[node name="MudIslets" type="RegionContainer" parent="World/Mangroves"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("MudIslets"), SubResource("MangrovesDetail99"), SubResource("MangrovesContour99"), SubResource("Strata")])
+
+[node name="Volcanic" type="WorldRegionLayout" parent="World"]
+layout_mode = 1
+region_size = 40.0
+transition_width = 8.0
+boundary_noise = 0.18
+cells_per_region = 2
+seed = 7378
+occurrence_weight = 1.0
+
+decorators = Array[WorldDecorator]([SubResource("VolcanicDatum")])
+
+[node name="VolcanicMassifs" type="RegionContainer" parent="World/Volcanic"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("VolcanicMassifs"), SubResource("VolcanicDetail100"), SubResource("VolcanicContour100"), SubResource("Strata")])
+
+[node name="LavaTables" type="RegionContainer" parent="World/Volcanic"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("LavaTables"), SubResource("VolcanicDetail101"), SubResource("VolcanicContour101"), SubResource("Strata")])
+
+[node name="BasaltSteps" type="RegionContainer" parent="World/Volcanic"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("BasaltSteps"), SubResource("VolcanicDetail102"), SubResource("VolcanicContour102"), SubResource("Strata")])
+
+[node name="CalderaBasins" type="RegionContainer" parent="World/Volcanic"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("CalderaBasins"), SubResource("VolcanicDetail103"), SubResource("VolcanicContour103"), SubResource("Strata")])
+
+[node name="LavaScarps" type="RegionContainer" parent="World/Volcanic"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("LavaScarps"), SubResource("VolcanicDetail104"), SubResource("VolcanicContour104"), SubResource("Strata")])
+
+[node name="Karst" type="WorldRegionLayout" parent="World"]
+layout_mode = 1
+region_size = 40.0
+transition_width = 8.0
+boundary_noise = 0.18
+cells_per_region = 2
+seed = 7449
+occurrence_weight = 1.0
+
+decorators = Array[WorldDecorator]([SubResource("KarstDatum")])
+
+[node name="LimestoneTowers" type="RegionContainer" parent="World/Karst"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("LimestoneTowers"), SubResource("KarstDetail105"), SubResource("KarstContour105"), SubResource("Strata")])
+
+[node name="KarstTables" type="RegionContainer" parent="World/Karst"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("KarstTables"), SubResource("KarstDetail106"), SubResource("KarstContour106"), SubResource("Strata")])
+
+[node name="KarstDolines" type="RegionContainer" parent="World/Karst"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("KarstDolines"), SubResource("KarstDetail107"), SubResource("KarstContour107"), SubResource("Strata")])
+
+[node name="KarstValleys" type="RegionContainer" parent="World/Karst"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("KarstValleys"), SubResource("KarstDetail108"), SubResource("KarstContour108"), SubResource("Strata")])
+
+[node name="LimestoneBenches" type="RegionContainer" parent="World/Karst"]
+occurrence_weight = 2.0
+decorators = Array[WorldDecorator]([SubResource("LimestoneBenches"), SubResource("KarstDetail109"), SubResource("KarstContour109"), SubResource("Strata")])
+
+[node name="TerrainView" type="TerrainView" parent="."]
+root_path = NodePath("../World")
+preview_area = AABB(-128, -64, -128, 256, 256, 256)
+sample_budget = 64000000
+auto_generate = false
+sample_spacing = 2.0
+lod_enabled = true
+lod_distance = 24.0
+lod_error = 0.5
+lod_near_error = 0.08
+lod_max_level = 3
+triangle_budget = 4000000
+
+[node name="Camera3D" type="Camera3D" parent="."]
+current = true
+near = 0.1
+far = 800.0
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+rotation_degrees = Vector3(-52, -25, 0)
+light_color = Color(1, 0.94, 0.82, 1)
+light_energy = 0.9
+shadow_enabled = true
+
+[node name="Environment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment")
+
+[node name="TerrainStreamer" type="TerrainStreamer" parent="."]
+template_path = NodePath("../TerrainView")
+view_distance = 256.0

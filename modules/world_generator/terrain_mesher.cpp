@@ -53,6 +53,27 @@ Color terrain_color(uint16_t p_material, const Vector3 &p_normal) {
 		case 5:
 			color = Color(0.25, 0.36, 0.44);
 			break;
+		case 6:
+			color = Color(0.65, 0.32, 0.18);
+			break;
+		case 7:
+			color = Color(0.65, 0.66, 0.57);
+			break;
+		case 8:
+			color = Color(0.2, 0.38, 0.2);
+			break;
+		case 9:
+			color = Color(0.62, 0.59, 0.25);
+			break;
+		case 10:
+			color = Color(0.28, 0.36, 0.26);
+			break;
+		case 11:
+			color = Color(0.23, 0.22, 0.23);
+			break;
+		case 12:
+			color = Color(0.75, 0.72, 0.6);
+			break;
 		default:
 			color = Color(0.48, 0.34, 0.22);
 			break;

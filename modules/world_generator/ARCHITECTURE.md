@@ -232,3 +232,271 @@ User explicitly requested multithreaded terrain generation off the main thread, 
 The main thread polls completion and registers at most 1024-triangle pieces under a soft frame budget. Hidden staging has collision layer/mask zero; only a complete latest candidate replaces the old visible/collidable preview. Old nodes retire incrementally. Physics/render server calls and the final activation cannot be preempted; this is not production physics-tick atomicity or a hard frame-time guarantee. More small mesh pieces increase draw calls/node counts.
 
 Requests coalesce to one active and one latest pending immutable snapshot. Superseded jobs cooperatively cancel; cancelled/failed results never replace published data. Node destruction cancels and joins callbacks before freeing their data. `generate_preview` returns acceptance, with completion/failure signals and progress polling. The UI adds radius/spacing/worker/collision controls, Cancel, progress, scrollable layout and incremental diagnostic-map work. Whole-window regeneration remains; incremental streaming/LOD/cache reuse are deferred. Default safety budgets are 16 million halo-inclusive samples and 2 million triangles.
+
+
+## Surface carpet, nesting and initial mesh LOD (2026-10-26)
+
+Confirmed direction: surface biomes form a thick, potentially layered carpet
+following a reference surface. Caves, pits and ravines can breach it and expose
+underground content. Regions remain recursively nestable; a ravine can belong to
+a bounded subregion. Full 3D allocation is particularly useful underground and
+remains a future allocation strategy. Moving floating islands are unresolved;
+generating their content and owning their motion should remain separate concerns.
+
+Prototype increment: base-elevation Resources resolve as root-to-leaf metadata,
+in list order (absolute replacement or relative addition), before compiling
+profiles/ravines. Bounds and explicit spheres retain spatial coordinates.
+Metadata alone does not change the Y=0 base field; a flat profile supplies ground.
+Nested scopes intersect; layout template instantiation preserves descendant
+scopes. Ravines carve an upward-open elliptical/meandering cut with a finite
+bottom. Strata assign deep material using the incoming field before carving;
+this is not yet a continuously queryable reference surface or 3D underground layout.
+
+Distance LOD uses worker-side meshoptimizer simplification, not mixed sample
+lattices. Section topological borders stay fixed; distance to the section AABB
+selects full detail or target triangle fractions 1/4 and 1/16, with absolute
+error caps. A per-section edge-incidence check rejects changed open/nonmanifold
+edges and falls back to the original mesh. Caller supplies world-space focus per request. Collision uses the
+same reduced geometry. Sampling/base extraction remain unchanged; simplification
+adds worker work but reduces geometry registration and rendering. No per-frame
+LOD switching, streaming reuse or transition-cell mesher is claimed. Optional
+meshoptimizer absence fails enabled LOD requests rather than silently ignoring it.
+
+
+## Cumulative nested demo and instance identity (2026-10-26)
+
+User clarified that every newest iterative demo must preserve earlier features
+and controls for interaction review. Demo scenes now use chronological
+`NNN_descriptive_name` names, matching scripts, preserved UIDs and latest-as-F5.
+004 supersedes the fixed lowland/highland example with the complete interactive
+world and actual weighted nested layouters through four levels.
+
+TerrainModifier::apply_seeded is a backward-compatible immutable context hook:
+default implementation calls apply. Layouts compose parent identity, their seed
+and owner coordinates and pass the derived uint32 identity to child operations.
+Nested child selection includes parent identity; geometry sites remain defined
+by the layouter's local settings. Fine cells sharing an owner share identity.
+Ravines use it for optional occurrence and position/rotation/size/bend variation.
+There is no shared RNG or discovery-order state. Probability/variation defaults
+preserve existing explicitly authored ravines. Sizes remain in metres; demo
+resources intentionally choose decreasing dimensions at increasing depth.
+
+get_region_at accepts optional parent instance_seed and returns the selected
+instance_seed for deeper queries. Diagnostics convert positions into template
+coordinates exactly as compiled evaluation does; they remain authoring diagnostics,
+not queries of a previously published snapshot. Existing one-argument callers
+retain the root/default-zero behaviour. This does not implement 3D Voronoi.
+
+
+## Biome envelopes, terrain variety and CPU defaults (2026-10-26)
+
+User requested all-core worker defaults, more view distance, less uniform nested
+terrain, lower mountain outskirts/higher spiky interiors, rarer ravines and no
+floating-sphere demonstration. 004 now has twenty profiles (three formation
+subregions per biome plus five inherited fallbacks), 256x128x256m default coverage,
+rare4%/8% cut settings and grounded profile-union outcrops instead of an additive
+sphere. Floating-island generation remains deferred.
+
+TerrainEvaluationContext carries stable instance seed, original world position
+and inherited biome depth. apply_context defaults to the existing seeded hook;
+layouts copy context for descendant programs. The optional biome_edges setting
+uses a bounded5x5 nearest-matching/foreign-site distance-gap estimate, smoothly
+capped at0.35 cell widths (minimum axis scale). Same-biome owner edges do not
+reset its envelope. Profiles opt into world-space noise, interior elevation/relief
+ramps, octave roughness and ridge sharpness. This is not a global connected-
+component ID/centroid solution: diagnostic owner identities remain for allocation
+and seeded local operations. Top-level map presentation hides white owner borders
+between matching biome types while retaining fine-cell diagnostics.
+
+Immutable compiled objects receive unique cache IDs. Fixed4096-entry thread-local
+XZ caches reuse profile heights and boundary estimates across Y samples; entries
+also check coordinates, inherited depth or seed/definition as relevant. No pointer
+reuse or stale-request hits, shared writes, task-order RNG or server access occurs.
+Worker count is OS logical processor count by default; positive explicit limits
+remain, capped by the shared pool. Terrain group tasks use its full/high-priority
+queue instead of the pool's limited low-priority allocation. Main-thread scene/
+physics publication stays budgeted and generation remains worker-only.
+
+
+## Structural mountains and layered landforms (2026-10-26)
+
+User delegated terrain technique/preset/tree authoring to the assistant, with
+qualitative visual feedback instead of identifying parameter fixes. Optional
+reference photos guide appearance. Architectural participation and push permissions
+remain unchanged; this is authority to iterate within the agreed generator model.
+
+005 preserves cumulative features and keeps004 as a comparison. Nine new concrete
+WorldTerrainDecorator classes share the sampled-field/worker/LOD contracts. A
+MountainRange profile builds deterministic summit points, compact mountain bodies
+and ridge/saddle connections across adjacent world tiles. The graph is evaluated
+locally with shared endpoints; biome envelopes provide scope/falloff. It is not
+an erosion simulation or exact region-polygon graph fitting. Existing noise-based
+Mountains remains for compatibility/comparison, but does not generate005 mountains.
+
+ADD_RELIEF shifts the incoming field by the local profile height and preserves
+material. It ignores the container datum in the shift so base height is not added
+twice. Mountain parents own the macro graph; nested children add shallow foothill,
+valley and terrace layers before carving. Additional plateau/mesa/dune/basin/
+escarpment profiles demonstrate other landforms. Current layouters are sufficient;
+no speculative new container interface is added simply to grow the type catalogue.
+
+
+## Cached-surface diagnostics and evaluated summits (2026-10-26)
+
+User requested a height map from generation to evaluate the actual composed
+output. TerrainHeightmap exports an optional CSV from completed TerrainData on
+the coordinator, before LOD/publication. It uses source-grid crossings, not the
+analytic profile shortcut, and marks clipped/missing columns. Request provenance,
+atomic file completion, cancellation and nonfatal diagnostic errors are explicit.
+This is a top-surface diagnostic; the 3D signed-field representation is retained.
+
+The optional NumPy/Matplotlib tool evaluates window-limited prominence, physical
+apex-ring drops, slopes, residuals and altitude variation; it is analysis tooling,
+not engine generation. Reports include inputs/thresholds/censoring. Synthetic
+fixtures verify broad versus sharp peaks, unequal heights and known saddles.
+Assess the complete scene with fixed paired inputs plus screenshots, and reject
+flat/uniform results even if their spike count improves.
+
+006 keeps005 as a baseline. Compatible graph parameters add rounded summit/crest
+cross-sections, broader bodies, height contrast and dominant/secondary bands.
+Irregular connections use a symmetric edge hash. Bounded per-worker tile caches
+reuse immutable summit descriptors by unique compilation ID and world tile;
+height changes cannot reuse stale entries. All earlier cumulative features remain.
+
+## 2026-10-26: irregular region boundaries and review scale (007)
+
+`WorldRegionLayout.boundary_noise` adds an optional two-scale seeded value-noise
+warp in normalized layout space. The same query transform feeds ownership,
+blend weights, local biome-depth estimates and authoring diagnostics. Grid and
+zero-noise layouts preserve prior behavior. Per-worker memoization keys include
+normalized input, seed and amount; immutable snapshots retain their own settings.
+Centers remain lattice anchors rather than exact centroids of warped regions.
+
+The native preview ceiling is16384 sections, with independent sample/triangle
+budgets unchanged. Demo007 preflights the lattice/halo allocation and optionally
+coarsens whole-window sampling to preserve the requested radius. It reports both
+requested and effective spacing. This is a preview policy, not adaptive-distance
+field storage, incremental residency or a production streaming implementation.
+
+007 retains the complete006 hierarchy and controls, adjusts all five terrain
+families, and adds a stationary1.8m capsule at X/Z=0. A post-publication one-column
+field query positions its feet; collision generation is independent. The capsule
+is a review aid, not a player controller. A close-up button changes the camera.
+Paired maps for seeds2026/42 retain wide peak-height spread but flag more sharp
+features than006: added roughness is an artistic tradeoff requiring review.
+
+## 2026-10-26: incremental residency and river courses (008)
+
+The user's movement-priority request advances beyond whole-window replacement.
+`TerrainStreamer` owns desired/resident patch sets, a priority queue, one active
+`TerrainView` job owner and staged outgoing views. Patches are64m XZ columns of
+16m world chunks; vertical bounds come from the template. Near-distance priority
+wins, with a forward-direction preference within nearby rings. Demand replans on
+16m focus-cell changes or direction reversal. Outgoing work is cooperatively
+cancelled; nearby missing work can preempt a distant active patch. Source mesh
+positions never follow the camera. LOD refresh uses hysteresis when residency
+approaches/recedes. This is an initial streamer with fixed source resolution,
+not adaptive-distance sampling, persistence or vertical residency migration.
+
+A rebuild compiles one immutable root program and captures generation settings
+on the main thread. Every patch in that epoch shares it, so live resource edits
+cannot change only newly loaded terrain. `TerrainView` still owns worker and
+staged render/physics publication. Its internal C++ snapshot handoff bypasses
+per-patch authoring compilation; public whole-window preview behavior remains.
+Source arrays are released after patch publication, retaining the program for
+field diagnostics. The template's triangle cap bounds resident output; nearer
+patches can displace farther ones. Retiring views/candidates add temporary memory.
+Low-priority WorkerThreadPool tasks leave capacity for higher-priority engine
+work. Requested workers still default to logical CPUs; actual task concurrency
+honours the engine pool's low-priority ratio. Publication uses a soft1ms budget
+per active view and retirement proceeds through one outgoing view at a time.
+These budgets reduce contention; they do not provide hard realtime guarantees.
+
+`RegionLayoutModifier` caches bounded XZ layout plans per worker, keyed by unique
+compiled identity, local coordinate and inherited instance seed. Plans include
+selection/weights, instance origins and optional biome depth. Copying the plan
+before recursion prevents child cache-slot replacement from corrupting its
+parent. Full cached-field export of007 remains exactly equal to the saved source
+lattice after this optimization. No mutable generation state is shared.
+
+`WorldRiverDecorator` is a separate native operation: a downhill authored
+centerline, deterministic meanders, channel cross-section and smooth bank cut.
+It removes ground only and rejects invalid/uphill paths during compilation.
+The renderer's water ribbon uses the same subdivided centerline. Optional XZ
+bounds assign ribbon segments to resident patches by midpoint; a segment/width
+can overreach at a residency edge. It is a static visual course, not automatic
+catchment routing, hydraulic erosion, flowing fluid or arbitrary-path validity.
+The demo captures separate immutable river render definitions on Generate.
+
+008 keeps the cumulative hierarchy/controls, adds nine composed terrain biome
+presets (14 total), two joining river courses and larger angular summit/ridge
+ranges. Forest names describe ground formations only. Existing decorators remain
+interchangeable; no Astray gameplay rules enter the reusable module. Source CSV
+exports use a bounded batch with streaming disabled for reproducible evaluation.
+
+## 2026-10-26: lakes, graded water and conservative mesh reduction (009)
+
+`WorldLakeDecorator` forms a complete signed-field basin: bed, interior and
+closed banks blended into incoming terrain, with a seeded elliptical shoreline.
+Unlike the river's remove-only operation, basin formation can add grounded
+terrain so standing water above sea level has a bed and banks. Default priority
+-40 puts later river/cave cuts after it. Center Y is an explicit independent
+water level, not a translated base plane or inherited metadata. Root009 examples
+use a river-connected level near6m and an upland level72m. Scope and instance
+ownership remain the caller's responsibility for nested generated water renders.
+Water polygons share the native shoreline and clip to loaded patch boundaries.
+The renderer can conform crossing river vertices to the standing lake surface;
+this is static water geometry, not a volume/flow solver.
+
+Rivers now have optional additional downstream slope, calculated from cumulative
+horizontal length along the authored polyline. Both sampling and water ribbons
+consume the same finalized meandering centerline. The demo matches the tributary
+endpoint and connected lake level when applying grade changes. A downhill authored
+path is still required; this does not discover a drainage network automatically.
+
+Mesh simplification optionally includes the near band through lod_near_error;
+zero remains the compatible default.009 opts into0.08m absolute error and keeps
+existing fixed borders/topology validation. lod_max_level allows1..4 bands,
+default2;009 uses3 with24m first threshold and0.5m distant base error. Source
+sampling is unchanged and collision follows the reduced mesh. A controlled
+128x256x128m all-near009 window reduced199499→54529 triangles, with exactly equal
+cached height CSVs and unchanged outer boundary edges. Local worker wall was
+5518→4934ms and accumulated publication33.3→11.1ms; these timings are not universal
+speed guarantees. The tree has also grown, so whole-scene iteration timings are
+not an isolated optimization benchmark.
+
+009 retains008 streaming and all cumulative controls, expands to20 biome types,
+109 formation leaves and332 tunable profile resources. Each direct formation
+adds small relief and contour layers. Explicit biome datums create broad altitude
+variation; plateaus/terraces/scarps add local variety. Profile menu names include
+formation, kind and base/layer role. The speed slider directly drives arrow
+movement without a modifier shortcut. G safely initializes the debug overlay;
+streaming labels skip unloaded positions, query highest terrain crossings and
+rebuild with frame yields. Grid lines remain a sea-level16m reference.
+
+The extra distant band exposed a mixed cliff/ground case where a section-face
+edge gained four global incidences despite passing an open-edge-only guard.
+Validation now compares geometric face-edge incidence as well as topological
+open edges. On a changed face, the simplifier retains the original triangle
+collar and retries the remaining interior. Each retry protects another face,
+so the loop is bounded to seven passes. Wholly planar sections allow their
+common-plane interior to simplify while their outline remains fixed. This
+prevents overlapping cliff edges without retaining dense interiors everywhere.
+
+009 defaults to2m overview samples for faster residency filling;1m/finer remain
+selectable. Heightmap comparisons use explicit1m sampling, including the new
+export tool --spacing override. Small sub-sample cuts may be less visible in the
+performance preset. The continuous field/decorator model is unchanged.
+
+
+## 2026-10-27: climate hierarchy and drainage study
+
+010 adds authored climate containers between broad land/ocean allocation and biome definitions. All previous terrain types, relief layers and nested cuts remain. Marine profiles deepen by inherited ocean-interior distance; the source enclosure expands to -288..224m. Climate names represent grouping presets rather than a temperature/moisture simulation.
+
+`WorldRiverRouter` is a RefCounted planning service, separate from scalar carving and rendering. Main-thread capture compiles an immutable pre-river program; a dedicated coordinator builds a bounded, world-anchored jittered Voronoi dual graph. Worker-pool tasks project node/edge-midpoint terrain heights. Boundary-connected submerged nodes define ocean outlets; reverse Dijkstra selects outlet-directed paths. Highland source candidates are refined at roughly2m intervals against actual terrain, enforcing nonascending water and an incision cap. Edge noise preserves endpoints, with straight-edge fallback. Sources can join accepted trunk nodes. Rejected candidates are skipped. Accepted world-space paths become ordinary root-local river decorators in the origin-rooted demo, with no second slope/meander deformation. Callers using translated roots must convert coordinates themselves.
+
+Planning uses a fixed finite study area independent of streamer focus. It is not an infinite watershed solver, rainfall/erosion model, or routing along the exact biome polygons. Its coarse top projection may miss thin roofs and small features. Coastal and highland lake suggestions use local heights, ocean proximity and exclusion around accepted rivers; basin creation remains an explicit later decorator operation.
+
+Generation columns carry exact original world coordinates through nested translated scopes. Layout plans are resolved once per column, copied before recursion; weighted field/material accumulation retains scalar operation order. Surface profiles compute a single cached height for each column, then apply their original blend operation to every Y sample. Other3D modifiers retain scalar evaluation. Fixed-size67-element scratch arrays cover the bounded section halo and router's65-sample projections. River carving indexes immutable segments in XZ bins, preserving segment order and nearest-course semantics. Optional max_cut_depth limits scalar-field changes around planned channels; legacy zero leaves carving unrestricted.
+
+Streaming can pause scheduling/publication while retaining old residents during plan preparation. Explicit regeneration cancels stale planning, captures current resource settings, and publishes only the latest request. Water visibility is independent of carving. This extends the existing immutable-request and main-thread scene/server publication model.

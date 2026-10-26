@@ -31,9 +31,14 @@
 #include "register_types.h"
 
 #include "region_container.h"
+#include "terrain_streamer.h"
 #include "terrain_view.h"
 #include "world_decorator.h"
+#include "world_lake_decorator.h"
+#include "world_region_decorators.h"
 #include "world_region_layout.h"
+#include "world_river_decorator.h"
+#include "world_river_router.h"
 #include "world_terrain_decorator.h"
 
 #include "core/object/class_db.h"
@@ -44,15 +49,31 @@ void initialize_world_generator_module(ModuleInitializationLevel p_level) {
 	}
 	GDREGISTER_ABSTRACT_CLASS(WorldDecorator);
 	GDREGISTER_CLASS(WorldSphereDecorator);
+	GDREGISTER_CLASS(WorldBaseElevationDecorator);
+	GDREGISTER_CLASS(WorldRavineDecorator);
+	GDREGISTER_CLASS(WorldRiverDecorator);
+	GDREGISTER_CLASS(WorldRiverRouter);
+	GDREGISTER_CLASS(WorldLakeDecorator);
+	GDREGISTER_CLASS(WorldStrataDecorator);
 	GDREGISTER_ABSTRACT_CLASS(WorldTerrainDecorator);
 	GDREGISTER_CLASS(WorldPlainsDecorator);
 	GDREGISTER_CLASS(WorldHillsDecorator);
 	GDREGISTER_CLASS(WorldMountainsDecorator);
 	GDREGISTER_CLASS(WorldSeaDecorator);
 	GDREGISTER_CLASS(WorldDeepSeaDecorator);
+	GDREGISTER_CLASS(WorldMountainRangeDecorator);
+	GDREGISTER_CLASS(WorldFoothillsDecorator);
+	GDREGISTER_CLASS(WorldPlateauDecorator);
+	GDREGISTER_CLASS(WorldMesaDecorator);
+	GDREGISTER_CLASS(WorldDunesDecorator);
+	GDREGISTER_CLASS(WorldBasinDecorator);
+	GDREGISTER_CLASS(WorldTerracesDecorator);
+	GDREGISTER_CLASS(WorldValleyDecorator);
+	GDREGISTER_CLASS(WorldEscarpmentDecorator);
 	GDREGISTER_CLASS(RegionContainer);
 	GDREGISTER_CLASS(WorldRegionLayout);
 	GDREGISTER_CLASS(TerrainView);
+	GDREGISTER_CLASS(TerrainStreamer);
 }
 
 void uninitialize_world_generator_module(ModuleInitializationLevel p_level) {

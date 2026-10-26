@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://ea27g27uk30r"]
 
-[ext_resource type="Script" uid="uid://ms33bayh03uh" path="res://demo.gd" id="1_demo"]
+[ext_resource type="Script" uid="uid://ms33bayh03uh" path="res://001_terrain_primitives.gd" id="1_demo"]
 
 [sub_resource type="WorldSphereDecorator" id="Hill"]
 radius = 0.14

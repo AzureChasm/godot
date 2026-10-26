@@ -5,6 +5,7 @@
 	</brief_description>
 	<description>
 		Abstract base for terrain decorators attached through [member RegionContainer.decorators]. Profiles evaluate a three-dimensional signed field from a noise-shaped surface. Later sphere operations can still carve caves or add floating solids. Coordinates are relative to the owning container. Default priority is -100, before sphere operations at 0. Replacement after a cave will overwrite that cave inside the shared scope. These fields are not exact signed distances.
+		Profile elevation is an offset from the reference established by an inherited [WorldBaseElevationDecorator], plus container translation.
 	</description>
 	<tutorials>
 	</tutorials>
@@ -13,7 +14,7 @@
 			Vertical relief scale in metres. Zero produces a flat surface. Noise contributions are normalized across octaves.
 		</member>
 		<member name="blend_mode" type="int" setter="set_blend_mode" getter="get_blend_mode" enum="WorldTerrainDecorator.BlendMode" default="0">
-			How the profile combines with the earlier signed field. Defaults to replacement; use additive mode to preserve existing solid and subtractive mode to preserve existing air.
+			How the profile combines with the earlier signed field. Defaults to replacement; use ADD_SOLID to preserve existing solid and REMOVE_SOLID to preserve existing air. ADD_RELIEF shifts the incoming field by the profile height without replacing the larger landform. Schedule detail layers before caves/carving, because shifting an already carved field also affects that carving. ADD_RELIEF preserves the incoming material and does not apply container/base elevation twice.
 		</member>
 		<member name="elevation" type="float" setter="set_elevation" getter="get_elevation" default="0.1">
 			Base surface height in metres relative to the owning container. A translated container shifts the profile vertically.
@@ -31,6 +32,57 @@
 		<member name="wavelength" type="float" setter="set_wavelength" getter="get_wavelength" default="5.0">
 			Horizontal noise scale in metres. Larger values spread features farther apart. This is a characteristic scale, not a repeating period.
 		</member>
+		<member name="world_space_noise" type="bool" setter="set_world_space_noise" getter="get_world_space_noise" default="false">
+			When true, noise uses original world XZ coordinates rather than the current region template coordinates. Matching neighbouring biome instances can share continuous terrain noise. Container translation still affects the vertical datum.
+		</member>
+		<member name="interior_elevation" type="float" setter="set_interior_elevation" getter="get_interior_elevation" default="0.0">
+			Additional elevation in metres toward the biome interior, using inherited depth from a WorldRegionLayout with biome_edges enabled. Defaults to no additional elevation.
+		</member>
+		<member name="interior_scale" type="float" setter="set_interior_scale" getter="get_interior_scale" default="1.0">
+			Relief multiplier toward the biome interior, interpolated from 1 at the outer edge. Range 0 to 100. Defaults to no change.
+		</member>
+		<member name="interior_width" type="float" setter="set_interior_width" getter="get_interior_width" default="12.0">
+			Depth in metres over which interior elevation and relief changes reach full strength, using smoothstep. The layouter provides a capped local estimate, not exact geometric distance. Minimum 0.1.
+		</member>
+		<member name="roughness" type="float" setter="set_roughness" getter="get_roughness" default="-1.0">
+			Relative amplitude of successive noise octaves, up to 0.95. Negative values choose the profile default: 0.3 for mountains and 0.5 otherwise. Larger values retain more small-scale rocky detail.
+		</member>
+		<member name="ridge_sharpness" type="float" setter="set_ridge_sharpness" getter="get_ridge_sharpness" default="2.0">
+			Exponent for ridged mountain noise, from 1 to 8. Larger values narrow the crests. Other profile types ignore this setting.
+		</member>
+		<member name="detail_strength" type="float" setter="set_detail_strength" getter="get_detail_strength" default="0.03">
+			Small secondary-noise strength for analytic landforms. Range 0 to 0.5; the legacy five profiles ignore it. Keep low when large summits should determine the silhouette.
+		</member>
+		<member name="ridge_width" type="float" setter="set_ridge_width" getter="get_ridge_width" default="0.18">
+			Ridge support width as a fraction of wavelength for mountain ranges, from 0.04 to 0.5.
+		</member>
+		<member name="summit_count" type="int" setter="set_summit_count" getter="get_summit_count" default="3">
+			Number of seeded summit points per wavelength-sized mountain graph tile, from 1 to 6. Neighbour tiles share connecting ridges. This is not a count per irregular biome region.
+		</member>
+		<member name="terrace_steps" type="int" setter="set_terrace_steps" getter="get_terrace_steps" default="6">
+			Number of levels used by the terrace profile, from 2 to 32.
+		</member>
+		<member name="edge_strength" type="float" setter="set_edge_strength" getter="get_edge_strength" default="1.0">
+			Relief multiplier at the outer biome edge, interpolating toward interior_scale using inherited biome depth. Range 0 to 4. The cumulative range preset uses 0.1 for low outskirts.
+		</member>
+		<member name="summit_variation" type="float" setter="set_summit_variation" getter="get_summit_variation" default="0.28">
+			Mountain graph summit-height range, from 0 to 1. Higher values allow lower secondary summits; zero makes equal authored graph heights. Defaults preserve the earlier range.
+		</member>
+		<member name="summit_rounding" type="float" setter="set_summit_rounding" getter="get_summit_rounding" default="0.0">
+			Blend from pointed to rounded summit bodies and ridge cross-sections, from 0 to 1. Reduces sharp apex tips while retaining major landform structure.
+		</member>
+		<member name="summit_breadth" type="float" setter="set_summit_breadth" getter="get_summit_breadth" default="0.46">
+			Mountain body support radius as a fraction of graph wavelength, from 0.2 to 0.9. Larger values make broader shoulders.
+		</member>
+		<member name="range_irregularity" type="float" setter="set_range_irregularity" getter="get_range_irregularity" default="0.0">
+			Seeded summit-position jitter and symmetric omission of some grid-neighbour ridge connections, from 0 to 1. Zero retains the legacy regular graph.
+		</member>
+		<member name="summit_height_bias" type="float" setter="set_summit_height_bias" getter="get_summit_height_bias" default="1.0">
+			Exponent shaping random heights inside the selected summit band, from 0.25 to 4. Larger values favour the lower portion. Used together with summit_variation and optional hierarchical_summits.
+		</member>
+		<member name="hierarchical_summits" type="bool" setter="set_hierarchical_summits" getter="get_hierarchical_summits" default="false">
+			Give each graph tile a dominant anchor and a lower secondary-summit band. Defaults to the previous uniform-band behaviour. Biome clipping can still alter which summits are visible; this is not exact peak placement inside a region polygon.
+		</member>
 	</members>
 	<constants>
 		<constant name="REPLACE_TERRAIN" value="0" enum="BlendMode">
@@ -41,6 +93,9 @@
 		</constant>
 		<constant name="REMOVE_SOLID" value="2" enum="BlendMode">
 			Intersect the earlier solid with the profile using the maximum field value. Removes solid above the profile; preserves earlier material IDs.
+		</constant>
+		<constant name="ADD_RELIEF" value="3" enum="BlendMode">
+			Subtract the generated profile height from the incoming signed field, retaining its material. Preserves the underlying landform while adding signed local relief. This is a field shift, not an erosion simulation or a heightmap storage mode.
 		</constant>
 	</constants>
 </class>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="WorldBasinDecorator" inherits="WorldTerrainDecorator" api_type="core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+	<brief_description>
+		Creates broad depressions.
+	</brief_description>
+	<description>
+		Remaps broad noise into negative relief. In ADD_RELIEF mode it lowers an existing surface; replacement uses the local reference level. Shared elevation, seed, composition, material and interior controls are inherited from [WorldTerrainDecorator].
+	</description>
+	<tutorials>
+	</tutorials>
+</class>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="WorldMountainRangeDecorator" inherits="WorldTerrainDecorator" api_type="core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+	<brief_description>
+		Builds mountains from discrete summits and a connected ridge graph.
+	</brief_description>
+	<description>
+		Uses seeded summit points in wavelength-sized world tiles, shared neighbour connections, broad compact mountain bodies and ridges with saddles. summit_count controls points per tile, ridge_width is a fraction of tile scale, and detail_strength adds restrained flank grooves and small noise. This is an analytic structural prototype, not simulated erosion or a graph fitted to an exact biome polygon. Set world_space_noise for continuity across templates; biome edge ramps control the enclosing mountain area. Shared elevation, seed, composition, material and interior controls are inherited from [WorldTerrainDecorator].
+	</description>
+	<tutorials>
+	</tutorials>
+</class>

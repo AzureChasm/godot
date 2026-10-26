@@ -1,6 +1,6 @@
 [gd_scene load_steps=8 format=3]
 
-[ext_resource type="Script" path="res://unbounded_world.gd" id="1"]
+[ext_resource type="Script" path="res://003_voronoi_world.gd" id="1"]
 
 [sub_resource type="WorldPlainsDecorator" id="Plains"]
 elevation = 1.0
@@ -71,6 +71,7 @@ decorators = Array[WorldDecorator]([SubResource("DeepSea")])
 root_path = NodePath("../World")
 preview_area = AABB(-32, -16, -32, 64, 32, 64)
 sample_spacing = 0.5
+lod_enabled = true
 
 [node name="Camera3D" type="Camera3D" parent="."]
 current = true

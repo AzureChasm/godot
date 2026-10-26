@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="WorldTerracesDecorator" inherits="WorldTerrainDecorator" api_type="core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+	<brief_description>
+		Creates softened stepped terrain.
+	</brief_description>
+	<description>
+		Quantizes broad noise into terrace_steps levels with rounded risers. ADD_RELIEF adds shallow benches without replacing the incoming landform. This is an analytic profile, not simulated river or agricultural terraces. Shared elevation, seed, composition, material and interior controls are inherited from [WorldTerrainDecorator].
+	</description>
+	<tutorials>
+	</tutorials>
+</class>

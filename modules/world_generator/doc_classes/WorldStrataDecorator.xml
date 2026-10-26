@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="WorldStrataDecorator" inherits="WorldDecorator" api_type="core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+	<brief_description>
+		Assigns rock material below a configurable incoming field depth.
+	</brief_description>
+	<description>
+		Changes only material, never the solid field. Schedule after terrain profiles and before carving, preferably in the same layout template program. Later cuts expose the assigned rock. Uses negative incoming field value as a depth proxy, not true geometric distance on steep slopes. This is a two-material prototype, not layered 3D underground region allocation. Makes the column shortcut ineligible because material varies with depth.
+	</description>
+	<tutorials>
+	</tutorials>
+	<members>
+		<member name="soil_depth" type="float" setter="set_soil_depth" getter="get_soil_depth" default="2.0">
+			Retain the incoming surface material above this field depth; assign rock below it.
+		</member>
+		<member name="rock_material" type="int" setter="set_rock_material" getter="get_rock_material" default="3">
+			Material ID below soil_depth, from 1 to 65535. The preview palette shows ID 3 as stone.
+		</member>
+	</members>
+</class>

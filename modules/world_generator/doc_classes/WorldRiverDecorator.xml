@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="WorldRiverDecorator" inherits="WorldDecorator" api_type="core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+	<brief_description>
+		Carves a deterministic river channel and banks along a configurable downhill centerline.
+	</brief_description>
+	<description>
+		Samples a subdivided authored centerline with seeded meanders, lowers terrain into a channel and blends banks into the incoming field. Only removes ground; it never fills an existing cave or dams another channel. Default priority 10 follows terrain formation and ordinary carving. Paths use container-local coordinates and must not climb downstream. Decorator scopes still apply. This is authored river-course generation, not drainage-network discovery, hydraulic erosion, fluid simulation or gameplay water ownership. Exposed water geometry is a separate render aid; the caller owns its material and residency.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="get_generated_centerline" qualifiers="const">
+			<return type="PackedVector3Array" />
+			<description>
+				Returns the validated subdivided centerline including seeded meanders and additional slope. Coordinates are container-local. Useful for matching tributaries and lake levels. Invalid paths return an empty array and report an error.
+			</description>
+		</method>
+		<method name="create_water_mesh" qualifiers="const">
+			<return type="ArrayMesh" />
+			<param index="0" name="bounds" type="AABB" default="AABB(0, 0, 0, 0, 0, 0)" />
+			<description>
+				Returns a water ribbon along the same subdivided centerline used by channel generation, or null when no segment belongs to [param bounds]. A zero-volume bounds argument includes the whole path. Nonempty bounds assign segments by their XZ midpoint; banks and water widths may overreach by a segment near a residency edge. Rendering the ribbon does not simulate water volume or validate that its entire course is supported by the surrounding terrain.
+			</description>
+		</method>
+	</methods>
+	<members>
+		<member name="slope" type="float" setter="set_slope" getter="get_slope" default="0.0">
+			Additional downstream fall in metres per horizontal metre, from zero to 0.25. Subtracted from interpolated point heights using cumulative horizontal length along the authored polyline. Carving and rendered water share the resulting course. Zero preserves authored heights. Authored points must still not climb downstream.
+		</member>
+		<member name="bank_width" type="float" setter="set_bank_width" getter="get_bank_width" default="10.0">
+			Transition distance beyond each side of the channel, greater than zero and at most 256 metres.
+		</member>
+		<member name="centerline" type="PackedVector3Array" setter="set_centerline" getter="get_centerline" default="PackedVector3Array(0, 2, -128, 0, 0, 128)">
+			Two to 4096 finite container-local points in downstream order; Y is the water level. Consecutive points must differ horizontally by at least 0.1 metres and must not increase in Y. Total horizontal length must not exceed 16384 metres. Invalid paths fail terrain compilation without replacing previously published terrain.
+		</member>
+		<member name="max_cut_depth" type="float" setter="set_max_cut_depth" getter="get_max_cut_depth" default="0.0">
+			Maximum scalar-field increase per operation, in metres; zero preserves unlimited legacy carving. Limits deep lateral cuts around routed channels. This is a field-space guard, not a hydraulic erosion model.
+		</member>
+		<member name="depth" type="float" setter="set_depth" getter="get_depth" default="3.0">
+			Channel center depth below the authored water level, greater than zero and at most 256 metres. Edges are shallower.
+		</member>
+		<member name="meander" type="float" setter="set_meander" getter="get_meander" default="4.0">
+			Sideways meander amplitude in metres, from zero to 256. Zero retains the straight authored segments. Each segment rejoins its authored endpoints.
+		</member>
+		<member name="priority" type="int" setter="set_priority" getter="get_priority" overrides="WorldDecorator" default="10" />
+		<member name="seed" type="int" setter="set_seed" getter="get_seed" default="42">
+			Deterministic meander phase seed. Loading order and worker count do not change the path.
+		</member>
+		<member name="width" type="float" setter="set_width" getter="get_width" default="6.0">
+			Full channel and water ribbon width in metres, greater than zero and at most 256.
+		</member>
+	</members>
+</class>

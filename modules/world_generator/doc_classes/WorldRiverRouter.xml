@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="WorldRiverRouter" inherits="RefCounted" api_type="core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+	<brief_description>Plans downhill river paths and lake sites from an immutable terrain snapshot.</brief_description>
+	<description>Builds a world-anchored noisy Voronoi drainage graph over a finite study area. A dedicated coordinator and worker-pool tasks project the existing scalar field onto a sampled top surface, discover boundary-connected ocean outlets and route highland sources. The terrain representation remains three-dimensional. This bounded surface approximation does not simulate rainfall, erosion, discharge, underground drainage or infinite cross-area catchments. Thin roofs and features between samples may be missed. Keep the study area fixed across camera movement; results belong to the captured configuration.</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="begin">
+			<return type="bool" />
+			<param index="0" name="root" type="RegionContainer" />
+			<param index="1" name="area" type="AABB" />
+			<param index="2" name="seed" type="int" default="2026" />
+			<param index="3" name="spacing" type="float" default="48.0" />
+			<param index="4" name="max_rivers" type="int" default="6" />
+			<description>Captures an immutable terrain program on the main thread and starts worker planning. The root must be in the scene tree. Spacing is 24..128 metres, maximum rivers 1..16, and the area supports at most 8192 sites within 100000 metres of the origin. Call before adding the resulting river and lake decorators. Returns false on invalid input or while another job is running.</description>
+		</method>
+		<method name="cancel">
+			<return type="void" />
+			<description>Requests cooperative cancellation. Wait until is_running returns false before starting another plan.</description>
+		</method>
+		<method name="is_running" qualifiers="const">
+			<return type="bool" />
+			<description>Returns whether worker planning is still running.</description>
+		</method>
+		<method name="get_statistics" qualifiers="const">
+			<return type="Dictionary" />
+			<description>Returns progress, phase, sample counts and error; completed jobs also report graph sizes, accepted rivers, rejected sources, cancellation and planning time in milliseconds.</description>
+		</method>
+		<method name="get_paths" qualifiers="const">
+			<return type="Array" />
+			<description>Returns completed downstream PackedVector3Array paths in world coordinates. Sources are highlands; endpoints meet ocean level or an accepted trunk. Paths are refined against the captured surface and never climb downstream. No partial paths are returned while running.</description>
+		</method>
+		<method name="get_lakes" qualifiers="const">
+			<return type="Dictionary" />
+			<description>Returns optional coastal and highland Vector3 sites in world coordinates. Coastal water targets Y=0; highland water uses local terrain elevation. Sites avoid accepted rivers. These are placement suggestions, not a complete lake catchment or spillway simulation.</description>
+		</method>
+	</methods>
+	<members>
+		<member name="edge_noise" type="float" setter="set_edge_noise" getter="get_edge_noise" default="0.18">Endpoint-preserving sideways edge displacement factor, 0..1. Invalid noisy routes retry straight graph edges.</member>
+		<member name="max_incision" type="float" setter="set_max_incision" getter="get_max_incision" default="6.0">Maximum sampled terrain height above proposed river water, 1..32 metres. Routes exceeding it are rejected.</member>
+		<member name="minimum_grade" type="float" setter="set_minimum_grade" getter="get_minimum_grade" default="0.0005">Minimum target downstream fall per horizontal metre, 0..0.02. Ocean endpoints clamp to Y=0.</member>
+		<member name="minimum_source_height" type="float" setter="set_minimum_source_height" getter="get_minimum_source_height" default="64.0">Minimum sampled source elevation, 1..512 metres.</member>
+		<member name="source_separation" type="float" setter="set_source_separation" getter="get_source_separation" default="192.0">Minimum horizontal spacing of accepted headwaters, 32..2048 metres.</member>
+	</members>
+</class>

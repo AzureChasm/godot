@@ -49,6 +49,8 @@ public:
 	void set_priority(int p_priority);
 	int get_priority() const;
 
+	// Spatial primitives keep explicit coordinates unless they opt into the regional datum.
+	virtual bool uses_base_elevation() const { return false; }
 	virtual Ref<TerrainModifier> compile(const Vector3 &p_origin, String &r_error) const = 0;
 };
 

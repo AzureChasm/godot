@@ -58,9 +58,15 @@ class TerrainBuildJob {
 	TerrainSection *section_output = nullptr;
 	static void run(void *p_userdata);
 	static void build_section(void *p_userdata, uint32_t p_index);
+	void simplify_surface(TerrainSurface &r_surface, const TerrainSection &p_section, int p_level) const;
 	void split_surface(const TerrainSurface &p_surface, Vector<PreparedTerrainSurface> &r_output) const;
 
 public:
+	String heightmap_csv_path;
+	int heightmap_stride = 1;
+	Dictionary heightmap_statistics;
+	String heightmap_error;
+	double heightmap_ms = 0;
 	TerrainData data;
 	Vector<PreparedTerrainSurface> surfaces;
 	Thread coordinator;
@@ -70,7 +76,15 @@ public:
 	SafeNumeric<uint32_t> completed_sections;
 	SafeNumeric<uint32_t> total_sections;
 	SafeNumeric<int64_t> triangles;
-	int workers = 8;
+	bool lod_enabled = false;
+	Vector3 lod_origin;
+	real_t lod_distance = 16;
+	real_t lod_error = 0.15;
+	real_t lod_near_error = 0;
+	int lod_max_level = 2;
+	SafeNumeric<int64_t> source_triangles;
+	SafeNumeric<uint32_t> simplified_sections;
+	int workers = 1;
 	int threads_used = 0;
 	int mesh_section_count = 0;
 	bool collision = true;

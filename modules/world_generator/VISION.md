@@ -87,3 +87,13 @@ Implementation will happen on a new feature branch. After the user reviews the p
 ## Confirmed chunk sizing (2026-10-25)
 
 World chunks have a fixed physical size of 16 × 16 × 16 m so the spatial scale remains understandable when sample resolution changes. Smaller internal sections may handle generation, meshing and edits. The next reviewed slice adds parent-arranged weighted biome occurrence and visible transitions in an unbounded-definition demo; the seeded grid, grouped Voronoi allocation and field blends are prototype strategies, not the final organic layout or biome-transition rule system.
+
+
+## Surface and underground clarification (2026-10-26)
+
+The default surface is a thick carpet, possibly with multiple layers, covering
+the world. Region-scoped caves, ravines and pits may open it to the underground.
+Nesting remains essential: such a cut may belong to a subregion, not the entire
+biome. Underground region grouping particularly needs vertical/3D allocation.
+Moving islands and optional repeatable routes/orbits remain open gameplay design;
+this does not commit the terrain generator to managing moving bodies.

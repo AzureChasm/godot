@@ -5,6 +5,7 @@
 	</brief_description>
 	<description>
 		Containers form the world-definition child tree. Decorators are resources in [member decorators], not child nodes. A bounded container limits its operations and descendants to its translated local [member area]. An unbounded container adds no local enclosure. The root may be unbounded while [TerrainView] requests only a finite preview. This prototype supports translation only and rejects rotated/scaled containers. Ordinary child areas are explicitly authored. [WorldRegionLayout] instead uses its children as weighted definitions and supplies their instance areas.
+	 Supports nested bounded subregions. All ancestor scopes intersect when applying descendant operations. [WorldBaseElevationDecorator] entries establish inherited authoring metadata before terrain compilation; they do not move bounds.
 	</description>
 	<tutorials>
 	</tutorials>

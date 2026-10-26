@@ -40,7 +40,57 @@
 #include "scene/resources/material.h"
 #include "scene/resources/mesh.h"
 
+void TerrainView::set_lod_origin(const Vector3 &p_value) {
+	ERR_FAIL_COND(!p_value.is_finite());
+	lod_origin = p_value;
+}
+void TerrainView::set_lod_distance(real_t p_value) {
+	ERR_FAIL_COND(!Math::is_finite(p_value) || p_value < 4 || p_value > 100000);
+	lod_distance = p_value;
+}
+void TerrainView::set_lod_max_level(int p_value) {
+	ERR_FAIL_COND(p_value < 1 || p_value > 4);
+	lod_max_level = p_value;
+}
+void TerrainView::set_lod_near_error(real_t p_value) {
+	ERR_FAIL_COND(!Math::is_finite(p_value) || p_value < 0 || p_value > 1);
+	lod_near_error = p_value;
+}
+void TerrainView::set_lod_error(real_t p_value) {
+	ERR_FAIL_COND(!Math::is_finite(p_value) || p_value < 0.01 || p_value > 2);
+	lod_error = p_value;
+}
+
+void TerrainView::set_heightmap_stride(int p_stride) {
+	ERR_FAIL_COND(p_stride < 1 || p_stride > 32);
+	heightmap_stride = p_stride;
+}
 void TerrainView::_bind_methods() {
+	ClassDB::bind_method(D_METHOD("set_lod_max_level", "value"), &TerrainView::set_lod_max_level);
+	ClassDB::bind_method(D_METHOD("get_lod_max_level"), &TerrainView::get_lod_max_level);
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "lod_max_level", PROPERTY_HINT_RANGE, "1,4,1"), "set_lod_max_level", "get_lod_max_level");
+	ClassDB::bind_method(D_METHOD("set_lod_near_error", "value"), &TerrainView::set_lod_near_error);
+	ClassDB::bind_method(D_METHOD("get_lod_near_error"), &TerrainView::get_lod_near_error);
+	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "lod_near_error", PROPERTY_HINT_RANGE, "0,1,0.01"), "set_lod_near_error", "get_lod_near_error");
+	ClassDB::bind_method(D_METHOD("set_heightmap_csv_path", "path"), &TerrainView::set_heightmap_csv_path);
+	ClassDB::bind_method(D_METHOD("get_heightmap_csv_path"), &TerrainView::get_heightmap_csv_path);
+	ClassDB::bind_method(D_METHOD("set_heightmap_stride", "stride"), &TerrainView::set_heightmap_stride);
+	ClassDB::bind_method(D_METHOD("get_heightmap_stride"), &TerrainView::get_heightmap_stride);
+	ADD_PROPERTY(PropertyInfo(Variant::STRING, "heightmap_csv_path", PROPERTY_HINT_SAVE_FILE, "*.csv"), "set_heightmap_csv_path", "get_heightmap_csv_path");
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "heightmap_stride", PROPERTY_HINT_RANGE, "1,32,1"), "set_heightmap_stride", "get_heightmap_stride");
+	ClassDB::bind_method(D_METHOD("set_lod_enabled", "value"), &TerrainView::set_lod_enabled);
+	ClassDB::bind_method(D_METHOD("is_lod_enabled"), &TerrainView::is_lod_enabled);
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "lod_enabled"), "set_lod_enabled", "is_lod_enabled");
+	ClassDB::bind_method(D_METHOD("set_lod_origin", "value"), &TerrainView::set_lod_origin);
+	ClassDB::bind_method(D_METHOD("get_lod_origin"), &TerrainView::get_lod_origin);
+	ADD_PROPERTY(PropertyInfo(Variant::VECTOR3, "lod_origin"), "set_lod_origin", "get_lod_origin");
+	ClassDB::bind_method(D_METHOD("set_lod_distance", "value"), &TerrainView::set_lod_distance);
+	ClassDB::bind_method(D_METHOD("get_lod_distance"), &TerrainView::get_lod_distance);
+	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "lod_distance", PROPERTY_HINT_RANGE, "4,256,1,or_greater"), "set_lod_distance", "get_lod_distance");
+	ClassDB::bind_method(D_METHOD("set_lod_error", "value"), &TerrainView::set_lod_error);
+	ClassDB::bind_method(D_METHOD("get_lod_error"), &TerrainView::get_lod_error);
+	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "lod_error", PROPERTY_HINT_RANGE, "0.01,2,0.01"), "set_lod_error", "get_lod_error");
+
 	ClassDB::bind_method(D_METHOD("set_worker_count", "count"), &TerrainView::set_worker_count);
 	ClassDB::bind_method(D_METHOD("get_worker_count"), &TerrainView::get_worker_count);
 	ClassDB::bind_method(D_METHOD("set_sample_budget", "samples"), &TerrainView::set_sample_budget);
@@ -52,7 +102,7 @@ void TerrainView::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("is_generating"), &TerrainView::is_generating);
 	ClassDB::bind_method(D_METHOD("get_progress"), &TerrainView::get_progress);
 	ClassDB::bind_method(D_METHOD("cancel_generation"), &TerrainView::cancel_generation);
-	ADD_PROPERTY(PropertyInfo(Variant::INT, "worker_count", PROPERTY_HINT_RANGE, "1,16,1"), "set_worker_count", "get_worker_count");
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "worker_count", PROPERTY_HINT_RANGE, "1,256,1,or_greater"), "set_worker_count", "get_worker_count");
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "sample_budget", PROPERTY_HINT_RANGE, "1000000,64000000,1000000"), "set_sample_budget", "get_sample_budget");
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "triangle_budget", PROPERTY_HINT_RANGE, "10000,4000000,10000"), "set_triangle_budget", "get_triangle_budget");
 	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "publication_budget_ms", PROPERTY_HINT_RANGE, "1,16,0.5"), "set_publication_budget_ms", "get_publication_budget_ms");
@@ -155,8 +205,12 @@ String TerrainView::get_status() const {
 	return status;
 }
 
+TerrainView::TerrainView() {
+	worker_count = MAX(1, OS::get_singleton()->get_processor_count());
+}
+
 void TerrainView::set_worker_count(int p_count) {
-	ERR_FAIL_COND(p_count < 1 || p_count > 16);
+	ERR_FAIL_COND(p_count < 1);
 	worker_count = p_count;
 }
 int TerrainView::get_worker_count() const {
@@ -256,17 +310,27 @@ bool TerrainView::generate_preview() {
 	candidate->data.sample_budget = sample_budget;
 	candidate->data.triangle_budget = triangle_budget;
 	candidate->data.bounds = preview_area;
+	candidate->heightmap_csv_path = heightmap_csv_path;
+	candidate->heightmap_stride = heightmap_stride;
 	candidate->workers = worker_count;
 	candidate->collision = collision_enabled;
+	candidate->lod_enabled = lod_enabled;
+	candidate->lod_origin = lod_origin;
+	candidate->lod_distance = lod_distance;
+	candidate->lod_error = lod_error;
+	candidate->lod_near_error = lod_near_error;
+	candidate->lod_max_level = lod_max_level;
 	String error;
 	// Only authoring access happens here. Compilation captures immutable C++
 	// values before the worker receives anything; no node/Resource reads on it.
-	if (!root->collect_operations(candidate->data.operations, error)) {
+	if (program_snapshot_enabled) {
+		candidate->data.operations = program_snapshot;
+	} else if (!root->collect_operations(candidate->data.operations, error)) {
 		memdelete(candidate);
 		return fail_generation(error);
 	}
-	if (root->is_bounded()) {
-		const AABB root_area(root->get_area().position + root->get_global_position(), root->get_area().size);
+	if (program_snapshot_enabled ? program_snapshot_bounded : root->is_bounded()) {
+		const AABB root_area = program_snapshot_enabled ? program_snapshot_area : AABB(root->get_area().position + root->get_global_position(), root->get_area().size);
 		candidate->data.bounds = candidate->data.bounds.intersection(root_area);
 	}
 	candidate->layout_ms = double(OS::get_singleton()->get_ticks_usec() - candidate->started_usec) / 1000.0;
@@ -453,7 +517,11 @@ void TerrainView::finish_generation() {
 	statistics["meshing_ms"] = job->meshing_cpu_ms;
 	statistics["sampling_cpu_ms"] = job->sampling_cpu_ms;
 	statistics["meshing_cpu_ms"] = job->meshing_cpu_ms;
+	statistics["heightmap"] = job->heightmap_statistics;
+	statistics["heightmap_error"] = job->heightmap_error;
+	statistics["heightmap_ms"] = job->heightmap_ms;
 	statistics["worker_ms"] = job->worker_ms;
+	statistics["worker_limit"] = job->workers;
 	statistics["worker_threads_used"] = job->threads_used;
 	statistics["generation_on_main_thread"] = job->main_thread_violation.is_set();
 	statistics["publication_ms"] = publication_cpu_ms + double(OS::get_singleton()->get_ticks_usec() - started) / 1000.0;
@@ -465,6 +533,10 @@ void TerrainView::finish_generation() {
 	statistics["mesh_chunks"] = job->mesh_section_count;
 	statistics["mesh_pieces"] = job->surfaces.size();
 	statistics["triangles"] = job->triangles.get();
+	statistics["source_triangles"] = job->source_triangles.get();
+	statistics["lod_enabled"] = job->lod_enabled;
+	statistics["lod_origin"] = job->lod_origin;
+	statistics["lod_sections"] = job->simplified_sections.get();
 	statistics["bounds"] = job->data.bounds;
 	statistics["generation_ms"] = double(OS::get_singleton()->get_ticks_usec() - job->started_usec) / 1000.0;
 	memdelete(job);
@@ -480,4 +552,12 @@ float TerrainView::sample_field(const Vector3 &p_world_position) const {
 	ERR_FAIL_COND_V(revision == 0 || !p_world_position.is_finite(), 0);
 	// Inspect the published compiled field, not resources edited since generation.
 	return published_data.sample(p_world_position).field;
+}
+
+void TerrainView::retire_preview() {
+	if (generated) {
+		retire(generated);
+		generated = nullptr;
+		set_process_internal(true);
+	}
 }

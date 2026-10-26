@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="WorldLakeDecorator" inherits="WorldDecorator" api_type="core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+	<brief_description>
+		Forms a grounded lake basin and closed banks at an independent water elevation.
+	</brief_description>
+	<description>
+		Blends a complete bed and bank formation into the incoming signed field with a seeded irregular elliptical shoreline. Center Y is the water level and may be above or below sea level. This operation may add and remove ground to establish a grounded basin; later cave and river cuts still apply. Default priority -40 follows terrain profiles and precedes ordinary cuts. Container and ancestor scopes restrict terrain changes. Water meshes are separate render aids in authoring coordinates; callers apply instance transforms and residency. This does not simulate water volume, drainage, overflow or persistence.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="create_water_mesh" qualifiers="const">
+			<return type="ArrayMesh" />
+			<param index="0" name="bounds" type="AABB" default="AABB(0, 0, 0, 0, 0, 0)" />
+			<description>
+				Returns a horizontal water disk at center.y using the same seeded shoreline as the basin. A positive-volume [param bounds] clips triangles exactly in XZ, so adjacent loaded patches share an edge. Zero-volume bounds includes the entire lake; returns null if no geometry remains. Terrain scopes and instance transforms must also be respected by the caller.
+			</description>
+		</method>
+		<method name="conform_water_mesh" qualifiers="const">
+			<return type="ArrayMesh" />
+			<param index="0" name="mesh" type="ArrayMesh" />
+			<description>
+				Returns a copy of [param mesh] with water vertices inside the lake shoreline flattened 0.02 metres below its level to avoid overlapping coplanar render surfaces. Used for static river ribbons crossing a standing lake. Does not alter terrain, route rivers or validate arbitrary water-level conflicts. Vertex layout, indices and surface materials are retained.
+			</description>
+		</method>
+	</methods>
+	<members>
+		<member name="bank_width" type="float" setter="set_bank_width" getter="get_bank_width" default="24.0">
+			Outer blending distance along the smaller ellipse axis in metres. The larger-axis band scales with the ellipse. Must be greater than zero and at most 1024. Keeps the outer bank connected to incoming terrain.
+		</member>
+		<member name="center" type="Vector3" setter="set_center" getter="get_center" default="Vector3(0, 0, 0)">
+			Container-local lake center; Y specifies the standing water level independently of sea level. Terrain formation and water generation share this value.
+		</member>
+		<member name="depth" type="float" setter="set_depth" getter="get_depth" default="8.0">
+			Center-bed depth below water level in metres, greater than zero and at most 256. The floor rises toward the shoreline.
+		</member>
+		<member name="priority" type="int" setter="set_priority" getter="get_priority" overrides="WorldDecorator" default="-40" />
+		<member name="radius" type="Vector2" setter="set_radius" getter="get_radius" default="Vector2(40, 28)">
+			Elliptical basin radii in X and Z, each from 2 to 4096 metres. The water edge lies at 80 percent of these radii; the bank crest lies at the full radius.
+		</member>
+		<member name="seed" type="int" setter="set_seed" getter="get_seed" default="42">
+			Deterministic irregular-shoreline phase seed.
+		</member>
+		<member name="shore_height" type="float" setter="set_shore_height" getter="get_shore_height" default="2.0">
+			Bank crest height above the water level in metres, greater than zero and at most 128.
+		</member>
+		<member name="shore_noise" type="float" setter="set_shore_noise" getter="get_shore_noise" default="0.15">
+			Seeded angular shoreline distortion, from zero to 0.35. Zero produces an ellipse.
+		</member>
+	</members>
+</class>

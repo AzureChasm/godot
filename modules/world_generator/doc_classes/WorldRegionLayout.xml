@@ -5,7 +5,7 @@
 	</brief_description>
 	<description>
 		A parent layouter whose child [RegionContainer] nodes are reusable biome definitions. Selects children using [member RegionContainer.occurrence_weight] and evaluates immutable child programs in their assigned regions. Immediate child template bounds/placement are superseded by parent allocation; manually authored descendants keep relative scopes. Layouts can nest. An unbounded root still generates only the finite [TerrainView] request.
-		Voronoi mode starts with deterministic jittered fine sites. Each fine cell belongs to the nearest coarse region site; cells with a common owner form a region, which selects one biome and shares one template origin. [member cells_per_region] controls average region size independently of biome occurrence weights. One produces separate fine-cell regions. All sites and choices depend on coordinates and seed, not discovery order. Grouping is an approximate density target, not an exact cell-count or connectivity guarantee. Regions are extruded vertically; 3D cell allocation is not implemented.
+		Voronoi mode starts with deterministic jittered fine sites. Each fine cell belongs to the nearest coarse region site; cells with a common owner form a region, which selects one biome and shares one template origin. [member cells_per_region] controls average region size independently of biome occurrence weights. One produces separate fine-cell regions. All sites and choices depend on coordinates and seed, not discovery order. Nested choices and seeded decorators also include the parent instance identity; grouped cells with the same owner share that identity. Grouping is an approximate density target, not an exact cell-count or connectivity guarantee. Regions are extruded vertically; 3D cell allocation is not implemented.
 		Neighboring region fields blend using normalized compact proximity weights in Voronoi mode and smoothstep bands in grid mode. Fine-cell weights are combined per region before template evaluation, so internal cell borders do not restart the terrain pattern. Material IDs select the strongest region. Child programs execute in local priority order as one layout operation at priority -100; later ancestor decorators can modify the blended result.
 	</description>
 	<tutorials>
@@ -14,12 +14,19 @@
 		<method name="get_region_at" qualifiers="const">
 			<return type="Dictionary" />
 			<param index="0" name="world_position" type="Vector3" />
+			<param index="1" name="instance_seed" type="int" default="0" />
 			<description>
-				Queries current authoring settings, not the published snapshot. Returns cell (fine-cell Vector3i, Y=0), region (shared owner Vector3i), biome (child name), center (world-space region template origin), and size (nominal XZ span, not polygon bounds). Grid mode uses identical cell and region IDs. This diagnoses the hard owner, not the transition mixture; the center need not be inside the union's sampled visible portion. Returns an empty dictionary for no eligible child. Positions must be finite and within the prototype's 100000 metre local range.
+				Queries current authoring settings, not the published snapshot. Returns cell (fine-cell Vector3i, Y=0), region (shared owner Vector3i), biome (child name), center (world-space region template origin), size (nominal XZ span, not polygon bounds), and instance_seed (stable identity for operations in the selected instance). Grid mode uses identical cell and region IDs. For a nested layouter, pass the parent result instance_seed and transform the query into the selected child template coordinates (world point minus parent instance center plus child global position). Root queries use the default zero. This diagnoses the hard owner, not the transition mixture; the center need not be inside the union's sampled visible portion. Returns an empty dictionary for no eligible child. Positions must be finite and within the prototype's 100000 metre local range.
 			</description>
 		</method>
 	</methods>
 	<members>
+		<member name="boundary_noise" type="float" setter="set_boundary_noise" getter="get_boundary_noise" default="0.0">
+			Seeded smooth domain-warp strength as a fraction of cell size (0 to 0.4). Bends Voronoi ownership and transition boundaries together; ignored in grid mode. Shared by native sampling and region diagnostics. Zero preserves the original straight boundaries.
+		</member>
+		<member name="biome_edges" type="bool" setter="set_biome_edges" getter="has_biome_edges" default="false">
+			Pass an XZ interior-depth estimate to descendant terrain profiles. The nearest matching and foreign biome sites are compared across the local 5 by 5 site neighbourhood. Same-child selections are considered one continuous biome envelope, so their internal owner boundaries do not reset the depth. The estimate saturates at 0.35 times cell size times minimum axis scale; it is not an exact boundary distance or a global connected-component centroid/ID. Nested layouters inherit it unless they enable their own estimate. With one eligible biome, depth saturates everywhere. Owner identities used for local allocation and seeded operations remain distinct.
+		</member>
 		<member name="cell_jitter" type="float" setter="set_cell_jitter" getter="get_cell_jitter" default="1.0">
 			Voronoi site displacement from lattice centers, from 0 to 1. Maximum displacement is 0.4 cell widths per axis, keeping sites inside their own cells and the local search bounded. Applied to fine and coarse sites.
 		</member>

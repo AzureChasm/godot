@@ -10,8 +10,8 @@ config_version=5
 
 [application]
 
-config/name="World Generator — Unbounded World"
-run/main_scene="res://unbounded_world.tscn"
+config/name="World Generator — Cumulative Demos"
+run/main_scene="res://010_climate_coasts_and_drainage.tscn"
 config/features=PackedStringArray("4.8", "GL Compatibility")
 
 [display]

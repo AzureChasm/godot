@@ -30,6 +30,8 @@
 
 #include "region_container.h"
 
+#include "world_region_decorators.h"
+
 #include "core/object/class_db.h"
 
 void RegionContainer::_bind_methods() {
@@ -96,13 +98,38 @@ bool RegionContainer::collect_local_operations(Vector<TerrainOperation> &r_opera
 		}
 		scopes.push_back(AABB(area.position + transform.origin, area.size));
 	}
+	// Resolve root-to-leaf authoring metadata without mutating shared Resources.
+	Vector<const RegionContainer *> lineage;
+	for (const RegionContainer *node = this; node; node = Object::cast_to<RegionContainer>(node->get_parent())) {
+		if (lineage.size() >= 65) {
+			r_error = "Base elevation nesting exceeds 64 levels.";
+			return false;
+		}
+		lineage.push_back(node);
+	}
+	real_t base_elevation = 0;
+	for (int n = lineage.size() - 1; n >= 0; --n) {
+		for (int d = 0; d < lineage[n]->decorators.size(); ++d) {
+			Ref<WorldBaseElevationDecorator> base = lineage[n]->decorators[d];
+			if (base.is_valid() && base->is_enabled()) {
+				base_elevation = base->is_relative() ? base_elevation + base->get_elevation() : base->get_elevation();
+			}
+		}
+	}
 	for (int i = 0; i < decorators.size(); ++i) {
 		Ref<WorldDecorator> decorator = decorators[i];
 		if (decorator.is_null() || !decorator->is_enabled()) {
 			continue;
 		}
+		if (Object::cast_to<WorldBaseElevationDecorator>(decorator.ptr())) {
+			continue;
+		}
+		Vector3 compile_origin = transform.origin;
+		if (decorator->uses_base_elevation()) {
+			compile_origin.y += base_elevation;
+		}
 		TerrainOperation operation;
-		operation.modifier = decorator->compile(transform.origin, r_error);
+		operation.modifier = decorator->compile(compile_origin, r_error);
 		if (operation.modifier.is_null()) {
 			return false;
 		}

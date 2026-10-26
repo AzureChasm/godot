@@ -37,7 +37,7 @@
 		<method name="get_statistics" qualifiers="const">
 			<return type="Dictionary" />
 			<description>
-				Returns the last successful revision, request_id, bounds, chunk_count (16 metre spatial groups), chunk_size, section_count, section_cells, effective_spacing, column_samples, uniform_sections, mesh_sections, mesh_pieces, triangles and sample_payload_bytes. Includes worker_threads_used and generation_on_main_thread for diagnostics. worker_ms is worker wall time; sampling_cpu_ms and meshing_cpu_ms sum elapsed durations of concurrent section callbacks, including scheduling/preemption; they are not OS CPU-time counters and may exceed worker wall time. Legacy sampling_ms/meshing_ms keys alias those CPU sums. layout_ms measures main-thread configuration capture; publication_ms accumulates main-thread registration elapsed time; commit_ms measures the final swap; max_publication_step_ms records the largest registration batch/commit. generation_ms includes queueing and frame scheduling. Legacy uniform_chunks/mesh_chunks refer to sections. Payload excludes meshes, collision, metadata and simultaneous old/staging previews. Failed/cancelled jobs do not replace these statistics.
+				Returns the last successful revision, request_id, bounds, chunk_count (16 metre spatial groups), chunk_size, section_count, section_cells, effective_spacing, column_samples, uniform_sections, mesh_sections, mesh_pieces, triangles and sample_payload_bytes. Includes source_triangles (before LOD), lod_sections (sections actually simplified), lod_enabled and lod_origin. Includes worker_limit (requested count capped by the pool), worker_threads_used and generation_on_main_thread for diagnostics. worker_ms is worker wall time; sampling_cpu_ms and meshing_cpu_ms sum elapsed durations of concurrent section callbacks, including scheduling/preemption; they are not OS CPU-time counters and may exceed worker wall time. Legacy sampling_ms/meshing_ms keys alias those CPU sums. layout_ms measures main-thread configuration capture; publication_ms accumulates main-thread registration elapsed time; commit_ms measures the final swap; max_publication_step_ms records the largest registration batch/commit. generation_ms includes queueing and frame scheduling. Legacy uniform_chunks/mesh_chunks refer to sections. Payload excludes meshes, collision, metadata and simultaneous old/staging previews. heightmap contains optional export path/request_id/column counts/spacing; heightmap_error reports a nonfatal diagnostic failure; heightmap_ms measures coordinator extraction/write time and is included in worker_ms, but not section CPU sums. Failed/cancelled jobs do not replace these statistics.
 			</description>
 		</method>
 		<method name="is_generating" qualifiers="const">
@@ -62,6 +62,22 @@
 		</method>
 	</methods>
 	<members>
+		<member name="lod_near_error" type="float" setter="set_lod_near_error" getter="get_lod_near_error" default="0.0">
+			Optional absolute near-field mesh simplification error in metres, from zero to one. Zero preserves the unsimplified near mesh. Positive values target one quarter of source indices while retaining fixed boundary vertices and checking boundary topology. Error constraints may retain more triangles. Source samples and field evaluation remain unchanged; collision follows the resulting mesh. Requires lod_enabled.
+		</member>
+		<member name="lod_max_level" type="int" setter="set_lod_max_level" getter="get_lod_max_level" default="2">
+			Maximum distance simplification level, from one to four. Levels start at lod_distance and double their thresholds thereafter. Level N targets 1/4^N of source indices and uses lod_error multiplied by 2^(N-1). Fixed borders and geometric error may prevent reaching the target. Default two preserves earlier behavior.
+		</member>
+		<member name="heightmap_csv_path" type="String" setter="set_heightmap_csv_path" getter="get_heightmap_csv_path" default="&quot;&quot;">
+			Optional diagnostic CSV destination for the next generated candidate. Empty disables export. Use an absolute or user:// path. The worker coordinator extracts the highest air-to-solid crossing from completed cached samples before mesh LOD, with linear vertical interpolation. Hidden caves/overhangs are not represented. Files contain metadata and x,z,height,status rows; clipped-top/no-surface columns have no height. A temporary file is renamed after completion. Diagnostic failures are nonfatal to terrain and reported in statistics.heightmap_error. CSV metadata request_id identifies the candidate; a late cancellation during scene publication can retain a completed candidate CSV without publishing that preview. Await preview_generated and compare request IDs when coupling artifacts to a visible revision.
+		</member>
+		<member name="heightmap_stride" type="int" setter="set_heightmap_stride" getter="get_heightmap_stride" default="1">
+			Diagnostic horizontal stride in source-lattice cells, from 1 to 32. Effective spacing is stride times the prepared cache spacing. The export uses lattice points inside the exact requested bounds and scans at original vertical spacing. This does not change terrain generation or meshing resolution.
+		</member>
+  <member name="lod_enabled" type="bool" setter="set_lod_enabled" getter="is_lod_enabled" default="false">Enable worker-side mesh simplification by distance from lod_origin. Requires the meshoptimizer module; otherwise the request fails explicitly. Sampling remains full resolution. Collision uses the resulting mesh and is approximate in simplified sections. Captured per generation request; does not change existing previews continuously.</member>
+  <member name="lod_origin" type="Vector3" setter="set_lod_origin" getter="get_lod_origin" default="Vector3(0, 0, 0)">World-space player or camera-focus position used for LOD. Distance is measured to the nearest point of each section box in 3D.</member>
+  <member name="lod_distance" type="float" setter="set_lod_distance" getter="get_lod_distance" default="16.0">Full-detail distance in metres. Sections beyond it target one quarter of source triangles, and beyond twice it target one sixteenth. Boundary locking and error limits may prevent reaching those targets. Minimum 4 metres.</member>
+  <member name="lod_error" type="float" setter="set_lod_error" getter="get_lod_error" default="0.15">Maximum simplifier absolute geometric error in metres for the first reduced level; twice this for the second. Range 0.01 to 2. Topological borders remain fixed to preserve section seams. This is the simplifier error metric, not an exact signed-field or collision tolerance.</member>
 		<member name="auto_generate" type="bool" setter="set_auto_generate" getter="is_auto_generate" default="true">
 			Queues one preview generation when the scene starts running. Automatic generation is disabled in editor mode; the Generate Preview Inspector action remains available for an explicit editor preview. Property changes do not continuously rebuild terrain.
 		</member>
@@ -81,7 +97,7 @@
 			Path to the top [RegionContainer] for this view.
 		</member>
 		<member name="sample_budget" type="int" setter="set_sample_budget" getter="get_sample_budget" default="16000000">
-			Maximum candidate lattice samples including section halos, from 1000000 to 64000000; default 16000000. Requests also have a 4096-section limit. Exceeding either fails asynchronously before dense arrays are allocated, retaining the previous preview. This is not a total process-memory limit.
+			Maximum candidate lattice samples including section halos, from 1000000 to 64000000; default 16000000. Requests also have a 16384-section limit. Exceeding either fails asynchronously before dense arrays are allocated, retaining the previous preview. This is not a total process-memory limit.
 		</member>
 		<member name="sample_spacing" type="float" setter="set_sample_spacing" getter="get_sample_spacing" default="0.1">
 			Requested experimental grid spacing in metres, accepted from 0.025 to 2. The generated lattice is snapped to fit whole sections inside fixed 16 metre world chunks, at the requested spacing or finer. Read effective_spacing from statistics for the actual value. Smaller values increase cost and may exceed the preview budget. A chosen spacing does not guarantee preservation of every feature of that size.
@@ -95,8 +111,8 @@
 		<member name="triangle_budget" type="int" setter="set_triangle_budget" getter="get_triangle_budget" default="2000000">
 			Maximum generated triangles, from 10000 to 4000000; default 2000000. Workers cancel the candidate if aggregate section output exceeds this budget; no partial candidate is published.
 		</member>
-		<member name="worker_count" type="int" setter="set_worker_count" getter="get_worker_count" default="8">
-			Requested maximum parallel section tasks, from 1 to 16; default 8. Actual usage is limited by available worker-pool threads, work size and shared pool scheduling. A dedicated waiting coordinator is additional. One worker still keeps generation off the main thread. Captured per request.
+		<member name="worker_count" type="int" setter="set_worker_count" getter="get_worker_count">
+			Requested maximum parallel section tasks, at least 1. Defaults to the logical processor count reported by the operating system. Actual usage is limited by available worker-pool threads, work size and shared pool scheduling. Terrain group tasks use the full worker queue rather than the smaller low-priority allocation. Explicit project worker-pool limits remain honoured. A dedicated waiting coordinator is additional. One worker still keeps generation off the main thread. Captured per request.
 		</member>
 	</members>
 	<signals>

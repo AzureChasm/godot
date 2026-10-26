@@ -56,10 +56,49 @@ TerrainSample TerrainData::sample(const Vector3 &p_position) const {
 			}
 		}
 		if (in_scope) {
-			operation.modifier->apply(p_position, result.field, result.material);
+			TerrainEvaluationContext context;
+			context.world_position = p_position;
+			operation.modifier->apply_context(p_position, result.field, result.material, context);
 		}
 	}
 	return result;
+}
+
+void TerrainData::apply_operation_column(const TerrainOperation &p_operation, const Vector3 *p_positions, int p_count, float *r_fields, uint16_t *r_materials, const TerrainEvaluationContext &p_context) {
+	int first = 0, last = p_count;
+	for (const AABB &scope : p_operation.scopes) {
+		const Vector3 end = scope.get_end();
+		if (p_positions[0].x < scope.position.x || p_positions[0].x > end.x || p_positions[0].z < scope.position.z || p_positions[0].z > end.z) {
+			return;
+		}
+		while (first < last && p_positions[first].y < scope.position.y) {
+			++first;
+		}
+		while (last > first && p_positions[last - 1].y > end.y) {
+			--last;
+		}
+	}
+	if (first == last) {
+		return;
+	}
+	TerrainEvaluationContext context = p_context;
+	context.column_offset += first;
+	if (context.world_column) {
+		context.world_position = context.world_column[context.column_offset];
+	}
+	p_operation.modifier->apply_column(p_positions + first, last - first, r_fields + first, r_materials + first, context);
+}
+void TerrainData::sample_column(const Vector3 *p_positions, int p_count, float *r_fields, uint16_t *r_materials) const {
+	for (int i = 0; i < p_count; ++i) {
+		r_fields[i] = p_positions[i].y;
+		r_materials[i] = 1;
+	}
+	TerrainEvaluationContext context;
+	context.world_position = p_positions[0];
+	context.world_column = p_positions;
+	for (const TerrainOperation &operation : operations) {
+		apply_operation_column(operation, p_positions, p_count, r_fields, r_materials, context);
+	}
 }
 
 Vector3 TerrainData::normal(const Vector3 &p_position) const {
@@ -115,8 +154,8 @@ bool TerrainData::prepare(String &r_error) {
 	const int64_t section_count = int64_t(count.x) * count.y * count.z;
 	const int side = section_cells + 3;
 	const int sample_count = side * side * side;
-	if (section_count <= 0 || section_count > 4096) {
-		r_error = vformat("Preview requires %d sections; maximum is 4096. Reduce view distance or increase spacing.", section_count);
+	if (section_count <= 0 || section_count > 16384) {
+		r_error = vformat("Preview requires %d sections; maximum is 16384. Reduce view distance or increase spacing.", section_count);
 		return false;
 	}
 	if (section_count * sample_count > sample_budget) {
@@ -147,7 +186,7 @@ bool TerrainData::prepare(String &r_error) {
 			}
 		}
 	}
-	column_samples = column_profile ? sections.size() * side * side : 0;
+	column_samples = sections.size() * side * side;
 	return true;
 }
 
@@ -155,45 +194,35 @@ bool TerrainData::build_section(TerrainSection &section, String &r_error, const 
 	const int side = section_cells + 3;
 	const int sample_count = side * side * side;
 	const int cx = section.address.x, cy = section.address.y, cz = section.address.z;
-	const Vector3 end = bounds.get_end();
 	section.fields.resize(sample_count);
 	section.materials.resize(sample_count);
 	float *fields = section.fields.ptrw();
 	uint16_t *materials = section.materials.ptrw();
 	bool uniform = true;
-	Vector<TerrainSample> columns;
-	if (column_profile) {
-		columns.resize(side * side);
-		for (int z = -1; z <= section_cells + 1; ++z) {
-			if (p_cancel && p_cancel->is_set()) {
-				return false;
-			}
-			for (int x = -1; x <= section_cells + 1; ++x) {
-				columns.write[(x + 1) + side * (z + 1)] = sample(Vector3((cx * section_cells + x) * spacing, bounds.get_center().y, (cz * section_cells + z) * spacing));
-			}
-		}
-	}
+
 	for (int z = -1; z <= section_cells + 1; ++z) {
 		if (p_cancel && p_cancel->is_set()) {
 			return false;
 		}
-		for (int y = -1; y <= section_cells + 1; ++y) {
-			for (int x = -1; x <= section_cells + 1; ++x) {
-				// Compute from global integer sample coordinates on every section.
-				// Shared border samples therefore evaluate identically.
-				const Vector3 position = Vector3(cx * section_cells + x, cy * section_cells + y, cz * section_cells + z) * spacing;
+		for (int x = -1; x <= section_cells + 1; ++x) {
+			if (p_cancel && p_cancel->is_set()) {
+				return false;
+			}
+			Vector3 positions[TerrainModifier::MAX_COLUMN_SAMPLES];
+			float column_fields[TerrainModifier::MAX_COLUMN_SAMPLES];
+			uint16_t column_materials[TerrainModifier::MAX_COLUMN_SAMPLES];
+			for (int y = -1; y <= section_cells + 1; ++y) {
+				positions[y + 1] = Vector3(cx * section_cells + x, cy * section_cells + y, cz * section_cells + z) * spacing;
+			}
+			sample_column(positions, side, column_fields, column_materials);
+			for (int y = -1; y <= section_cells + 1; ++y) {
 				TerrainSample value;
-				if (column_profile && position.y >= bounds.position.y && position.y <= end.y) {
-					value = columns[(x + 1) + side * (z + 1)];
-					value.field += position.y - bounds.get_center().y;
-				} else {
-					value = sample(position);
-				}
+				value.field = column_fields[y + 1];
+				value.material = column_materials[y + 1];
 				if (!Math::is_finite(value.field)) {
 					r_error = "A decorator produced a non-finite terrain sample.";
 					return false;
 				}
-				// A narrow signed field: distant air/solid becomes compressible.
 				value.field = CLAMP(value.field, float(-4 * spacing), float(4 * spacing));
 				const int index = section.index(x, y, z);
 				fields[index] = value.field;
@@ -206,6 +235,7 @@ bool TerrainData::build_section(TerrainSection &section, String &r_error, const 
 			}
 		}
 	}
+
 	section.uniform = uniform;
 	if (uniform) {
 		section.fields.clear();
